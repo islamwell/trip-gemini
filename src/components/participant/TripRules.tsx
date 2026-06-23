@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../services/firebase';
-import { collection, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc, query, where, getDocs, limit } from 'firebase/firestore';
 import * as Icons from 'lucide-react';
 import { covenantData } from '../../data/covenant';
 
@@ -41,6 +41,7 @@ export const TripRules: React.FC = () => {
   const [signatureName, setSignatureName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [signatureData, setSignatureData] = useState<any>(null);
 
   // Calculate checklists progress
   const allItems = covenantData.flatMap(section => section.items);
@@ -58,8 +59,25 @@ export const TripRules: React.FC = () => {
         autoChecked[item.id] = true;
       });
       setCheckedItems(autoChecked);
+
+      // Fetch signature data to display
+      if (user) {
+        const fetchSignature = async () => {
+          try {
+            const sigRef = collection(db, 'signatures');
+            const q = query(sigRef, where('participantId', '==', user.uid), limit(1));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+              setSignatureData(snap.docs[0].data());
+            }
+          } catch (err) {
+            console.error("Failed to fetch signature", err);
+          }
+        };
+        fetchSignature();
+      }
     }
-  }, [hasSignedRules]);
+  }, [hasSignedRules, user]);
 
   const toggleItem = (itemId: string) => {
     if (hasSignedRules) return; // Disallow toggle after signing
@@ -86,14 +104,18 @@ export const TripRules: React.FC = () => {
     setError('');
 
     let ipAddress = 'unknown';
+    let locationStr = 'Unknown Location';
     try {
-      const res = await fetch('https://api64.ipify.org?format=json');
+      const res = await fetch('https://ipapi.co/json/');
       if (res.ok) {
         const data = await res.json();
         ipAddress = data.ip || 'unknown';
+        if (data.city && data.country_name) {
+          locationStr = `${data.city}, ${data.country_name}`;
+        }
       }
     } catch (ipErr) {
-      console.warn('Failed to retrieve IP address:', ipErr);
+      console.warn('Failed to retrieve IP/Location:', ipErr);
     }
 
     try {
@@ -103,6 +125,7 @@ export const TripRules: React.FC = () => {
         timestamp: serverTimestamp(),
         signedAt: new Date().toISOString(),
         ipAddress: ipAddress,
+        location: locationStr,
       });
 
       // Update participant's document as single source of truth
@@ -321,14 +344,41 @@ export const TripRules: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="mt-16 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-8 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800 flex flex-col md:flex-row items-center gap-5 text-center md:text-left justify-center shadow-lg">
-          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center shrink-0">
-            <Icons.Check className="w-8 h-8 text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
+        <div className="mt-16 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-8 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800 flex flex-col items-center gap-6 text-center shadow-lg animate-slide-up">
+          <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center shrink-0">
+            <Icons.Check className="w-10 h-10 text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mb-1">Thank you!</h3>
-            <p className="text-slate-600 dark:text-slate-400 text-base">You have successfully signed and agreed to the trip covenant.</p>
+            <h3 className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mb-2">Covenant Signed!</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-lg">JazakAllah Khair. You have officially agreed to the trip rules.</p>
           </div>
+          
+          {signatureData && (
+            <div className="w-full max-w-lg mt-4 bg-white/60 dark:bg-slate-800/60 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 text-left space-y-3">
+              <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">Digital Signature Record</h4>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-slate-500">Participant Name</p>
+                  <p className="font-semibold text-slate-800 dark:text-slate-200">{signatureData.participantName}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Date & Time</p>
+                  <p className="font-semibold text-slate-800 dark:text-slate-200">
+                    {signatureData.signedAt ? new Date(signatureData.signedAt).toLocaleString() : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">IP Address</p>
+                  <p className="font-mono text-sm font-medium text-slate-800 dark:text-slate-200">{signatureData.ipAddress}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Location</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-200">{signatureData.location || 'Unknown'}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
