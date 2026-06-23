@@ -1,0 +1,10 @@
+{
+  "projectId": "trip-gemini-20260623",
+  "appId": "1:959041102974:web:04e685c422f43ddb30a42f",
+  "storageBucket": "trip-gemini-20260623.firebasestorage.app",
+  "apiKey": "AIzaSyChDO5o6gA5lLWmtO1D2_Ik8FsOP-HUiso",
+  "authDomain": "trip-gemini-20260623.firebaseapp.com",
+  "messagingSenderId": "959041102974",
+  "projectNumber": "959041102974",
+  "version": "2"
+}

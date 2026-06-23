@@ -1,0 +1,479 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { Link } from 'react-router-dom';
+import { ScrollText, Map, MessageSquare, Wallet, CheckSquare, Bell, Volume2, VolumeX, UserCheck, ShieldCheck } from 'lucide-react';
+import { db } from '../../services/firebase';
+import { doc, onSnapshot, collection, query, orderBy, limit } from 'firebase/firestore';
+import { resolveStops, defaultItinerary } from './Itinerary';
+
+interface ParticipantProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  hasSignedRules?: boolean;
+  duty?: string;
+}
+
+interface NotificationMsg {
+  id: string;
+  title: string;
+  message: string;
+  timestamp?: any;
+}
+
+export const Dashboard: React.FC = () => {
+  const { user, role } = useAuth();
+  const { t } = useLanguage();
+
+  // Real-time states
+  const [profile, setProfile] = useState<ParticipantProfile | null>(null);
+  const [allParticipants, setAllParticipants] = useState<ParticipantProfile[]>([]);
+  const [dbItinerary, setDbItinerary] = useState<Record<string, any[]>>(defaultItinerary);
+  const [latestNotification, setLatestNotification] = useState<NotificationMsg | null>(null);
+  const [showNotificationBanner, setShowNotificationBanner] = useState(false);
+  const [showDutiesList, setShowDutiesList] = useState(false);
+
+  // Alarm states
+  const [audioEnabled, setAudioEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('alarm_audio_enabled') !== 'false';
+  });
+  const [notifEnabled, setNotifEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('alarm_notif_enabled') === 'true';
+  });
+  const [upcomingAlarms, setUpcomingAlarms] = useState<any[]>([]);
+  const triggeredAlarmsRef = useRef<Set<string>>(new Set());
+
+  // Subscribe to real-time databases
+  useEffect(() => {
+    if (!user) return;
+
+    // 1. Participant profile (for individual duty)
+    const unsubProfile = onSnapshot(doc(db, 'participants', user.uid), (docSnap) => {
+      if (docSnap.exists()) {
+        setProfile({ id: docSnap.id, ...docSnap.data() } as ParticipantProfile);
+      }
+    });
+
+    // 2. All participants (for general duty list)
+    const unsubAllParticipants = onSnapshot(collection(db, 'participants'), (snap) => {
+      const list: ParticipantProfile[] = [];
+      snap.forEach((docSnap) => {
+        list.push({ id: docSnap.id, ...docSnap.data() } as ParticipantProfile);
+      });
+      setAllParticipants(list);
+    });
+
+    // 3. Itinerary stops (for alarm calculations)
+    const unsubItinerary = onSnapshot(collection(db, 'itinerary'), (snap) => {
+      const data: Record<string, any[]> = {};
+      snap.forEach((docSnap) => {
+        data[docSnap.id] = docSnap.data().stops;
+      });
+      if (Object.keys(data).length === 4) {
+        setDbItinerary(data);
+      }
+    });
+
+    // 4. Latest broadcast notification
+    const qNotif = query(collection(db, 'notifications'), orderBy('timestamp', 'desc'), limit(1));
+    const unsubNotifications = onSnapshot(qNotif, (snap) => {
+      if (!snap.empty) {
+        const docSnap = snap.docs[0];
+        const notifData = { id: docSnap.id, ...docSnap.data() } as NotificationMsg;
+        
+        // Check if this notification has been dismissed locally
+        const dismissed = localStorage.getItem(`dismissed_notif_${docSnap.id}`) === 'true';
+        if (!dismissed) {
+          setLatestNotification(notifData);
+          setShowNotificationBanner(true);
+        }
+      }
+    });
+
+    return () => {
+      unsubProfile();
+      unsubAllParticipants();
+      unsubItinerary();
+      unsubNotifications();
+    };
+  }, [user]);
+
+  // Sync alarm settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('alarm_audio_enabled', String(audioEnabled));
+  }, [audioEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('alarm_notif_enabled', String(notifEnabled));
+    if (notifEnabled && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, [notifEnabled]);
+
+  // Determine current active trip day (Oslo time base)
+  const getActiveTripDay = () => {
+    const now = new Date();
+    const dateString = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    if (['thursday', 'friday', 'saturday', 'sunday'].includes(dateString)) {
+      return dateString;
+    }
+    return 'thursday'; // Default/mock fallback during development
+  };
+
+  // Sound Alarm Chime generator (Web Audio Synth - ding-dong sound)
+  const playAlarmSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+
+      // First chime: 880Hz (A5)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(880, ctx.currentTime);
+      gain1.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start();
+      osc1.stop(ctx.currentTime + 0.45);
+
+      // Second chime: 660Hz (E5) at 0.28s delay
+      setTimeout(() => {
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(660, ctx.currentTime);
+        gain2.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start();
+        osc2.stop(ctx.currentTime + 0.55);
+      }, 280);
+    } catch (err) {
+      console.error("Synthesizer playback error:", err);
+    }
+  };
+
+  // Fire a Browser Notification
+  const triggerNotification = (title: string, body: string) => {
+    if (notifEnabled && Notification.permission === 'granted') {
+      new Notification(title, {
+        body,
+        icon: '/favicon.svg'
+      });
+    }
+  };
+
+  // Test Alarm triggers instantly
+  const handleTestAlarm = () => {
+    playAlarmSound();
+    triggerNotification("🔔 Alarm Test", "This is a test notification from the road trip alarm chimer!");
+    alert("Test alarm chime triggered! Verify audio sound and notification popups.");
+  };
+
+  // Alarm clock monitor loop
+  useEffect(() => {
+    const activeDay = getActiveTripDay();
+    const stopsRaw = dbItinerary[activeDay] || defaultItinerary[activeDay];
+    const resolvedStopsList = resolveStops(activeDay, stopsRaw);
+
+    const checkAlarms = () => {
+      const now = new Date();
+      const currentHours = now.getHours();
+      const currentMins = now.getMinutes();
+
+      // Formulate alarms list for display
+      const alarmsList = resolvedStopsList
+        .filter(stop => stop.type === 'location' || stop.type === 'prayer')
+        .map(stop => {
+          const [hStr, mStr] = stop.time.split(':');
+          const stopHours = parseInt(hStr, 10);
+          const stopMins = parseInt(mStr, 10);
+          
+          // Calculate alert time (10 minutes before)
+          let alertHours = stopHours;
+          let alertMins = stopMins - 10;
+          if (alertMins < 0) {
+            alertMins += 60;
+            alertHours = (alertHours - 1 + 24) % 24;
+          }
+
+          const alertTimeStr = `${String(alertHours).padStart(2, '0')}:${String(alertMins).padStart(2, '0')}`;
+          return {
+            label: stop.label,
+            time: stop.time,
+            type: stop.type,
+            alertTime: alertTimeStr,
+            stopHours,
+            stopMins,
+            alertHours,
+            alertMins
+          };
+        });
+
+      setUpcomingAlarms(alarmsList);
+
+      // Perform checks against current clock
+      alarmsList.forEach(alarm => {
+        const alarmKey = `${alarm.label}-${alarm.time}`;
+        if (currentHours === alarm.alertHours && currentMins === alarm.alertMins) {
+          // If we haven't triggered this alarm in the current session
+          if (!triggeredAlarmsRef.current.has(alarmKey)) {
+            triggeredAlarmsRef.current.add(alarmKey);
+            
+            // Trigger effects
+            if (audioEnabled) playAlarmSound();
+            triggerNotification(
+              "⚠️ Upcoming Trip Event (10 mins)",
+              `"${alarm.label}" scheduled at ${alarm.time}. Please prepare!`
+            );
+          }
+        }
+      });
+    };
+
+    // Run check immediately and start 10s interval
+    checkAlarms();
+    const interval = setInterval(checkAlarms, 10000);
+
+    return () => clearInterval(interval);
+  }, [dbItinerary, audioEnabled, notifEnabled]);
+
+  const dismissNotification = () => {
+    if (latestNotification) {
+      localStorage.setItem(`dismissed_notif_${latestNotification.id}`, 'true');
+      setShowNotificationBanner(false);
+    }
+  };
+
+  const cards = [
+    {
+      title: t('nav.rules'),
+      description: 'Review and sign the mandatory trip rules.',
+      icon: ScrollText,
+      to: '/rules',
+      color: 'bg-blue-500',
+    },
+    {
+      title: 'Itinerary & Stops',
+      description: 'View the route, breaks, and prayer times.',
+      icon: Map,
+      to: '/itinerary',
+      color: 'bg-emerald-500',
+    },
+    {
+      title: t('nav.finances'),
+      description: 'Check your payment status and trip costs.',
+      icon: Wallet,
+      to: '/finances',
+      color: 'bg-violet-500',
+    },
+    {
+      title: t('nav.checklist'),
+      description: 'Check your packing list and where to buy items.',
+      icon: CheckSquare,
+      to: '/checklist',
+      color: 'bg-rose-500',
+    },
+    {
+      title: t('nav.complaints'),
+      description: 'Submit concerns privately to the handler.',
+      icon: MessageSquare,
+      to: '/complaints',
+      color: 'bg-amber-500',
+    }
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Broadcast Notifications Alert Banner */}
+      {showNotificationBanner && latestNotification && (
+        <div className="glass bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/30 p-5 rounded-3xl flex flex-col sm:flex-row gap-4 items-start justify-between shadow-sm animate-pulse">
+          <div className="flex gap-3">
+            <div className="w-10 h-10 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
+              <Bell className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">🚨 BROADCAST: {latestNotification.title}</span>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">{latestNotification.message}</p>
+            </div>
+          </div>
+          <button
+            onClick={dismissNotification}
+            className="text-xs font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-500/35 transition-colors self-end sm:self-center"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-900 dark:from-primary-400 dark:to-primary-200">Dashboard</h1>
+          <p className="text-slate-500 mt-2">Welcome back, {user?.displayName || 'Participant'}.</p>
+        </div>
+        
+        {role === 'admin' && (
+          <Link to="/admin" className="inline-flex items-center gap-1.5 justify-center px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-medium transition-transform hover:scale-105">
+            <ShieldCheck className="w-4 h-4" /> Admin Panel
+          </Link>
+        )}
+      </div>
+
+      {/* Duty Assignment Banner */}
+      <div className="glass p-6 rounded-3xl border border-card-border flex flex-col md:flex-row gap-6 items-start md:items-center justify-between animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <div className="flex gap-4 items-center">
+          <div className="w-14 h-14 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-2xl flex items-center justify-center shrink-0">
+            <UserCheck className="w-8 h-8" />
+          </div>
+          <div>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Assigned Trip Duty</span>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-0.5">
+              {profile?.duty ? profile.duty : 'General Help / Passenger'}
+            </h2>
+          </div>
+        </div>
+        
+        <button
+          onClick={() => setShowDutiesList(!showDutiesList)}
+          className="text-sm font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-5 py-2.5 rounded-xl transition-all"
+        >
+          {showDutiesList ? 'Hide Assigned Roles' : 'View Passenger Roles'}
+        </button>
+      </div>
+
+      {/* Passenger Roles Collapsed Grid */}
+      {showDutiesList && (
+        <div className="glass p-6 rounded-3xl border border-card-border animate-slide-down">
+          <h3 className="font-bold text-lg mb-4">👥 Trip Duty Allocations</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {allParticipants.map((p) => (
+              <div key={p.id} className="bg-slate-50/50 dark:bg-slate-800/20 border border-card-border p-4 rounded-xl flex justify-between items-center">
+                <div>
+                  <span className="font-bold block text-slate-800 dark:text-slate-200 text-sm">{p.name}</span>
+                  <span className="text-[11px] text-slate-400 font-mono">{p.email}</span>
+                </div>
+                <span className="text-xs font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-full text-right max-w-[120px] truncate">
+                  {p.duty || 'General Help'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Alarm Settings & Countdown Widget */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        <div className="lg:col-span-2 glass p-6 rounded-3xl border border-card-border flex flex-col justify-between space-y-6">
+          <div>
+            <h3 className="font-bold text-lg flex items-center gap-1.5">
+              ⏰ Trip Departure & Prayer Alarms
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Warning chimes play exactly **10 minutes before** major departures and scheduled prayer times on the road.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={() => setAudioEnabled(!audioEnabled)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
+                audioEnabled ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
+              }`}
+            >
+              {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              {audioEnabled ? 'Audio Chime Enabled' : 'Audio Chime Muted'}
+            </button>
+
+            <button
+              onClick={() => setNotifEnabled(!notifEnabled)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
+                notifEnabled ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
+              }`}
+            >
+              {notifEnabled ? '🔔 Notifications Active' : '🔕 Notifications Off'}
+            </button>
+
+            <button
+              onClick={handleTestAlarm}
+              className="px-4 py-2.5 border border-card-border rounded-xl font-bold text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200"
+            >
+              🔊 Test Sound & Notification
+            </button>
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-3xl border border-card-border flex flex-col justify-between">
+          <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Upcoming Alarms Today ({getActiveTripDay().toUpperCase()})</h4>
+          
+          <div className="mt-4 space-y-3 max-h-[140px] overflow-y-auto pr-1">
+            {upcomingAlarms.length === 0 ? (
+              <p className="text-xs text-slate-400 italic">No alerts scheduled for today.</p>
+            ) : (
+              upcomingAlarms.slice(0, 3).map((alarm, idx) => (
+                <div key={idx} className="flex justify-between items-center border-b border-card-border pb-2 last:border-b-0 text-xs">
+                  <div>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-[150px]">{alarm.label}</span>
+                    <span className="text-[10px] text-slate-400">Warning at {alarm.alertTime}</span>
+                  </div>
+                  <span className="font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold px-2 py-0.5 rounded">
+                    {alarm.time}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Grid Menu Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {cards.map((card, idx) => {
+          const Icon = card.icon;
+          return (
+            <Link 
+              key={idx} 
+              to={card.to}
+              className="glass p-6 rounded-3xl flex items-start gap-5 hover-lift group animate-slide-up"
+              style={{ animationDelay: `${0.4 + (idx * 0.1)}s` }}
+            >
+              <div className={`${card.color} w-14 h-14 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-${card.color.split('-')[1]}-500/40 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                <Icon className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-1 group-hover:text-primary-600 transition-colors">{card.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{card.description}</p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+      
+      {/* Trip Progress Bar */}
+      <div className="glass p-6 rounded-2xl mt-8">
+        <h2 className="text-xl font-bold mb-4">Trip Progress</h2>
+        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-4 overflow-hidden relative">
+          <div className="bg-primary-500 h-full w-1/4 rounded-full relative z-10"></div>
+          {/* Stops markers */}
+          <div className="absolute top-0 w-full h-full flex justify-between px-2 items-center z-20">
+            <div className="w-2 h-2 rounded-full bg-white shadow-sm"></div>
+            <div className="w-2 h-2 rounded-full bg-white shadow-sm"></div>
+            <div className="w-2 h-2 rounded-full bg-white shadow-sm"></div>
+            <div className="w-2 h-2 rounded-full bg-white shadow-sm"></div>
+          </div>
+        </div>
+        <div className="flex justify-between text-xs text-slate-500 font-medium uppercase tracking-wider mt-3">
+          <span>Oslo</span>
+          <span>Geilo</span>
+          <span>Stryn</span>
+          <span>Geiranger</span>
+        </div>
+      </div>
+    </div>
+  );
+};
