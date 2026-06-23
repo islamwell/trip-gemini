@@ -24,7 +24,12 @@ const ProtectedRoute = ({
 
   if (loading) return <div className="flex items-center justify-center min-h-[50vh]">Loading...</div>;
   if (!user) return <Navigate to="/login" replace />;
-  if (requiredRole && role !== requiredRole && role !== 'admin') return <Navigate to="/" replace />; // Admins can access everything
+  if (requiredRole && role !== requiredRole && role !== 'admin') {
+    if (requiredRole === 'admin') {
+      return <Navigate to="/admin-login" replace />;
+    }
+    return <Navigate to="/" replace />;
+  }
 
   // Enforce Onboarding Flow for non-admins (or admins acting as participants)
   // Admins can probably bypass, but let's make everyone sign the rules for compliance.
@@ -72,6 +77,7 @@ const Complaints = React.lazy(() => import('./components/participant/Complaints'
 const Welcome = React.lazy(() => import('./components/participant/Welcome').then(m => ({ default: m.Welcome })));
 const Checklist = React.lazy(() => import('./components/participant/Checklist').then(m => ({ default: m.Checklist })));
 const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AdminLogin = React.lazy(() => import('./components/admin/AdminLogin').then(m => ({ default: m.AdminLogin })));
 import { ThemeProvider } from './contexts/ThemeContext';
 
 // Main App Component
@@ -160,6 +166,14 @@ function AppContent() {
           <ProtectedRoute requiredRole="admin">
             <AuthenticatedLayout>
               <AdminDashboard />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin-login" element={
+          <ProtectedRoute requireLanguage={false} requireRules={false}>
+            <AuthenticatedLayout>
+              <AdminLogin />
             </AuthenticatedLayout>
           </ProtectedRoute>
         } />

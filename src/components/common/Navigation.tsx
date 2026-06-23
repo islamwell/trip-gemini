@@ -2,11 +2,9 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Home, ScrollText, Wallet, MessageSquare, Map, CheckSquare, ShieldCheck } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
 
 export const Navigation: React.FC = () => {
   const { t } = useLanguage();
-  const { role } = useAuth();
 
   const navItems = [
     { to: '/', icon: Home, label: t('nav.home') },
@@ -17,9 +15,8 @@ export const Navigation: React.FC = () => {
     { to: '/complaints', icon: MessageSquare, label: t('nav.complaints') },
   ];
 
-  if (role === 'admin') {
-    navItems.push({ to: '/admin', icon: ShieldCheck, label: 'Admin' });
-  }
+  // Always show admin tab. Non-admins will be prompted for the password.
+  navItems.push({ to: '/admin', icon: ShieldCheck, label: 'Admin' });
 
   return (
     <>
