@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Palette, Bell, Check } from 'lucide-react';
+import { Palette, Bell } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
