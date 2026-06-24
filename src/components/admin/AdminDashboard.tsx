@@ -5,6 +5,7 @@ import { collection, onSnapshot, query, addDoc, getDocs, doc, setDoc, deleteDoc,
 import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard, Trash2, Settings } from 'lucide-react';
 import { calculateBudget } from '../../data/finances';
 import { useToast } from '../../contexts/ToastContext';
+import { Finances } from '../participant/Finances';
 
 interface ParticipantProfile {
   id: string;
@@ -66,7 +67,7 @@ export const AdminDashboard: React.FC = () => {
   const [maxPassengers, setMaxPassengers] = useState(17);
   
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'complaints' | 'duties' | 'itinerary'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'budget' | 'duties' | 'itinerary' | 'complaints'>('users');
 
   // Itinerary Edit Form State
   const [selectedDay, setSelectedDay] = useState<string>('thursday');
@@ -404,6 +405,14 @@ export const AdminDashboard: React.FC = () => {
           Payments Track
         </button>
         <button
+          onClick={() => setActiveTab('budget')}
+          className={`px-6 py-3 font-semibold text-sm transition-all border-b-2 whitespace-nowrap ${
+            activeTab === 'budget' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Budget Breakdown
+        </button>
+        <button
           onClick={() => setActiveTab('duties')}
           className={`px-6 py-3 font-semibold text-sm transition-all border-b-2 whitespace-nowrap ${
             activeTab === 'duties' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
@@ -534,6 +543,10 @@ export const AdminDashboard: React.FC = () => {
               })}
             </tbody>
           </table>
+        )}
+
+        {activeTab === 'budget' && (
+          <Finances />
         )}
 
         {activeTab === 'duties' && (

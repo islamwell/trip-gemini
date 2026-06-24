@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
-import { ScrollText, Map, MessageSquare, Wallet, CheckSquare, Bell, Volume2, VolumeX, UserCheck } from 'lucide-react';
+import { ScrollText, Map, MessageSquare, CheckSquare, Bell, Volume2, VolumeX, UserCheck } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { doc, onSnapshot, collection, query, orderBy, limit } from 'firebase/firestore';
 import { resolveStops, defaultItinerary } from './Itinerary';
@@ -270,13 +270,7 @@ export const Dashboard: React.FC = () => {
       to: '/itinerary',
       color: 'bg-emerald-500',
     },
-    {
-      title: t('nav.finances'),
-      description: 'Check your payment status and trip costs.',
-      icon: Wallet,
-      to: '/finances',
-      color: 'bg-violet-500',
-    },
+
     {
       title: t('nav.checklist'),
       description: 'Check your packing list and where to buy items.',

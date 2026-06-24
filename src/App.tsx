@@ -75,7 +75,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 const Dashboard = React.lazy(() => import('./components/participant/Dashboard').then(m => ({ default: m.Dashboard })));
 const TripRules = React.lazy(() => import('./components/participant/TripRules').then(m => ({ default: m.TripRules })));
 const Itinerary = React.lazy(() => import('./components/participant/Itinerary').then(m => ({ default: m.Itinerary })));
-const Finances = React.lazy(() => import('./components/participant/Finances').then(m => ({ default: m.Finances })));
+
 const Complaints = React.lazy(() => import('./components/participant/Complaints').then(m => ({ default: m.Complaints })));
 const Welcome = React.lazy(() => import('./components/participant/Welcome').then(m => ({ default: m.Welcome })));
 const Checklist = React.lazy(() => import('./components/participant/Checklist').then(m => ({ default: m.Checklist })));
@@ -152,13 +152,6 @@ function AppContent() {
           </ProtectedRoute>
         } />
 
-        <Route path="/finances" element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Finances />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        } />
 
         <Route path="/complaints" element={
           <ProtectedRoute>
