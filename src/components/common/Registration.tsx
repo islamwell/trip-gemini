@@ -187,21 +187,31 @@ const CountdownTimer = () => {
     return () => clearInterval(timer);
   }, [targetDate]);
 
+  const hasTitle = !!t('countdown.title');
+
   return (
     <div className="mb-6 text-center bg-white/30 dark:bg-slate-900/30 p-4 rounded-2xl border border-card-border shadow-inner">
-      <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">{t('countdown.title', 'Registration Deadline')}</h3>
-      <div dir="ltr" className="flex justify-center gap-4 sm:gap-6">
+      {hasTitle && (
+        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">
+          {t('countdown.title')}
+        </h3>
+      )}
+      <div dir="ltr" className="flex justify-center mx-auto w-fit gap-4 sm:gap-6">
         {[
-          { label: t('countdown.days', 'Days'), value: timeLeft.days },
-          { label: t('countdown.hours', 'Hours'), value: timeLeft.hours },
-          { label: t('countdown.mins', 'Mins'), value: timeLeft.minutes },
-          { label: t('countdown.secs', 'Secs'), value: timeLeft.seconds },
+          { key: 'days', label: t('countdown.days', 'Days'), value: timeLeft.days },
+          { key: 'hours', label: t('countdown.hours', 'Hours'), value: timeLeft.hours },
+          { key: 'mins', label: t('countdown.mins', 'Mins'), value: timeLeft.minutes },
+          { key: 'secs', label: t('countdown.secs', 'Secs'), value: timeLeft.seconds },
         ].map(item => (
-          <div key={item.label} className="flex flex-col items-center min-w-[60px] sm:min-w-[70px]">
+          <div key={item.key} className="flex flex-col items-center min-w-[60px] sm:min-w-[70px]">
             <span className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-b from-red-500 to-orange-500 drop-shadow-sm">
               {item.value.toString().padStart(2, '0')}
             </span>
-            <span className="text-xs font-medium text-slate-400 mt-1 uppercase">{item.label}</span>
+            {item.label && (
+              <span className="text-xs font-medium text-slate-400 mt-1 uppercase">
+                {item.label}
+              </span>
+            )}
           </div>
         ))}
       </div>
