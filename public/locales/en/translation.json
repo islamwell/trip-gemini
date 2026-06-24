@@ -184,5 +184,50 @@
     "vipps_modal_account": "Bank Account",
     "vipps_modal_close": "Close",
     "vipps_modal_sms": "Send SMS Link"
+  },
+  "countdown": {
+    "title": "Registration Deadline",
+    "days": "Days",
+    "hours": "Hours",
+    "mins": "Mins",
+    "secs": "Secs"
+  },
+  "registration": {
+    "title": "Title",
+    "role": "Volunteer Role",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "firstPlaceholder": "John",
+    "lastPlaceholder": "Doe",
+    "phone": "Phone",
+    "email": "Email (Opt)",
+    "passcode": "Passcode (Opt 4-12 digits)",
+    "passcodeHint": "Used to log back in quickly on a new device.",
+    "submit": "Register Now",
+    "toggleLogin": "Already have an account? Log In",
+    "toggleRegister": "Don't have an account? Register",
+    "phoneError": "Please include your country code starting with + (e.g. +47).",
+    "identifierError": "Please provide either a Phone Number or an Email.",
+    "failed": "Registration failed."
+  },
+  "login": {
+    "title": "Welcome Back",
+    "identifier": "Phone or Email",
+    "identifierPlaceholder": "Phone number or Email",
+    "passcode": "Passcode",
+    "passcodePlaceholder": "Leave blank if none",
+    "submit": "Log In",
+    "forgotPasscode": "Forgot Passcode? Login with SMS",
+    "smsLogin": "SMS Login",
+    "phone": "Phone Number",
+    "sendSms": "Send SMS Code",
+    "verifySms": "Verify SMS",
+    "sixDigit": "6-Digit Code",
+    "verifySubmit": "Verify & Login",
+    "backToPasscode": "Back to Passcode Login",
+    "phoneRequired": "Please enter your phone number.",
+    "smsSent": "SMS code sent!",
+    "smsFailed": "Failed to send SMS",
+    "invalidSms": "Invalid SMS code"
   }
 }

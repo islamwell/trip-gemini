@@ -184,5 +184,50 @@
     "vipps_modal_account": "Bankkonto",
     "vipps_modal_close": "Lukk",
     "vipps_modal_sms": "Send SMS-lenke"
+  },
+  "countdown": {
+    "title": "Registreringsfrist",
+    "days": "Dager",
+    "hours": "Timer",
+    "mins": "Min",
+    "secs": "Sek"
+  },
+  "registration": {
+    "title": "Tittel",
+    "role": "Frivillig rolle",
+    "firstName": "Fornavn",
+    "lastName": "Etternavn",
+    "firstPlaceholder": "Ola",
+    "lastPlaceholder": "Nordmann",
+    "phone": "Telefon",
+    "email": "E-post (valgfritt)",
+    "passcode": "Passkode (4-12 siffer, valgfritt)",
+    "passcodeHint": "Brukes for rask innlogging på en ny enhet.",
+    "submit": "Registrer deg nå",
+    "toggleLogin": "Har du allerede en konto? Logg inn",
+    "toggleRegister": "Har du ikke konto? Registrer deg",
+    "phoneError": "Vennligst inkluder landskode som starter med + (f.eks. +47).",
+    "identifierError": "Vennligst oppgi enten telefonnummer eller e-post.",
+    "failed": "Registrering feilet."
+  },
+  "login": {
+    "title": "Velkommen tilbake",
+    "identifier": "Telefon eller e-post",
+    "identifierPlaceholder": "Telefonnummer eller e-post",
+    "passcode": "Passkode",
+    "passcodePlaceholder": "La stå blank hvis ingen",
+    "submit": "Logg inn",
+    "forgotPasscode": "Glemt passkode? Logg inn med SMS",
+    "smsLogin": "SMS Innlogging",
+    "phone": "Telefonnummer",
+    "sendSms": "Send SMS-kode",
+    "verifySms": "Bekreft SMS",
+    "sixDigit": "6-sifret kode",
+    "verifySubmit": "Bekreft og logg inn",
+    "backToPasscode": "Tilbake til passkode-innlogging",
+    "phoneRequired": "Vennligst skriv inn telefonnummeret ditt.",
+    "smsSent": "SMS-kode sendt!",
+    "smsFailed": "Klarte ikke å sende SMS",
+    "invalidSms": "Ugyldig SMS-kode"
   }
 }

@@ -138,5 +138,50 @@
     "vipps_modal_account": "بینک اکاؤنٹ",
     "vipps_modal_close": "بند کریں",
     "vipps_modal_sms": "ایس ایم ایس لنک بھیجیں"
+  },
+  "countdown": {
+    "title": "رجسٹریشن کی آخری تاریخ",
+    "days": "دن",
+    "hours": "گھنٹے",
+    "mins": "منٹ",
+    "secs": "سیکنڈ"
+  },
+  "registration": {
+    "title": "عنوان",
+    "role": "رضاکارانہ کردار",
+    "firstName": "پہلا نام",
+    "lastName": "آخری نام",
+    "firstPlaceholder": "علی",
+    "lastPlaceholder": "خان",
+    "phone": "فون",
+    "email": "ای میل (اختیاری)",
+    "passcode": "پاس کوڈ (4 سے 12 ہندسے، اختیاری)",
+    "passcodeHint": "نئی ڈیوائس پر جلدی لاگ ان کرنے کے لیے۔",
+    "submit": "ابھی رجسٹر کریں",
+    "toggleLogin": "پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں",
+    "toggleRegister": "اکاؤنٹ نہیں ہے؟ رجسٹر کریں",
+    "phoneError": "براہ کرم کنٹری کوڈ (مثلاً +47) کے ساتھ فون نمبر درج کریں۔",
+    "identifierError": "براہ کرم فون نمبر یا ای میل فراہم کریں۔",
+    "failed": "رجسٹریشن ناکام ہو گئی۔"
+  },
+  "login": {
+    "title": "خوش آمدید",
+    "identifier": "فون یا ای میل",
+    "identifierPlaceholder": "فون نمبر یا ای میل",
+    "passcode": "پاس کوڈ",
+    "passcodePlaceholder": "اگر نہیں ہے تو خالی چھوڑ دیں",
+    "submit": "لاگ ان",
+    "forgotPasscode": "پاس کوڈ بھول گئے؟ ایس ایم ایس کے ذریعے لاگ ان کریں",
+    "smsLogin": "ایس ایم ایس لاگ ان",
+    "phone": "فون نمبر",
+    "sendSms": "ایس ایم ایس کوڈ بھیجیں",
+    "verifySms": "ایس ایم ایس کی تصدیق کریں",
+    "sixDigit": "6 ہندسوں کا کوڈ",
+    "verifySubmit": "تصدیق کریں اور لاگ ان کریں",
+    "backToPasscode": "پاس کوڈ لاگ ان پر واپس جائیں",
+    "phoneRequired": "براہ کرم اپنا فون نمبر درج کریں۔",
+    "smsSent": "ایس ایم ایس کوڈ بھیج دیا گیا!",
+    "smsFailed": "ایس ایم ایس بھیجنے میں ناکامی",
+    "invalidSms": "ایس ایم ایس کوڈ غلط ہے"
   }
 }

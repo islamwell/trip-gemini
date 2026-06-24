@@ -40,19 +40,19 @@ const CountdownTimer = () => {
 
   return (
     <div className="mb-6 text-center bg-white/30 dark:bg-slate-900/30 p-4 rounded-2xl border border-card-border shadow-inner">
-      <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Registration Deadline</h3>
-      <div dir="ltr" className="flex justify-center gap-4">
+      <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">{t('countdown.title', 'Registration Deadline')}</h3>
+      <div dir="ltr" className="flex justify-center gap-4 sm:gap-6">
         {[
-          { label: 'Days', value: timeLeft.days },
-          { label: 'Hours', value: timeLeft.hours },
-          { label: 'Mins', value: timeLeft.minutes },
-          { label: 'Secs', value: timeLeft.seconds },
+          { label: t('countdown.days', 'Days'), value: timeLeft.days },
+          { label: t('countdown.hours', 'Hours'), value: timeLeft.hours },
+          { label: t('countdown.mins', 'Mins'), value: timeLeft.minutes },
+          { label: t('countdown.secs', 'Secs'), value: timeLeft.seconds },
         ].map(item => (
-          <div key={item.label} className="flex flex-col items-center min-w-[50px]">
-            <span className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-b from-primary-500 to-primary-800 drop-shadow-sm">
+          <div key={item.label} className="flex flex-col items-center min-w-[60px] sm:min-w-[70px]">
+            <span className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-b from-red-500 to-orange-500 drop-shadow-sm">
               {item.value.toString().padStart(2, '0')}
             </span>
-            <span className="text-xs font-medium text-slate-400 mt-1">{item.label}</span>
+            <span className="text-xs font-medium text-slate-400 mt-1 uppercase">{item.label}</span>
           </div>
         ))}
       </div>
@@ -67,7 +67,7 @@ export const Registration: React.FC = () => {
   const [message, setMessage] = useState('');
   
   // Form State
-  const [salutation, setSalutation] = useState('Br.');
+  const [salutation, setSalutation] = useState('Brother');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -194,7 +194,7 @@ export const Registration: React.FC = () => {
                     onChange={(e) => setSalutation(e.target.value)}
                     className={`${inputClass} px-3 py-2 text-sm`}
                   >
-                    {['Br.', 'Sr.', 'Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Imam'].map(s => (
+                    {['Brother', 'Sister', 'Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Imam'].map(s => (
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
