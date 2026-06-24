@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
-import { ScrollText, Map, MessageSquare, Wallet, CheckSquare, Bell, Volume2, VolumeX, UserCheck, ShieldCheck } from 'lucide-react';
+import { ScrollText, Map, MessageSquare, Wallet, CheckSquare, Bell, Volume2, VolumeX, UserCheck } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { doc, onSnapshot, collection, query, orderBy, limit } from 'firebase/firestore';
 import { resolveStops, defaultItinerary } from './Itinerary';
@@ -26,7 +26,7 @@ interface NotificationMsg {
 }
 
 export const Dashboard: React.FC = () => {
-  const { user, role } = useAuth();
+  const { user } = useAuth();
   const { t } = useLanguage();
   const { showInfo } = useToast();
 

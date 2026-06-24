@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Home, ScrollText, Wallet, MessageSquare, Map, CheckSquare, ShieldCheck } from 'lucide-react';
+import { Home, ScrollText, Wallet, MessageSquare, Map, CheckSquare } from 'lucide-react';
 
 export const Navigation: React.FC = () => {
   const { t } = useLanguage();
