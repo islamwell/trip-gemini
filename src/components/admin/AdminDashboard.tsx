@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../services/firebase';
 import { collection, onSnapshot, query, addDoc, getDocs, doc, setDoc, deleteDoc, serverTimestamp, where } from 'firebase/firestore';
-import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard, Trash2, Settings } from 'lucide-react';
+import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard, Trash2, Settings, LogOut } from 'lucide-react';
 import { calculateBudget } from '../../data/finances';
 import { useToast } from '../../contexts/ToastContext';
 import { Finances } from '../participant/Finances';
@@ -55,7 +55,7 @@ export const DUTY_OPTIONS = [
 ];
 
 export const AdminDashboard: React.FC = () => {
-  const { role } = useAuth();
+  const { role, logout } = useAuth();
   const { showSuccess, showError } = useToast();
   
   const [participants, setParticipants] = useState<ParticipantProfile[]>([]);
@@ -318,9 +318,18 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 px-4">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin Control Panel</h1>
-        <p className="text-slate-500 mt-2">Manage user signatures, assign duties, edit the itinerary, and resolve feedback.</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Admin Control Panel</h1>
+          <p className="text-slate-500 mt-2">Manage user signatures, assign duties, edit the itinerary, and resolve feedback.</p>
+        </div>
+        <button 
+          onClick={logout}
+          className="flex items-center gap-2 px-4 py-2 text-error bg-error/10 hover:bg-error/20 rounded-xl font-bold transition-all"
+        >
+          <LogOut className="w-5 h-5" />
+          Logout
+        </button>
       </div>
 
 

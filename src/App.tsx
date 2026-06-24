@@ -5,7 +5,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { Header } from './components/common/Header';
 import { Navigation } from './components/common/Navigation';
 import { Footer } from './components/common/Footer';
-import { Login } from './components/common/Login';
+import { Registration } from './components/common/Registration';
 import { isSignInWithEmailLink } from 'firebase/auth';
 import { auth } from './services/firebase';
 
@@ -108,7 +108,7 @@ function AppContent() {
       <AutoUpdater />
       <Routes>
         <Route path="/login" element={
-          user ? <Navigate to="/" replace /> : <PublicLayout><Login /></PublicLayout>
+          user ? <Navigate to="/" replace /> : <PublicLayout><Registration /></PublicLayout>
         } />
         
         {/* Protected Routes */}

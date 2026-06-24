@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { User } from 'firebase/auth';
-import { onAuthStateChanged, signOut, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import type { User, ConfirmationResult } from 'firebase/auth';
+import { onAuthStateChanged, signOut, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPhoneNumber } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 
@@ -13,8 +13,12 @@ interface AuthContextType {
   sendMagicLink: (email: string) => Promise<void>;
   completeSignIn: (email: string, windowUrl: string) => Promise<void>;
   signInWithPassword: (email: string, password?: string) => Promise<void>;
+  signInWithIdentifierAndPasscode: (identifier: string, passcode: string) => Promise<void>;
+  sendPhoneSms: (phone: string, appVerifier: any) => Promise<ConfirmationResult>;
+  confirmPhoneSms: (confirmationResult: ConfirmationResult, code: string) => Promise<void>;
   logout: () => Promise<void>;
   updateOnboardingStatus: (signed: boolean, langSet: boolean) => void;
+  updateParticipantProfile: (data: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -148,6 +152,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithIdentifierAndPasscode = async (identifier: string, passcode: string) => {
+    // Determine if it's an email or a phone number
+    const isEmail = identifier.includes('@');
+    const synthesizedEmail = isEmail ? identifier.toLowerCase() : `${identifier.replace(/[^0-9+]/g, '')}@trip-oslo.web.app`;
+    
+    // Pad passcode to meet Firebase's 6 char minimum
+    const paddedPassword = passcode ? `${passcode}-triposlo` : 'nopasscode-triposlo';
+
+    await signInWithPassword(synthesizedEmail, paddedPassword);
+  };
+
+  const sendPhoneSms = async (phone: string, appVerifier: any) => {
+    // Format phone to international if missing + (Assuming Norway +47 as default if not specified)
+    let formattedPhone = phone.startsWith('+') ? phone : `+47${phone.replace(/^0+/, '')}`;
+    return await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+  };
+
+  const confirmPhoneSms = async (confirmationResult: ConfirmationResult, code: string) => {
+    await confirmationResult.confirm(code);
+  };
+
   const logout = async () => {
     await signOut(auth);
   };
@@ -157,8 +182,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (langSet) setLanguageSet(true);
   };
 
+  const updateParticipantProfile = async (data: any) => {
+    if (!user) return;
+    await setDoc(doc(db, 'participants', user.uid), data, { merge: true });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, role, hasSignedRules, languageSet, sendMagicLink, completeSignIn, signInWithPassword, logout, updateOnboardingStatus }}>
+    <AuthContext.Provider value={{ 
+      user, loading, role, hasSignedRules, languageSet, 
+      sendMagicLink, completeSignIn, signInWithPassword, 
+      signInWithIdentifierAndPasscode, sendPhoneSms, confirmPhoneSms,
+      logout, updateOnboardingStatus, updateParticipantProfile 
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );

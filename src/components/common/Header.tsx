@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Globe, LogOut, Palette, Bell, Check } from 'lucide-react';
+import { Globe, Palette, Bell, Check } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 export const Header: React.FC = () => {
   const { language, setLanguage } = useLanguage();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const [latestNotif, setLatestNotif] = useState<any>(null);
@@ -176,15 +176,7 @@ export const Header: React.FC = () => {
               )}
             </div>
             
-            {user && (
-              <button 
-                onClick={logout}
-                className="p-2.5 sm:p-2 text-slate-600 hover:text-error dark:text-slate-300 transition-colors rounded-xl hover:bg-error/10 active:scale-95"
-                title="Logout"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
-            )}
+
           </div>
         </div>
       </header>
