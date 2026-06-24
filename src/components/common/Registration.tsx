@@ -4,14 +4,162 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { RecaptchaVerifier } from 'firebase/auth';
 import type { ConfirmationResult } from 'firebase/auth';
 import { auth } from '../../services/firebase';
+import { HelpCircle, X } from 'lucide-react';
 
-const EXTENDED_DUTY_OPTIONS = [
-  { group: 'Default', options: ['None - but I will make Dua'] },
-  { group: 'Spiritual & Educational', options: ['Wake-Up Caller for Fajr (Wakes up everyone)', 'Quran tajweed teacher'] },
-  { group: 'Food & Refreshment', options: ['Halal Grocery Scout & Verifier (Checks ingredients)', 'Hydration & Water helper (Distributes water)', 'Iftar/Suhoor Time Announcer', 'Fruit & Snack Distributor'] },
-  { group: 'Transport & Cleanliness', options: ['Bus Cleanliness Officer (Keeps bus tidy)', 'Trash & Recycling helper', 'Sound System & Nasheed Manager (Manages audio)', 'Weather & Road Commentator (Checks route updates)'] },
-  { group: 'Community & Care', options: ['Elderly Support team (Assists elderly)', 'Halal Entertainment (Engages kids/group)', 'Salah Garment & Cover Organiser', 'Lost & Found Custodian (Keeps track of items)'] },
-  { group: 'Logistics & Tech', options: ['Complaint In-Charge', 'Shared Expenses & Token Collector', 'Driver (Drives the minibus)', 'Map navigator GPS copilot (Guides driver)', 'Photographer (Captures memories)', 'Journalist (Writes trip summary)'] }
+interface DutyOption {
+  dbValue: string;
+  titleKey: string;
+  hintKey: string;
+}
+
+interface DutyGroup {
+  group: string;
+  groupKey: string;
+  options: DutyOption[];
+}
+
+const EXTENDED_DUTY_OPTIONS: DutyGroup[] = [
+  {
+    group: 'Default',
+    groupKey: 'registration.role_groups.Default',
+    options: [
+      {
+        dbValue: 'None - but I will make Dua',
+        titleKey: 'registration.roles.none',
+        hintKey: 'registration.role_hints.none'
+      }
+    ]
+  },
+  {
+    group: 'Spiritual & Educational',
+    groupKey: 'registration.role_groups.Spiritual & Educational',
+    options: [
+      {
+        dbValue: 'Wake-Up Caller for Fajr (Wakes up everyone)',
+        titleKey: 'registration.roles.fajr_caller',
+        hintKey: 'registration.role_hints.fajr_caller'
+      },
+      {
+        dbValue: 'Quran tajweed teacher',
+        titleKey: 'registration.roles.quran_teacher',
+        hintKey: 'registration.role_hints.quran_teacher'
+      }
+    ]
+  },
+  {
+    group: 'Food & Refreshment',
+    groupKey: 'registration.role_groups.Food & Refreshment',
+    options: [
+      {
+        dbValue: 'Halal Grocery Scout & Verifier (Checks ingredients)',
+        titleKey: 'registration.roles.grocery_scout',
+        hintKey: 'registration.role_hints.grocery_scout'
+      },
+      {
+        dbValue: 'Hydration & Water helper (Distributes water)',
+        titleKey: 'registration.roles.hydration_helper',
+        hintKey: 'registration.role_hints.hydration_helper'
+      },
+      {
+        dbValue: 'Iftar/Suhoor Time Announcer',
+        titleKey: 'registration.roles.iftar_announcer',
+        hintKey: 'registration.role_hints.iftar_announcer'
+      },
+      {
+        dbValue: 'Fruit & Snack Distributor',
+        titleKey: 'registration.roles.snack_distributor',
+        hintKey: 'registration.role_hints.snack_distributor'
+      }
+    ]
+  },
+  {
+    group: 'Transport & Cleanliness',
+    groupKey: 'registration.role_groups.Transport & Cleanliness',
+    options: [
+      {
+        dbValue: 'Bus Cleanliness Officer (Keeps bus tidy)',
+        titleKey: 'registration.roles.cleanliness_officer',
+        hintKey: 'registration.role_hints.cleanliness_officer'
+      },
+      {
+        dbValue: 'Trash & Recycling helper',
+        titleKey: 'registration.roles.trash_helper',
+        hintKey: 'registration.role_hints.trash_helper'
+      },
+      {
+        dbValue: 'Sound System & Nasheed Manager (Manages audio)',
+        titleKey: 'registration.roles.audio_manager',
+        hintKey: 'registration.role_hints.audio_manager'
+      },
+      {
+        dbValue: 'Weather & Road Commentator (Checks route updates)',
+        titleKey: 'registration.roles.weather_commentator',
+        hintKey: 'registration.role_hints.weather_commentator'
+      }
+    ]
+  },
+  {
+    group: 'Community & Care',
+    groupKey: 'registration.role_groups.Community & Care',
+    options: [
+      {
+        dbValue: 'Elderly Support team (Assists elderly)',
+        titleKey: 'registration.roles.elderly_support',
+        hintKey: 'registration.role_hints.elderly_support'
+      },
+      {
+        dbValue: 'Halal Entertainment (Engages kids/group)',
+        titleKey: 'registration.roles.entertainment_helper',
+        hintKey: 'registration.role_hints.entertainment_helper'
+      },
+      {
+        dbValue: 'Salah Garment & Cover Organiser',
+        titleKey: 'registration.roles.garment_organiser',
+        hintKey: 'registration.role_hints.garment_organiser'
+      },
+      {
+        dbValue: 'Lost & Found Custodian (Keeps track of items)',
+        titleKey: 'registration.roles.lost_found',
+        hintKey: 'registration.role_hints.lost_found'
+      }
+    ]
+  },
+  {
+    group: 'Logistics & Tech',
+    groupKey: 'registration.role_groups.Logistics & Tech',
+    options: [
+      {
+        dbValue: 'Complaint In-Charge',
+        titleKey: 'registration.roles.complaint_incharge',
+        hintKey: 'registration.role_hints.complaint_incharge'
+      },
+      {
+        dbValue: 'Shared Expenses & Token Collector',
+        titleKey: 'registration.roles.token_collector',
+        hintKey: 'registration.role_hints.token_collector'
+      },
+      {
+        dbValue: 'Driver (Drives the minibus)',
+        titleKey: 'registration.roles.driver',
+        hintKey: 'registration.role_hints.driver'
+      },
+      {
+        dbValue: 'Map navigator GPS copilot (Guides driver)',
+        titleKey: 'registration.roles.navigator',
+        hintKey: 'registration.role_hints.navigator'
+      },
+      {
+        dbValue: 'Photographer (Captures memories)',
+        titleKey: 'registration.roles.photographer',
+        hintKey: 'registration.role_hints.photographer'
+      },
+      {
+        dbValue: 'Journalist (Writes trip summary)',
+        titleKey: 'registration.roles.journalist',
+        hintKey: 'registration.role_hints.journalist'
+      }
+    ]
+  }
 ];
 
 const CountdownTimer = () => {
@@ -78,9 +226,13 @@ export const Registration: React.FC = () => {
   const [smsCode, setSmsCode] = useState('');
   
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const { signInWithIdentifierAndPasscode, sendPhoneSms, confirmPhoneSms, updateParticipantProfile } = useAuth();
   const { t } = useLanguage();
+
+  const currentDutyOption = EXTENDED_DUTY_OPTIONS.flatMap(g => g.options).find(o => o.dbValue === duty);
+  const currentDutyHint = currentDutyOption ? t(currentDutyOption.hintKey) : '';
 
   useEffect(() => {
     // Initialize reCAPTCHA for SMS auth
@@ -196,19 +348,38 @@ export const Registration: React.FC = () => {
                     className={`${inputClass} px-3 py-2 text-sm`}
                   >
                     {['Brother', 'Sister', 'Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Imam'].map(s => (
-                      <option key={s} value={s}>{s}</option>
+                      <option key={s} value={s}>{t(`registration.salutations.${s}`, s)}</option>
                     ))}
                   </select>
                 </div>
                 <div className="w-full sm:w-2/3">
-                  <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.role', 'Volunteer Role')}</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">{t('registration.role', 'Volunteer Role')}</label>
+                    <button
+                      type="button"
+                      onClick={() => setShowHelpModal(true)}
+                      className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors p-0.5"
+                      title={t('registration.roleDetailsTitle', 'Volunteer Roles Reference Guide')}
+                    >
+                      <HelpCircle className="w-4 h-4 cursor-pointer" />
+                    </button>
+                  </div>
                   <select value={duty} onChange={(e) => setDuty(e.target.value)} className={`${inputClass} px-3 py-2 text-sm truncate`}>
                     {EXTENDED_DUTY_OPTIONS.map(group => (
-                      <optgroup key={group.group} label={group.group}>
-                        {group.options.map(opt => <option key={opt} value={opt} title={opt}>{opt}</option>)}
+                      <optgroup key={group.group} label={t(group.groupKey, group.group)}>
+                        {group.options.map(opt => (
+                          <option key={opt.dbValue} value={opt.dbValue} title={t(opt.titleKey, opt.dbValue)}>
+                            {t(opt.titleKey, opt.dbValue)}
+                          </option>
+                        ))}
                       </optgroup>
                     ))}
                   </select>
+                  {currentDutyHint && (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 italic mt-1 leading-normal">
+                      {currentDutyHint}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -323,6 +494,71 @@ export const Registration: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* HELPER MODAL */}
+      {showHelpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-2xl bg-card-bg border border-card-border rounded-2xl shadow-2xl p-6 max-h-[85vh] flex flex-col animate-scale-in">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center pb-4 border-b border-card-border">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-primary-600" />
+                {t('registration.roleDetailsTitle', 'Volunteer Roles Reference Guide')}
+              </h3>
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-6 pr-1 scrollbar-thin">
+              {EXTENDED_DUTY_OPTIONS.map(group => (
+                <div key={group.group} className="space-y-3 text-left">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-1">
+                    {t(group.groupKey, group.group)}
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {group.options.map(opt => (
+                      <div 
+                        key={opt.dbValue} 
+                        onClick={() => {
+                          setDuty(opt.dbValue);
+                          setShowHelpModal(false);
+                        }}
+                        className={`p-3 rounded-xl border transition-all cursor-pointer text-left ${
+                          duty === opt.dbValue 
+                            ? 'border-primary-500 bg-primary-50/10 dark:bg-primary-950/20 ring-2 ring-primary-500/20' 
+                            : 'border-card-border bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        <h5 className="font-semibold text-sm text-slate-800 dark:text-slate-200">
+                          {t(opt.titleKey, opt.dbValue)}
+                        </h5>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                          {t(opt.hintKey)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-4 border-t border-card-border flex justify-end">
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-5 py-2.5 rounded-xl transition-colors text-sm cursor-pointer"
+              >
+                {t('registration.close', 'Close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
