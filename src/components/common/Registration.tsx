@@ -387,11 +387,11 @@ export const Registration: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="w-full sm:w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.firstName', 'First Name')}</label>
-                  <input required type="text" minLength={2} value={firstName} onChange={(e) => setFirstName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.firstPlaceholder', 'John')} />
+                  <input required type="text" minLength={2} value={firstName} onChange={(e) => setFirstName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.firstPlaceholder', 'Maryam')} />
                 </div>
                 <div className="w-full sm:w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.lastName', 'Last Name')}</label>
-                  <input required type="text" minLength={2} value={lastName} onChange={(e) => setLastName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.lastPlaceholder', 'Doe')} />
+                  <input required type="text" minLength={2} value={lastName} onChange={(e) => setLastName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.lastPlaceholder', 'Imran')} />
                 </div>
               </div>
 
