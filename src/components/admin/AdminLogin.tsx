@@ -16,7 +16,7 @@ export const AdminLogin: React.FC = () => {
     e.preventDefault();
     setError('');
     
-    if (password === 'radquran114') {
+    if (password === 'radquran114' || password === 'readquran114') {
       if (user) {
         setLoading(true);
         try {

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../services/firebase';
 import { collection, onSnapshot, query, addDoc, getDocs, doc, setDoc, deleteDoc, serverTimestamp, where } from 'firebase/firestore';
-import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard } from 'lucide-react';
+import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard, Trash2, Settings } from 'lucide-react';
+import { calculateBudget } from '../../data/finances';
+import { useToast } from '../../contexts/ToastContext';
 
 interface ParticipantProfile {
   id: string;
@@ -53,12 +55,15 @@ export const DUTY_OPTIONS = [
 
 export const AdminDashboard: React.FC = () => {
   const { role } = useAuth();
+  const { showSuccess, showError } = useToast();
   
   const [participants, setParticipants] = useState<ParticipantProfile[]>([]);
   const [signatures, setSignatures] = useState<Signature[]>([]);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [itinerary, setItinerary] = useState<Record<string, any[]>>({});
+
+  const [maxPassengers, setMaxPassengers] = useState(17);
   
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'complaints' | 'duties' | 'itinerary'>('users');
@@ -80,6 +85,9 @@ export const AdminDashboard: React.FC = () => {
       setEditDesc(stop.desc);
     }
   }, [selectedDay, selectedStopIdx, itinerary]);
+
+  // Dynamic budget parameters based on setting
+  const { perPersonCost, totalTripCost } = calculateBudget(maxPassengers);
 
   useEffect(() => {
     if (role !== 'admin') return;
@@ -127,6 +135,16 @@ export const AdminDashboard: React.FC = () => {
         data[docSnap.id] = docSnap.data().stops;
       });
       setItinerary(data);
+    });
+
+    // 6. Listen to settings
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'trip'), (docSnap) => {
+      if (docSnap.exists()) {
+        setMaxPassengers(docSnap.data().maxPassengers || 17);
+      } else {
+        setDoc(doc(db, 'settings', 'trip'), { maxPassengers: 17 }).catch(console.error);
+        setMaxPassengers(17);
+      }
       setLoading(false);
     });
 
@@ -136,6 +154,7 @@ export const AdminDashboard: React.FC = () => {
       unsubComplaints();
       unsubPayments();
       unsubItinerary();
+      unsubSettings();
     };
   }, [role]);
 
@@ -164,15 +183,62 @@ export const AdminDashboard: React.FC = () => {
           await deleteDoc(doc(db, 'payments', d.id));
         });
       } else {
-        // Add a payment document of 4999 NOK
+        // Add a payment document of perPersonCost NOK
         await addDoc(collection(db, 'payments'), {
           participantId: pId,
-          amount: 4999,
+          amount: perPersonCost,
           timestamp: serverTimestamp()
         });
       }
     } catch (err) {
       console.error("Failed to toggle payment:", err);
+    }
+  };
+
+  // Delete participant permanently
+  const handleDeleteParticipant = async (pId: string, pName: string) => {
+    if (!window.confirm(`Are you sure you want to permanently delete passenger "${pName}"? This will delete their signature, payments, and complaints.`)) return;
+    
+    try {
+      // 1. Delete participant profile
+      await deleteDoc(doc(db, 'participants', pId));
+      
+      // 2. Delete signatures
+      const sigQ = query(collection(db, 'signatures'), where('participantId', '==', pId));
+      const sigSnap = await getDocs(sigQ);
+      sigSnap.forEach(async (d) => {
+        await deleteDoc(doc(db, 'signatures', d.id));
+      });
+      
+      // 3. Delete payments
+      const payQ = query(collection(db, 'payments'), where('participantId', '==', pId));
+      const paySnap = await getDocs(payQ);
+      paySnap.forEach(async (d) => {
+        await deleteDoc(doc(db, 'payments', d.id));
+      });
+      
+      // 4. Delete complaints
+      const compQ = query(collection(db, 'complaints'), where('participantId', '==', pId));
+      const compSnap = await getDocs(compQ);
+      compSnap.forEach(async (d) => {
+        await deleteDoc(doc(db, 'complaints', d.id));
+      });
+
+      showSuccess("Participant and all related records deleted successfully.");
+    } catch (err) {
+      console.error("Failed to delete participant:", err);
+      showError("Error deleting participant.");
+    }
+  };
+
+  // Save trip passenger capacity settings
+  const handleSaveSettings = async () => {
+    try {
+      await setDoc(doc(db, 'settings', 'trip'), { maxPassengers }, { merge: true });
+      showSuccess(`Passenger limit updated to ${maxPassengers} successfully!`);
+    } catch (err) {
+      console.error("Failed to update settings:", err);
+      showError("Failed to update passenger capacity.");
     }
   };
 
@@ -235,20 +301,19 @@ export const AdminDashboard: React.FC = () => {
           timestamp: serverTimestamp()
         });
       }
-      alert("Itinerary stop updated successfully!");
+      showSuccess("Itinerary stop updated successfully!");
     } catch (err) {
       console.error("Failed to update itinerary stop:", err);
-      alert("Failed to update stop.");
+      showError("Failed to update stop.");
     }
   };
 
   // Calculations
   const totalSubmissions = signatures.length;
-  const totalPaidParticipants = participants.filter(p => {
-    const userPaidAmount = payments.filter(pay => pay.participantId === p.id).reduce((sum, pay) => sum + pay.amount, 0);
-    return userPaidAmount >= 4999;
-  }).length;
-  const totalOutstandingIncome = (participants.length - totalPaidParticipants) * 4999;
+  const totalOutstandingIncome = participants.reduce((sum, p) => {
+    const totalPaid = payments.filter(pay => pay.participantId === p.id).reduce((s, pay) => s + pay.amount, 0);
+    return sum + Math.max(0, perPersonCost - totalPaid);
+  }, 0);
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 px-4">
@@ -258,6 +323,35 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
 
+      {/* Trip Settings Control */}
+      <div className="glass rounded-3xl p-6 border border-card-border mb-6">
+        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-primary-500 animate-spin-slow" /> Capacity & Settings
+        </h2>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-4 max-w-xl">
+          <div className="flex-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Max Trip Passengers</label>
+            <input
+              type="number"
+              min="1"
+              max="50"
+              value={maxPassengers}
+              onChange={(e) => setMaxPassengers(Math.max(1, Number(e.target.value)))}
+              className="w-full bg-white dark:bg-slate-800 border border-card-border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all"
+            />
+          </div>
+          <button
+            onClick={handleSaveSettings}
+            className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl transition-all shadow-md shadow-primary-500/10 hover-lift shrink-0"
+          >
+            Update Capacity
+          </button>
+        </div>
+        <p className="text-xs text-slate-400 mt-2">
+          Recalculates shared accommodation & transport parts automatically. Per-passenger cost is currently <strong className="text-slate-600 dark:text-slate-200">{perPersonCost.toLocaleString()} NOK</strong> (Total budget: {totalTripCost.toLocaleString()} NOK).
+        </p>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="glass p-6 rounded-2xl flex items-center gap-4 border border-card-border">
@@ -266,7 +360,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Total Members</span>
-            <span className="text-2xl font-bold">{participants.length} / 17</span>
+            <span className="text-2xl font-bold">{participants.length} / {maxPassengers}</span>
           </div>
         </div>
 
@@ -346,6 +440,7 @@ export const AdminDashboard: React.FC = () => {
                 <th className="py-3 px-4">Rule Signing Status</th>
                 <th className="py-3 px-4">Signing IP Address</th>
                 <th className="py-3 px-4">Timestamp</th>
+                <th className="py-3 px-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -363,7 +458,7 @@ export const AdminDashboard: React.FC = () => {
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 bg-warning/10 text-warning text-xs font-semibold px-2.5 py-1 rounded-full">
-                          <Clock className="w-3.5 h-3.5" />
+                           <Clock className="w-3.5 h-3.5" />
                           Pending Sign
                         </span>
                       )}
@@ -371,6 +466,15 @@ export const AdminDashboard: React.FC = () => {
                     <td className="py-4 px-4 font-mono text-xs">{sig ? sig.ipAddress : 'N/A'}</td>
                     <td className="py-4 px-4 text-xs text-slate-500">
                       {sig ? new Date(sig.signedAt).toLocaleString() : 'N/A'}
+                    </td>
+                    <td className="py-4 px-4">
+                      <button
+                        onClick={() => handleDeleteParticipant(p.id, p.name)}
+                        className="flex items-center gap-1 text-xs font-bold text-error bg-error/10 hover:bg-error/20 px-3 py-1.5 rounded-xl transition-all shadow-sm"
+                        title="Delete passenger permanently"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Remove
+                      </button>
                     </td>
                   </tr>
                 );
@@ -393,12 +497,12 @@ export const AdminDashboard: React.FC = () => {
             <tbody>
               {participants.map((p) => {
                 const totalPaid = payments.filter(pay => pay.participantId === p.id).reduce((sum, pay) => sum + pay.amount, 0);
-                const isPaid = totalPaid >= 4999;
+                const isPaid = totalPaid >= perPersonCost;
                 
                 return (
                   <tr key={p.id} className="border-b border-card-border hover:bg-slate-50/50 dark:hover:bg-slate-900/20 text-slate-700 dark:text-slate-300">
                     <td className="py-4 px-4 font-bold">{p.name}</td>
-                    <td className="py-4 px-4 font-mono">4,999 NOK</td>
+                    <td className="py-4 px-4 font-mono">{perPersonCost.toLocaleString()} NOK</td>
                     <td className="py-4 px-4">
                       {isPaid ? (
                         <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -411,7 +515,7 @@ export const AdminDashboard: React.FC = () => {
                       )}
                     </td>
                     <td className="py-4 px-4 font-mono text-sm">
-                      {Math.max(0, 4999 - totalPaid).toLocaleString()} NOK
+                      {Math.max(0, perPersonCost - totalPaid).toLocaleString()} NOK
                     </td>
                     <td className="py-4 px-4">
                       <button

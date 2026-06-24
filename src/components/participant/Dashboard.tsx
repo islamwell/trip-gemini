@@ -6,6 +6,8 @@ import { ScrollText, Map, MessageSquare, Wallet, CheckSquare, Bell, Volume2, Vol
 import { db } from '../../services/firebase';
 import { doc, onSnapshot, collection, query, orderBy, limit } from 'firebase/firestore';
 import { resolveStops, defaultItinerary } from './Itinerary';
+import { useToast } from '../../contexts/ToastContext';
+
 
 interface ParticipantProfile {
   id: string;
@@ -26,6 +28,8 @@ interface NotificationMsg {
 export const Dashboard: React.FC = () => {
   const { user, role } = useAuth();
   const { t } = useLanguage();
+  const { showInfo } = useToast();
+
 
   // Real-time states
   const [profile, setProfile] = useState<ParticipantProfile | null>(null);
@@ -173,7 +177,7 @@ export const Dashboard: React.FC = () => {
   const handleTestAlarm = () => {
     playAlarmSound();
     triggerNotification("🔔 Alarm Test", "This is a test notification from the road trip alarm chimer!");
-    alert("Test alarm chime triggered! Verify audio sound and notification popups.");
+    showInfo("Test alarm chime triggered! Verify audio sound and notification popups.");
   };
 
   // Alarm clock monitor loop
@@ -317,12 +321,6 @@ export const Dashboard: React.FC = () => {
           <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-900 dark:from-primary-400 dark:to-primary-200">Dashboard</h1>
           <p className="text-slate-500 mt-2">Welcome back, {user?.displayName || 'Participant'}.</p>
         </div>
-        
-        {role === 'admin' && (
-          <Link to="/admin" className="inline-flex items-center gap-1.5 justify-center px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-medium transition-transform hover:scale-105">
-            <ShieldCheck className="w-4 h-4" /> Admin Panel
-          </Link>
-        )}
       </div>
 
       {/* Duty Assignment Banner */}

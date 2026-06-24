@@ -4,7 +4,7 @@ import { CheckSquare, Square, ShoppingBag, Info } from 'lucide-react';
 
 interface ChecklistItem {
   id: string;
-  category: 'clothing' | 'spiritual' | 'electronics' | 'health';
+  category: 'clothing' | 'spiritual' | 'electronics' | 'health' | 'documents' | 'comfort';
   nameKey: string;
   descKey: string;
   storeKey: string;
@@ -105,15 +105,160 @@ const checklistItems: ChecklistItem[] = [
     nameKey: 'checklist.items.h3_name',
     descKey: 'checklist.items.h3_desc',
     storeKey: 'checklist.stores.kiwi_rema'
+  },
+  // New Clothing items
+  {
+    id: 'c5',
+    category: 'clothing',
+    nameKey: 'checklist.items.c5_name',
+    descKey: 'checklist.items.c5_desc',
+    storeKey: 'checklist.stores.xxl_stormberg'
+  },
+  {
+    id: 'c6',
+    category: 'clothing',
+    nameKey: 'checklist.items.c6_name',
+    descKey: 'checklist.items.c6_desc',
+    storeKey: 'checklist.stores.xxl_kiwi'
+  },
+  {
+    id: 'c7',
+    category: 'clothing',
+    nameKey: 'checklist.items.c7_name',
+    descKey: 'checklist.items.c7_desc',
+    storeKey: 'checklist.stores.synsam_any'
+  },
+  // New Spiritual items
+  {
+    id: 's4',
+    category: 'spiritual',
+    nameKey: 'checklist.items.s4_name',
+    descKey: 'checklist.items.s4_desc',
+    storeKey: 'checklist.stores.app'
+  },
+  {
+    id: 's5',
+    category: 'spiritual',
+    nameKey: 'checklist.items.s5_name',
+    descKey: 'checklist.items.s5_desc',
+    storeKey: 'checklist.stores.online_mosque'
+  },
+  // New Electronics items
+  {
+    id: 'e4',
+    category: 'electronics',
+    nameKey: 'checklist.items.e4_name',
+    descKey: 'checklist.items.e4_desc',
+    storeKey: 'checklist.stores.clas_kjell'
+  },
+  {
+    id: 'e5',
+    category: 'electronics',
+    nameKey: 'checklist.items.e5_name',
+    descKey: 'checklist.items.e5_desc',
+    storeKey: 'checklist.stores.clas_biltema'
+  },
+  // New Health items
+  {
+    id: 'h4',
+    category: 'health',
+    nameKey: 'checklist.items.h4_name',
+    descKey: 'checklist.items.h4_desc',
+    storeKey: 'checklist.stores.apotek'
+  },
+  {
+    id: 'h5',
+    category: 'health',
+    nameKey: 'checklist.items.h5_name',
+    descKey: 'checklist.items.h5_desc',
+    storeKey: 'checklist.stores.apotek_kiwi'
+  },
+  {
+    id: 'h6',
+    category: 'health',
+    nameKey: 'checklist.items.h6_name',
+    descKey: 'checklist.items.h6_desc',
+    storeKey: 'checklist.stores.apotek1'
+  },
+  // Documents
+  {
+    id: 'd1',
+    category: 'documents',
+    nameKey: 'checklist.items.d1_name',
+    descKey: 'checklist.items.d1_desc',
+    storeKey: 'checklist.stores.already_owned'
+  },
+  {
+    id: 'd2',
+    category: 'documents',
+    nameKey: 'checklist.items.d2_name',
+    descKey: 'checklist.items.d2_desc',
+    storeKey: 'checklist.stores.insurance'
+  },
+  {
+    id: 'd3',
+    category: 'documents',
+    nameKey: 'checklist.items.d3_name',
+    descKey: 'checklist.items.d3_desc',
+    storeKey: 'checklist.stores.already_owned'
+  },
+  {
+    id: 'd4',
+    category: 'documents',
+    nameKey: 'checklist.items.d4_name',
+    descKey: 'checklist.items.d4_desc',
+    storeKey: 'checklist.stores.bank_atm'
+  },
+  // Comfort & Supplies
+  {
+    id: 'f1',
+    category: 'comfort',
+    nameKey: 'checklist.items.f1_name',
+    descKey: 'checklist.items.f1_desc',
+    storeKey: 'checklist.stores.any_clas'
+  },
+  {
+    id: 'f2',
+    category: 'comfort',
+    nameKey: 'checklist.items.f2_name',
+    descKey: 'checklist.items.f2_desc',
+    storeKey: 'checklist.stores.kiwi_rema_any'
+  },
+  {
+    id: 'f3',
+    category: 'comfort',
+    nameKey: 'checklist.items.f3_name',
+    descKey: 'checklist.items.f3_desc',
+    storeKey: 'checklist.stores.xxl_sport1'
+  },
+  {
+    id: 'f4',
+    category: 'comfort',
+    nameKey: 'checklist.items.f4_name',
+    descKey: 'checklist.items.f4_desc',
+    storeKey: 'checklist.stores.any_store'
   }
 ];
 
 export const Checklist: React.FC = () => {
   const { t } = useLanguage();
-  const [activeCategory, setActiveCategory] = useState<'all' | 'clothing' | 'spiritual' | 'electronics' | 'health'>('all');
+  const [activeCategory, setActiveCategory] = useState<'all' | 'clothing' | 'spiritual' | 'electronics' | 'health' | 'documents' | 'comfort'>('all');
   const [checkedIds, setCheckedIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('geiranger-packing-checklist');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('geiranger-packing-checklist');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        } else if (parsed && typeof parsed === 'object') {
+          // Backward compatibility: convert object { c1: true, c2: false } to array of checked IDs
+          return Object.keys(parsed).filter(key => parsed[key] === true);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to parse checklist items:", e);
+    }
+    return [];
   });
 
   useEffect(() => {
@@ -137,7 +282,9 @@ export const Checklist: React.FC = () => {
     { id: 'clothing', label: '🧥 Clothing & Gear' },
     { id: 'spiritual', label: '🕋 Spiritual' },
     { id: 'electronics', label: '🔋 Electronics' },
-    { id: 'health', label: '💊 Health & Hygiene' }
+    { id: 'health', label: '💊 Health & Hygiene' },
+    { id: 'documents', label: '📄 Documents' },
+    { id: 'comfort', label: '🎒 Comfort & Supplies' }
   ];
 
   return (

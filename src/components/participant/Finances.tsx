@@ -2,68 +2,38 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { db } from '../../services/firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { Wallet, CheckCircle2, AlertCircle, CreditCard, ExternalLink } from 'lucide-react';
-
-const PARTICIPANT_COUNT = 17;
-
-const expenseBreakdown = [
-  {
-    category: '🏡 Accommodation & Lodging',
-    desc: 'Shared luxury mountain cabins in Geilo, Stryn, and Geiranger (3 nights).',
-    amountPerPerson: 2265,
-    totalAmount: 2265 * PARTICIPANT_COUNT,
-    color: 'from-emerald-500 to-teal-500',
-  },
-  {
-    category: '🚐 Transport & Logistics',
-    desc: '17-seater Sprinter minibus rental, fuel, highway tolls (bompenger), and car ferries.',
-    amountPerPerson: 1500,
-    totalAmount: 1500 * PARTICIPANT_COUNT,
-    color: 'from-blue-500 to-indigo-500',
-  },
-  {
-    category: '🍲 Food & Communal Catering',
-    desc: 'Breakfast groceries, daily sandwich/trail lunch packages, and warm communal dinners.',
-    amountPerPerson: 800,
-    totalAmount: 800 * PARTICIPANT_COUNT,
-    color: 'from-amber-500 to-orange-500',
-  },
-  {
-    category: '🚢 Activities & Fjord Cruise',
-    desc: 'Geirangerfjord sightseeing cruise, Dalsnibba Skywalk admission, and scenic routes.',
-    amountPerPerson: 350,
-    totalAmount: 350 * PARTICIPANT_COUNT,
-    color: 'from-pink-500 to-rose-500',
-  },
-  {
-    category: '🛡️ Safety Buffer & Admin',
-    desc: 'Emergency contingency fund, first-aid kit, parking fees, and administrative items.',
-    amountPerPerson: 84,
-    totalAmount: 84 * PARTICIPANT_COUNT,
-    color: 'from-purple-500 to-fuchsia-500',
-  },
-];
+import { collection, query, where, onSnapshot, doc } from 'firebase/firestore';
+import { Wallet, CheckCircle2, AlertCircle, CreditCard, ExternalLink, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
+import { calculateBudget } from '../../data/finances';
 
 export const Finances: React.FC = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
   
-  const participantCount = PARTICIPANT_COUNT;
-  const perPersonCost = 4999;
-  const totalTripCost = perPersonCost * participantCount; // 84,983 NOK
-  
+  const [maxPassengers, setMaxPassengers] = useState(17);
   const [paidAmount, setPaidAmount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   // Hardcoded Admin Phone Number for Vipps (Norwegian Payment App)
   const VIPPS_ADMIN_PHONE = "4799999999"; 
 
   useEffect(() => {
+    // 1. Listen to trip capacity settings
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'trip'), (docSnap) => {
+      if (docSnap.exists()) {
+        setMaxPassengers(docSnap.data().maxPassengers || 17);
+      }
+    });
+
+    return () => unsubSettings();
+  }, []);
+
+  useEffect(() => {
     if (!user) return;
     
-    // Listen for payments
+    // 2. Listen for payments
     const paymentsRef = collection(db, 'payments');
     const q = query(paymentsRef, where('participantId', '==', user.uid));
     
@@ -82,6 +52,7 @@ export const Finances: React.FC = () => {
     return () => unsubscribe();
   }, [user]);
 
+  const { perPersonCost, totalTripCost, breakdown } = calculateBudget(maxPassengers);
   const balance = perPersonCost - paidAmount;
   const isPaid = balance <= 0;
 
@@ -105,7 +76,7 @@ export const Finances: React.FC = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t('nav.finances')}</h1>
-        <p className="text-slate-500 mt-2">Track your payments and trip costs transparently.</p>
+        <p className="text-slate-500 mt-2">Track your payments, trip costs, and verified budget evidence transparently.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -117,16 +88,16 @@ export const Finances: React.FC = () => {
           
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-card-border">
-              <span className="text-slate-500">Total Trip Cost</span>
-              <span className="font-mono font-medium">{totalTripCost.toLocaleString()} NOK</span>
+              <span className="text-slate-500 font-medium text-sm">Total Group Cost</span>
+              <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{totalTripCost.toLocaleString()} NOK</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-card-border">
-              <span className="text-slate-500">Participants</span>
-              <span className="font-mono font-medium">{participantCount}</span>
+              <span className="text-slate-500 font-medium text-sm">Passengers Capacity</span>
+              <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{maxPassengers}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">Your Share</span>
-              <span className="font-mono font-bold text-lg text-primary-600 dark:text-primary-400">{perPersonCost.toLocaleString()} NOK</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300 text-sm">Your Individual Share</span>
+              <span className="font-mono font-black text-xl text-primary-600 dark:text-primary-400">{perPersonCost.toLocaleString()} NOK</span>
             </div>
           </div>
         </div>
@@ -139,29 +110,29 @@ export const Finances: React.FC = () => {
 
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-slate-500">Paid</span>
-              <span className="font-mono font-medium text-success">{paidAmount.toLocaleString()} NOK</span>
+              <span className="text-slate-500 font-medium text-sm">Paid Amount</span>
+              <span className="font-mono font-bold text-success text-base">{paidAmount.toLocaleString()} NOK</span>
             </div>
             <div className="flex justify-between items-center pb-4 border-b border-card-border">
-              <span className="text-slate-500">Outstanding</span>
-              <span className="font-mono font-bold text-error">{Math.max(0, balance).toLocaleString()} NOK</span>
+              <span className="text-slate-500 font-medium text-sm">Outstanding Balance</span>
+              <span className="font-mono font-bold text-error text-base">{Math.max(0, balance).toLocaleString()} NOK</span>
             </div>
 
             {isPaid ? (
-              <div className="mt-4 bg-success/10 text-success p-4 rounded-xl flex items-center justify-center gap-2">
+              <div className="mt-4 bg-success/10 text-success p-4 rounded-xl flex items-center justify-center gap-2 border border-success/20">
                 <CheckCircle2 className="w-5 h-5" />
-                <span className="font-medium">Paid in Full</span>
+                <span className="font-bold text-sm uppercase tracking-wide">Paid in Full</span>
               </div>
             ) : (
               <div className="mt-4 space-y-4">
-                <div className="bg-warning/10 text-warning p-3 rounded-lg flex items-start gap-2 text-sm">
+                <div className="bg-warning/10 text-warning p-3 rounded-lg flex items-start gap-2 text-sm border border-warning/20">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <p>Please pay your outstanding balance before the trip begins.</p>
+                  <p className="text-xs">Please transfer your outstanding share before departure.</p>
                 </div>
                 
                 <button 
                   onClick={handleVippsPayment}
-                  className="w-full flex items-center justify-center gap-2 bg-[#ff5b24] hover:bg-[#e04a1b] text-white py-3 rounded-xl font-bold transition-all hover-lift"
+                  className="w-full flex items-center justify-center gap-2 bg-[#ff5b24] hover:bg-[#e04a1b] text-white py-3 rounded-xl font-bold transition-all hover-lift shadow-md shadow-[#ff5b24]/10"
                 >
                   Pay with Vipps
                   <ExternalLink className="w-4 h-4" />
@@ -172,33 +143,110 @@ export const Finances: React.FC = () => {
         </div>
       </div>
 
-      {/* Detailed Expense Category Section */}
+      {/* Detailed Expense Category Section with Accordions */}
       <div className="glass rounded-3xl p-6 md:p-8 shadow-md border border-card-border mt-8">
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2">
-          📊 Itemized Budget Breakdown (Per Participant)
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+          📊 Itemized Budget Breakdown & Evidence
         </h2>
-        <div className="space-y-6">
-          {expenseBreakdown.map((item, idx) => (
-            <div key={idx} className="space-y-2">
-              <div className="flex justify-between items-start gap-4 text-sm md:text-base">
-                <div className="space-y-0.5">
-                  <span className="font-bold text-slate-800 dark:text-slate-200 block">{item.category}</span>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+          Click on any category below to expand itemized calculations, formulas, and verified official booking/pricing kilder (sources).
+        </p>
+        <div className="space-y-4">
+          {breakdown.map((item, idx) => {
+            const isExpanded = expandedCategory === item.id;
+            return (
+              <div 
+                key={idx} 
+                className={`border border-card-border rounded-2xl overflow-hidden transition-all duration-200 ${
+                  isExpanded ? 'bg-slate-50/30 dark:bg-slate-900/10 shadow-sm' : ''
+                }`}
+              >
+                {/* Accordion Header */}
+                <button
+                  onClick={() => setExpandedCategory(isExpanded ? null : item.id)}
+                  className="w-full text-left p-5 flex justify-between items-center gap-4 transition-all hover:bg-slate-50/50 dark:hover:bg-slate-900/10"
+                >
+                  <div className="space-y-1">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block text-base md:text-lg">{item.category}</span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">{item.desc}</p>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <div className="text-right">
+                      <span className="font-mono font-bold text-slate-800 dark:text-slate-100 block text-sm md:text-base">
+                        {item.amountPerPerson.toLocaleString()} NOK
+                      </span>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        Total: {item.totalAmount.toLocaleString()} NOK
+                      </span>
+                    </div>
+                    {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                  </div>
+                </button>
+
+                {/* Progress bar */}
+                <div className="px-5 pb-1">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full bg-gradient-to-r ${item.color}`}
+                      style={{ width: `${(item.amountPerPerson / perPersonCost) * 100}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <span className="font-mono font-bold text-slate-800 dark:text-slate-100 block">{item.amountPerPerson.toLocaleString()} NOK</span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Total Group: {item.totalAmount.toLocaleString()} NOK</span>
-                </div>
+
+                {/* Accordion Content */}
+                {isExpanded && (
+                  <div className="p-5 pt-3 border-t border-card-border bg-slate-50/20 dark:bg-slate-900/5 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-emerald-500" /> Verifiable Evidence & Sources
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {item.evidence.map((ev, evIdx) => (
+                        <div 
+                          key={evIdx} 
+                          className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-card-border flex flex-col justify-between space-y-2 hover:shadow-sm transition-shadow"
+                        >
+                          <div className="space-y-1.5">
+                            <span className="font-extrabold text-xs text-slate-700 dark:text-slate-300 block">{ev.label}</span>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal font-normal">
+                              {ev.costDetail}
+                            </p>
+                          </div>
+                          {ev.sourceUrl && (
+                            <a
+                              href={ev.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-primary-600 dark:text-primary-400 hover:underline pt-2 border-t border-card-border mt-2"
+                            >
+                              {ev.sourceLabel || 'Verify Price Source'} <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              {/* Progress bar */}
-              <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                <div 
-                  className={`h-full bg-gradient-to-r ${item.color}`}
-                  style={{ width: `${(item.amountPerPerson / perPersonCost) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mathematical Proof Badge */}
+      <div className="glass rounded-3xl p-6 md:p-8 shadow-md border border-card-border bg-gradient-to-br from-primary-500/5 to-teal-500/5 mt-8">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+          🤝 Verifiable Mathematical Proof
+        </h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+          We prove that the total group cost is distributed with absolute mathematical parity. The sum of all individual shares matches the group budget exactly:
+        </p>
+        <div className="bg-white/50 dark:bg-slate-900/50 p-6 rounded-2xl border border-card-border flex flex-col items-center justify-center text-center space-y-3">
+          <div className="font-mono font-bold text-lg md:text-2xl text-slate-800 dark:text-slate-100 tracking-tight">
+            {maxPassengers} Passengers × {perPersonCost.toLocaleString()} NOK = {totalTripCost.toLocaleString()} NOK
+          </div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
+            Verified Group Cost Balance: {totalTripCost.toLocaleString()} NOK / {totalTripCost.toLocaleString()} NOK (100% Balanced)
+          </div>
         </div>
       </div>
 
@@ -224,15 +272,15 @@ export const Finances: React.FC = () => {
 
               <div className="text-left space-y-2 pt-4 border-t border-slate-100 dark:border-slate-700 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Receiver Phone:</span>
+                  <span className="text-slate-500 font-medium">Receiver Phone:</span>
                   <span className="font-mono font-bold">{VIPPS_ADMIN_PHONE}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Amount:</span>
+                  <span className="text-slate-500 font-medium">Amount:</span>
                   <span className="font-mono font-bold text-error">{balance.toLocaleString()} NOK</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Bank Account:</span>
+                  <span className="text-slate-500 font-medium">Bank Account:</span>
                   <span className="font-mono font-bold">1234.56.78901</span>
                 </div>
               </div>

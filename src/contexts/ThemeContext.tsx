@@ -16,8 +16,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'sepia') {
       return storedTheme;
     }
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return systemPrefersDark ? 'dark' : 'light';
+    return 'light';
   });
 
   useEffect(() => {

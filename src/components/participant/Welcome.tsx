@@ -5,12 +5,16 @@ import { useAuth } from '../../contexts/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { Globe, ArrowRight } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext';
+
 
 export const Welcome: React.FC = () => {
   const { setLanguage } = useLanguage();
   const { user, updateOnboardingStatus } = useAuth();
   const navigate = useNavigate();
+  const { showError } = useToast();
   const [loading, setLoading] = useState(false);
+
 
   const handleSelectLanguage = async (lang: string) => {
     if (!user) return;
@@ -26,7 +30,7 @@ export const Welcome: React.FC = () => {
       navigate('/rules');
     } catch (error: any) {
       console.error("Failed to set language:", error);
-      alert(`Error setting language: ${error.message}`);
+      showError(`Error setting language: ${error.message}`);
       setLoading(false);
     }
   };

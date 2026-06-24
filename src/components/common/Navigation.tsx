@@ -15,26 +15,25 @@ export const Navigation: React.FC = () => {
     { to: '/complaints', icon: MessageSquare, label: t('nav.complaints') },
   ];
 
-  // Always show admin tab. Non-admins will be prompted for the password.
-  navItems.push({ to: '/admin', icon: ShieldCheck, label: 'Admin' });
-
   return (
     <>
-      {/* Mobile Bottom Navigation */}
+      {/* Mobile Bottom Navigation — scrollable for many items */}
       <nav className="lg:hidden fixed bottom-0 w-full glass border-t border-card-border z-50 pb-safe">
-        <div className="flex justify-around items-center h-16 px-2">
+        <div className="flex items-center h-16 px-1 overflow-x-auto scrollbar-none">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  isActive ? 'text-primary-600 dark:text-primary-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                `flex flex-col items-center justify-center min-w-[60px] flex-1 h-full py-1 transition-all duration-200 rounded-xl mx-0.5 active:scale-90 ${
+                  isActive 
+                    ? 'text-primary-600 dark:text-primary-400 bg-primary-50/50 dark:bg-primary-900/15' 
+                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
                 }`
               }
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium uppercase tracking-wider">{label}</span>
+              <span className="text-[9px] font-semibold uppercase tracking-wider mt-0.5 truncate max-w-[56px] text-center">{label}</span>
             </NavLink>
           ))}
         </div>

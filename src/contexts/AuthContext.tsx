@@ -31,52 +31,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(firebaseUser);
       if (firebaseUser) {
         try {
+          const isAdminEmail = firebaseUser.email?.toLowerCase() === 'admin@nrq.no';
           // Fetch Role and Onboarding Status
           const docRef = doc(db, 'participants', firebaseUser.uid);
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists()) {
             const data = docSnap.data();
-            setRole(data.role as 'participant' | 'admin');
-            setLanguageSet(!!data.languageSet);
+            const resolvedRole = isAdminEmail ? 'admin' : (data.role as 'participant' | 'admin');
+            setRole(resolvedRole);
             
-            if (data.hasSignedRules) {
+            if (isAdminEmail) {
+              setLanguageSet(true);
               setHasSignedRules(true);
+              // Force role: 'admin' in database if it's different
+              if (data.role !== 'admin' || !data.languageSet || !data.hasSignedRules) {
+                await setDoc(docRef, { role: 'admin', languageSet: true, hasSignedRules: true }, { merge: true });
+              }
             } else {
-              // Fallback for legacy signature validation
-              const sigRef = collection(db, 'signatures');
-              const q = query(sigRef, where('participantId', '==', firebaseUser.uid));
-              const sigSnap = await getDocs(q);
-              const signed = !sigSnap.empty;
-              setHasSignedRules(signed);
-              if (signed) {
-                // Update profile as single source of truth
-                await setDoc(docRef, { hasSignedRules: true }, { merge: true });
+              setLanguageSet(!!data.languageSet);
+              if (data.hasSignedRules) {
+                setHasSignedRules(true);
+              } else {
+                // Fallback for legacy signature validation
+                const sigRef = collection(db, 'signatures');
+                const q = query(sigRef, where('participantId', '==', firebaseUser.uid));
+                const sigSnap = await getDocs(q);
+                const signed = !sigSnap.empty;
+                setHasSignedRules(signed);
+                if (signed) {
+                  // Update profile as single source of truth
+                  await setDoc(docRef, { hasSignedRules: true }, { merge: true });
+                }
               }
             }
           } else {
             // Auto-create participant profile
+            const resolvedRole = isAdminEmail ? 'admin' : 'participant';
             await setDoc(docRef, {
               id: firebaseUser.uid,
               email: firebaseUser.email,
-              name: firebaseUser.displayName || 'Participant',
-              role: 'participant',
+              name: firebaseUser.displayName || (isAdminEmail ? 'Admin' : 'Participant'),
+              role: resolvedRole,
               language: 'en',
-              languageSet: false, // Force them to pick
-              hasSignedRules: false,
+              languageSet: isAdminEmail, // Admin doesn't need to pick language
+              hasSignedRules: isAdminEmail, // Admin doesn't need to sign rules
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp()
             });
-            setRole('participant');
-            setLanguageSet(false);
-            setHasSignedRules(false);
+            setRole(resolvedRole);
+            setLanguageSet(isAdminEmail);
+            setHasSignedRules(isAdminEmail);
           }
 
         } catch (error) {
           console.error("Error fetching user data:", error);
-          setRole('participant');
-          setHasSignedRules(false);
-          setLanguageSet(false);
+          setRole(firebaseUser.email?.toLowerCase() === 'admin@nrq.no' ? 'admin' : 'participant');
+          setHasSignedRules(firebaseUser.email?.toLowerCase() === 'admin@nrq.no');
+          setLanguageSet(firebaseUser.email?.toLowerCase() === 'admin@nrq.no');
         }
       } else {
         setRole(null);
@@ -108,6 +120,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithPassword = async (email: string, password?: string) => {
     if (!password) {
       throw new Error("Password is required to sign in.");
+    }
+    const isMinAdmin = email.toLowerCase() === 'admin@nrq.no';
+    if (isMinAdmin && password !== 'readquran114' && password !== 'radquran114') {
+      throw new Error("Incorrect admin password.");
     }
     try {
       await signInWithEmailAndPassword(auth, email, password);

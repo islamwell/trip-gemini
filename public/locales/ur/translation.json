@@ -101,5 +101,35 @@
       "apotek_kiwi": "فارمیسی یا سپر مارکیٹ",
       "kiwi_rema": "کیوی، ریما 1000 یا کوپ ایکسٹرا"
     }
+  },
+  "finances": {
+    "loading": "مالیاتی ڈیٹا لوڈ ہو رہا ہے...",
+    "subtitle": "اپنے ادائیگیوں، سفر کے اخراجات، اور تصدیق شدہ بجٹ کے ثبوت کو شفاف طریقے سے دیکھیں۔",
+    "breakdown": "سفر کی تقسیم",
+    "total_group_cost": "مجموعی گروپ لاگت",
+    "passengers_capacity": "مسافروں کی گنجائش",
+    "individual_share": "آپ کا انفرادی حصہ",
+    "payment_status": "ادائیگی کی حیثیت",
+    "paid_amount": "ادا شدہ رقم",
+    "outstanding_balance": "باقی رقم",
+    "paid_in_full": "مکمل ادائیگی ہو گئی",
+    "pending_payment_desc": "براہ کرم روانگی سے پہلے اپنا بقایا حصہ منتقل کریں۔",
+    "pay_with_vipps": "Vipps کے ذریعے ادائیگی کریں",
+    "itemized_breakdown_title": "تفصیلی بجٹ کی تقسیم اور ثبوت",
+    "itemized_breakdown_desc": "تفصیلی حسابات، فارمولے اور تصدیق شدہ آفیشل بکنگ/قیمتوں کے ذرائع دیکھنے کے لیے نیچے کسی بھی زمرے پر کلک کریں۔",
+    "verifiable_evidence_title": "تصدیق شدہ ثبوت اور ذرائع",
+    "math_proof_title": "تصدیق شدہ ریاضیاتی ثبوت",
+    "math_proof_desc": "ہم یہ ثابت کرتے ہیں کہ گروپ کی مجموعی لاگت کو مطلق ریاضیاتی مساوات کے ساتھ تقسیم کیا گیا ہے۔ تمام انفرادی حصوں کا مجموعہ گروپ کے بجٹ سے بالکل مطابقت رکھتا ہے:",
+    "math_proof_verified": "تصدیق شدہ گروپ لاگت کا توازن",
+    "math_proof_balanced": "100% متوازن",
+    "vipps_modal_title": "Vipps ٹرانسفر",
+    "vipps_modal_desc": "چونکہ آپ ڈیسک ٹاپ براؤزر پر ہیں، براہ کرم اس کوڈ کو اسکین کریں یا Vipps ایپ میں دستی ٹرانسفر کریں۔",
+    "vipps_modal_scan": "فون سے QR کوڈ اسکین کریں",
+    "vipps_modal_scan_desc": "اپنے فون کے کیمرہ سے کوڈ اسکین کریں",
+    "vipps_modal_receiver": "وصول کنندہ کا فون",
+    "vipps_modal_amount": "رقم",
+    "vipps_modal_account": "بینک اکاؤنٹ",
+    "vipps_modal_close": "بند کریں",
+    "vipps_modal_sms": "ایس ایم ایس لنک بھیجیں"
   }
 }

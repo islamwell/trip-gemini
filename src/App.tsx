@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { Header } from './components/common/Header';
 import { Navigation } from './components/common/Navigation';
+import { Footer } from './components/common/Footer';
 import { Login } from './components/common/Login';
 import { isSignInWithEmailLink } from 'firebase/auth';
 import { auth } from './services/firebase';
@@ -50,8 +51,9 @@ const AuthenticatedLayout = ({ children, hideNav = false }: { children: React.Re
       <Header />
       <div className="flex flex-1 max-w-7xl mx-auto w-full">
         {!hideNav && <Navigation />}
-        <main className={`flex-1 p-4 lg:p-8 pb-24 lg:pb-8 ${hideNav ? 'w-full' : ''}`}>
+        <main className={`flex-1 p-4 lg:p-8 pb-32 lg:pb-8 flex flex-col ${hideNav ? 'w-full' : ''}`}>
           {children}
+          <Footer />
         </main>
       </div>
     </div>
@@ -62,8 +64,9 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col">
         {children}
+        <Footer />
       </main>
     </div>
   );
@@ -79,6 +82,7 @@ const Checklist = React.lazy(() => import('./components/participant/Checklist').
 const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 const AdminLogin = React.lazy(() => import('./components/admin/AdminLogin').then(m => ({ default: m.AdminLogin })));
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
 
 // Main App Component
 function AppContent() {
@@ -188,14 +192,17 @@ function App() {
   return (
     <LanguageProvider>
       <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </AuthProvider>
+        </ToastProvider>
       </ThemeProvider>
     </LanguageProvider>
   );
 }
 
 export default App;
+

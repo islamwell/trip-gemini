@@ -285,5 +285,97 @@ export const covenantData: CovenantSection[] = [
     items: [
       { id: "16_1", en: "We do not want to end the trip saying we argued, neglected prayers, wasted time, or scrolled endlessly.", no: "Vi ønsker ikke å avslutte turen med å si at vi kranglet, forsømte bønner, kastet bort tid eller scrollet endeløst.", ur: "ہم سفر کے آخر میں یہ نہیں کہنا چاہتے کہ ہم بحث کرتے رہے، نمازیں قضا کیں، وقت ضائع کیا یا فون سکرول کرتے رہے۔" }
     ]
+  },
+  {
+    id: 17,
+    title: {
+      en: "Nature & Environment Responsibility",
+      no: "Natur- og miljøansvar",
+      ur: "فطرت اور ماحولیات کی ذمہ داری"
+    },
+    iconName: "Trees",
+    quote: {
+      en: "\"If the Hour (Day of Judgment) is about to be established and one of you was holding a palm shoot, let him plant it if he can.\" — Prophet Muhammad ﷺ",
+      no: "\"Hvis Timen (Dommedagen) er i ferd med å bli etablert og en av dere holder et palmeskudd, la ham plante det om han kan.\" — Profeten Muhammad ﷺ",
+      ur: "\"اگر قیامت قائم ہونے والی ہو اور تم میں سے کسی کے ہاتھ میں کھجور کا پودا ہو تو اگر وہ اسے لگا سکے تو ضرور لگائے۔\" — نبی کریم ﷺ"
+    },
+    items: [
+      { id: "17_1", en: "Do not litter. Leave every place cleaner than you found it.", no: "Ikke forsøpl. Forlat hvert sted renere enn du fant det.", ur: "کوڑا نہ پھیلائیں۔ ہر جگہ کو پہلے سے زیادہ صاف چھوڑ کر جائیں۔" },
+      { id: "17_2", en: "Follow Norwegian friluftsliv rules — respect nature trails and marked paths.", no: "Følg norske friluftslivsregler — respekter naturstier og merkede løyper.", ur: "ناروے کے فریلوفتسلیو اصولوں کی پابندی کریں — قدرتی پگڈنڈیوں اور نشان زدہ راستوں کا احترام کریں۔" },
+      { id: "17_3", en: "Do not pick flowers, break branches, or disturb wildlife.", no: "Ikke plukk blomster, brekk greiner eller forstyrr dyrelivet.", ur: "پھول نہ توڑیں، شاخیں نہ توڑیں اور جنگلی حیات کو پریشان نہ کریں۔" },
+      { id: "17_4", en: "Use designated trash bins and recycling stations.", no: "Bruk tildelte søppelbøtter og gjenvinningsstasjoner.", ur: "مقررہ کوڑے دان اور ری سائیکلنگ اسٹیشنز استعمال کریں۔" },
+      { id: "17_5", en: "Teach children to appreciate and protect the environment as Allah's trust (amanah).", no: "Lær barna å verdsette og beskytte miljøet som Allahs betrodd gave (amanah).", ur: "بچوں کو سکھائیں کہ ماحولیات کی حفاظت اللہ کی امانت ہے۔" }
+    ]
+  },
+  {
+    id: 18,
+    title: {
+      en: "Accommodation & Hygiene Rules",
+      no: "Regler for overnatting og hygiene",
+      ur: "قیام اور صفائی کے قوانین"
+    },
+    iconName: "Home",
+    items: [
+      { id: "18_1", en: "Keep shared cabins/rooms tidy — make beds, clean surfaces, and pack belongings neatly.", no: "Hold delte hytter/rom ryddige — re opp senger, rengjør overflater og pakk eiendelene pent.", ur: "مشترکہ کیبنز/کمرے صاف ستھرے رکھیں — بستر درست کریں، سطحیں صاف کریں اور سامان منظم رکھیں۔" },
+      { id: "18_2", en: "Bathroom etiquette — leave it clean for the next person. Wipe surfaces dry after wudu.", no: "Badetikette — forlat det rent for neste person. Tørk overflater etter wudu.", ur: "باتھ روم کے آداب — اگلے شخص کے لیے صاف چھوڑیں۔ وضو کے بعد سطحیں خشک کریں۔" },
+      { id: "18_3", en: "Respect quiet hours after Isha prayer. Allow others to rest.", no: "Respekter stille timer etter Isha-bønnen. La andre hvile.", ur: "عشاء کی نماز کے بعد خاموشی کے اوقات کا احترام کریں۔ دوسروں کو آرام کرنے دیں۔" },
+      { id: "18_4", en: "Take off shoes at the door and keep the entrance area clean.", no: "Ta av skoene ved døren og hold inngangsområdet rent.", ur: "دروازے پر جوتے اتاریں اور داخلی جگہ کو صاف رکھیں۔" },
+      { id: "18_5", en: "Report any damage or issues to the trip leader immediately.", no: "Rapporter eventuelle skader eller problemer til turlederen umiddelbart.", ur: "کسی بھی نقصان یا مسئلے کی اطلاع فوری طور پر سفر کے ذمہ دار کو دیں۔" },
+      { id: "18_6", en: "Share common spaces fairly — kitchen, bathroom, and living room.", no: "Del fellesarealer rettferdig — kjøkken, bad og stue.", ur: "مشترکہ جگہیں منصفانہ طور پر استعمال کریں — باورچی خانہ، باتھ روم اور بیٹھک۔" }
+    ]
+  },
+  {
+    id: 19,
+    title: {
+      en: "Children's Conduct",
+      no: "Barnas oppførsel",
+      ur: "بچوں کا طرزِ عمل"
+    },
+    iconName: "Baby",
+    quote: {
+      en: "\"Be kind to your children and teach them beautiful manners.\" — Prophet Muhammad ﷺ",
+      no: "\"Vær snill mot barna deres og lær dem vakre manerer.\" — Profeten Muhammad ﷺ",
+      ur: "\"اپنے بچوں کے ساتھ شفقت سے پیش آؤ اور انہیں خوبصورت آداب سکھاؤ۔\" — نبی کریم ﷺ"
+    },
+    items: [
+      { id: "19_1", en: "Parents are responsible for their children at all times — near water, cliffs, and roads.", no: "Foreldre er ansvarlige for barna sine til enhver tid — nær vann, stup og veier.", ur: "والدین ہر وقت اپنے بچوں کے ذمہ دار ہیں — پانی، چٹانوں اور سڑکوں کے قریب خاص طور پر۔" },
+      { id: "19_2", en: "Children must follow the same respect and adab rules as adults.", no: "Barn må følge de samme reglene for respekt og adab som voksne.", ur: "بچوں کو بھی بڑوں کی طرح احترام اور آداب کے اصولوں کی پابندی کرنی ہوگی۔" },
+      { id: "19_3", en: "Encourage children to participate in dhikr and short duas during the trip.", no: "Oppmuntre barna til å delta i dhikr og korte duaer under turen.", ur: "بچوں کو سفر کے دوران ذکر اور مختصر دعاؤں میں شریک ہونے کی ترغیب دیں۔" },
+      { id: "19_4", en: "No excessive screen time for children — engage them with nature.", no: "Ingen overdreven skjermtid for barn — engasjer dem med naturen.", ur: "بچوں کے لیے زیادہ اسکرین ٹائم نہیں — انہیں فطرت سے جوڑیں۔" },
+      { id: "19_5", en: "Children should greet others with Salam and say 'JazakAllah' when helped.", no: "Barn bør hilse andre med Salam og si 'JazakAllah' når de får hjelp.", ur: "بچوں کو دوسروں کو سلام کرنا چاہیے اور مدد ملنے پر 'جزاک اللہ' کہنا چاہیے۔" }
+    ]
+  },
+  {
+    id: 20,
+    title: {
+      en: "Photography & Social Media Etiquette",
+      no: "Fotografering og sosiale medier-etikette",
+      ur: "فوٹوگرافی اور سوشل میڈیا کے آداب"
+    },
+    iconName: "Camera",
+    items: [
+      { id: "20_1", en: "Ask permission before photographing or filming other participants.", no: "Spør om tillatelse før du fotograferer eller filmer andre deltakere.", ur: "دوسرے شرکاء کی تصویر یا ویڈیو بنانے سے پہلے اجازت لیں۔" },
+      { id: "20_2", en: "Do not share group photos on social media without consent of everyone visible.", no: "Ikke del gruppebilder på sosiale medier uten samtykke fra alle som er synlige.", ur: "تصویر میں نظر آنے والے ہر شخص کی اجازت کے بغیر سوشل میڈیا پر گروپ تصاویر شیئر نہ کریں۔" },
+      { id: "20_3", en: "Do not post real-time location of the group for security reasons.", no: "Ikke legg ut gruppens sanntidsposisjon av sikkerhetsgrunner.", ur: "حفاظتی وجوہات کی بنا پر گروپ کی لائیو لوکیشن پوسٹ نہ کریں۔" },
+      { id: "20_4", en: "Focus on experiencing moments, not staging them for social media.", no: "Fokuser på å oppleve øyeblikkene, ikke iscenesette dem for sosiale medier.", ur: "لمحوں سے لطف اندوز ہونے پر توجہ دیں، سوشل میڈیا کے لیے بناوٹ نہ کریں۔" },
+      { id: "20_5", en: "Avoid excessive selfie-taking at sacred or reflective locations.", no: "Unngå overdreven selfie-taking på hellige eller kontemplative steder.", ur: "مقدس یا سوچ بچار والی جگہوں پر ضرورت سے زیادہ سیلفیاں لینے سے گریز کریں۔" }
+    ]
+  },
+  {
+    id: 21,
+    title: {
+      en: "Health & Safety Preparedness",
+      no: "Helse- og sikkerhetsberedskap",
+      ur: "صحت اور حفاظت کی تیاری"
+    },
+    iconName: "ShieldCheck",
+    items: [
+      { id: "21_1", en: "Inform the trip leader of any medical conditions, allergies, or dietary restrictions.", no: "Informer turlederen om eventuelle medisinske tilstander, allergier eller diettrestriksjoner.", ur: "سفر کے ذمہ دار کو کسی بھی طبی حالت، الرجی یا غذائی پابندیوں سے آگاہ کریں۔" },
+      { id: "21_2", en: "Carry personal medications and a basic first aid kit.", no: "Ha med personlige medisiner og et grunnleggende førstehjelpsskrin.", ur: "ذاتی دوائیں اور ابتدائی طبی امداد کا بنیادی سامان ساتھ رکھیں۔" },
+      { id: "21_3", en: "Stay hydrated and eat regular meals — do not skip meals during long drives.", no: "Hold deg hydrert og spis regelmessige måltider — ikke hopp over måltider under lange kjøreturer.", ur: "پانی پیتے رہیں اور باقاعدگی سے کھائیں — لمبے سفر میں کھانا نہ چھوڑیں۔" },
+      { id: "21_4", en: "Know the emergency number in Norway: 113 (ambulance), 110 (fire), 112 (police).", no: "Kjenn nødnumrene i Norge: 113 (ambulanse), 110 (brann), 112 (politi).", ur: "ناروے کے ہنگامی نمبر جان لیں: 113 (ایمبولینس)، 110 (فائر)، 112 (پولیس)۔" },
+      { id: "21_5", en: "Wear appropriate safety gear at glacier viewpoints and steep trails.", no: "Bruk passende sikkerhetsutstyr ved brevannspunkter og bratte stier.", ur: "گلیشیئر ویو پوائنٹس اور کھڑی پگڈنڈیوں پر مناسب حفاظتی سامان پہنیں۔" },
+      { id: "21_6", en: "Never swim alone in fjords or rivers — cold water shock is a real danger.", no: "Svøm aldri alene i fjorder eller elver — kaldtvannssjokk er en reell fare.", ur: "فیورڈز یا دریاؤں میں کبھی اکیلے نہ تیریں — ٹھنڈے پانی کا جھٹکا ایک حقیقی خطرہ ہے۔" }
+    ]
   }
 ];
