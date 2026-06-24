@@ -524,7 +524,7 @@ export const Itinerary: React.FC = () => {
 
       {/* Tabs and Details */}
       <div className="glass rounded-3xl overflow-hidden shadow-sm">
-        <div className="flex border-b border-card-border overflow-x-auto">
+        <div className="flex flex-wrap border-b border-card-border pb-2 gap-2">
           {Object.keys(itineraryData).map((day) => (
             <button
               key={day}

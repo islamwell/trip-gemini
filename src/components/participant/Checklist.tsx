@@ -316,7 +316,7 @@ export const Checklist: React.FC = () => {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex border-b border-card-border overflow-x-auto gap-2 pb-2">
+      <div className="flex flex-wrap border-b border-card-border gap-2 pb-4">
         {categories.map((cat) => (
           <button
             key={cat.id}
