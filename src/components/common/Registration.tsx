@@ -169,6 +169,10 @@ export const Registration: React.FC = () => {
     }
   };
 
+  const inputClass = "w-full rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none transition-colors " +
+    "focus:bg-green-50 dark:focus:bg-green-900/30 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 " +
+    "invalid:[&:not(:placeholder-shown)]:bg-pink-50 dark:invalid:[&:not(:placeholder-shown)]:bg-pink-900/30 invalid:[&:not(:placeholder-shown)]:border-pink-500 invalid:[&:not(:placeholder-shown)]:text-pink-600 invalid:[&:not(:placeholder-shown)]:focus:ring-pink-500/20";
+
   return (
     <div className="flex flex-1 items-center justify-center p-4">
       <div className="w-full max-w-md glass p-6 sm:p-8 rounded-2xl shadow-xl mt-8 mb-8">
@@ -188,7 +192,7 @@ export const Registration: React.FC = () => {
                   <select 
                     value={salutation} 
                     onChange={(e) => setSalutation(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none text-sm"
+                    className={`${inputClass} px-3 py-2 text-sm`}
                   >
                     {['Br.', 'Sr.', 'Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Imam'].map(s => (
                       <option key={s} value={s}>{s}</option>
@@ -197,7 +201,7 @@ export const Registration: React.FC = () => {
                 </div>
                 <div className="w-2/3">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.role', 'Volunteer Role')}</label>
-                  <select value={duty} onChange={(e) => setDuty(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none text-sm truncate">
+                  <select value={duty} onChange={(e) => setDuty(e.target.value)} className={`${inputClass} px-3 py-2 text-sm truncate`}>
                     {EXTENDED_DUTY_OPTIONS.map(group => (
                       <optgroup key={group.group} label={group.group}>
                         {group.options.map(opt => <option key={opt} value={opt} title={opt}>{opt}</option>)}
@@ -211,11 +215,11 @@ export const Registration: React.FC = () => {
               <div className="flex gap-3">
                 <div className="w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.firstName', 'First Name')}</label>
-                  <input required type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none text-sm" placeholder={t('registration.firstPlaceholder', 'John')} />
+                  <input required type="text" minLength={2} value={firstName} onChange={(e) => setFirstName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.firstPlaceholder', 'John')} />
                 </div>
                 <div className="w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.lastName', 'Last Name')}</label>
-                  <input required type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none text-sm" placeholder={t('registration.lastPlaceholder', 'Doe')} />
+                  <input required type="text" minLength={2} value={lastName} onChange={(e) => setLastName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.lastPlaceholder', 'Doe')} />
                 </div>
               </div>
 
@@ -223,17 +227,17 @@ export const Registration: React.FC = () => {
               <div className="flex gap-3">
                 <div className="w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.phone', 'Phone')}</label>
-                  <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none text-sm" placeholder="+47 123 45 678" />
+                  <input required type="tel" pattern="^\+.*" title="Must start with country code (e.g., +47)" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder="+47 123 45 678" />
                 </div>
                 <div className="w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.email', 'Email (Opt)')}</label>
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none text-sm" placeholder="you@mail.com" />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder="you@mail.com" />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.passcode', 'Passcode (Opt 4-12 digits)')}</label>
-                <input type="password" maxLength={12} value={passcode} onChange={(e) => setPasscode(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none" placeholder="1234" />
+                <input type="password" minLength={4} maxLength={12} value={passcode} onChange={(e) => setPasscode(e.target.value)} className={`${inputClass} px-3 py-2.5`} placeholder="1234" />
                 <p className="text-xs text-slate-400 mt-1">{t('registration.passcodeHint', 'Used to log back in quickly on a new device.')}</p>
               </div>
 
@@ -252,12 +256,12 @@ export const Registration: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium mb-1">{t('login.identifier', 'Phone or Email')}</label>
-              <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none" placeholder={t('login.identifierPlaceholder', 'Phone number or Email')} />
+              <input required value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputClass} px-4 py-3`} placeholder={t('login.identifierPlaceholder', 'Phone number or Email')} />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">{t('login.passcode', 'Passcode')}</label>
-              <input type="password" value={passcode} onChange={(e) => setPasscode(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none" placeholder={t('login.passcodePlaceholder', 'Leave blank if none')} />
+              <input type="password" value={passcode} onChange={(e) => setPasscode(e.target.value)} className={`${inputClass} px-4 py-3`} placeholder={t('login.passcodePlaceholder', 'Leave blank if none')} />
             </div>
 
             <button type="submit" disabled={loading} className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50 active:scale-95 shadow-md shadow-primary-500/20">
@@ -279,7 +283,7 @@ export const Registration: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('login.phone', 'Phone Number')}</label>
-                  <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none" placeholder="+47 123 45 678" />
+                  <input required type="tel" pattern="^\+.*" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputClass} px-4 py-3`} placeholder="+47 123 45 678" />
                 </div>
                 <button type="button" onClick={handleSendSms} disabled={loading} className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50 active:scale-95 shadow-md shadow-primary-500/20">
                   {loading ? t('common.sending', 'Sending...') : t('login.sendSms', 'Send SMS Code')}
@@ -292,7 +296,7 @@ export const Registration: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('login.sixDigit', '6-Digit Code')}</label>
-                  <input required type="text" value={smsCode} onChange={(e) => setSmsCode(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-card-border bg-white/50 dark:bg-slate-800/50 outline-none text-center tracking-widest text-lg" placeholder="123456" />
+                  <input required type="text" pattern="[0-9]{6}" value={smsCode} onChange={(e) => setSmsCode(e.target.value)} className={`${inputClass} px-4 py-3 text-center tracking-widest text-lg`} placeholder="123456" />
                 </div>
                 <button type="submit" disabled={loading} className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50 active:scale-95 shadow-md shadow-primary-500/20">
                   {loading ? t('common.verifying', 'Verifying...') : t('login.verifySubmit', 'Verify & Login')}
