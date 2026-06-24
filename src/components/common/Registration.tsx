@@ -15,6 +15,7 @@ const EXTENDED_DUTY_OPTIONS = [
 ];
 
 const CountdownTimer = () => {
+  const { t } = useLanguage();
   const targetDate = new Date('2026-07-02T14:00:00+02:00').getTime(); // July 2, 2pm
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
