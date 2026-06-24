@@ -21,7 +21,7 @@ export const Login: React.FC = () => {
         await signInWithPassword(email, password);
       } else {
         await sendMagicLink(email);
-        setMessage('Magic link sent! Check your email to sign in.');
+        setMessage(t('auth.magic_link_sent'));
       }
     } catch (error: any) {
       setMessage(`Error: ${error.message}`);
@@ -31,7 +31,7 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+    <div className="flex flex-1 items-center justify-center p-4">
       <div className="w-full max-w-md glass p-8 rounded-2xl shadow-xl">
         <div className="mb-8 text-center">
           <div className="mx-auto w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
@@ -40,7 +40,7 @@ export const Login: React.FC = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold">{t('auth.login')}</h1>
-          <p className="text-slate-500 mt-2">Sign in to manage your trip details</p>
+          <p className="text-slate-500 mt-2">{t('auth.subtitle')}</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
@@ -82,7 +82,7 @@ export const Login: React.FC = () => {
               disabled={loading}
               className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:opacity-70 disabled:cursor-not-allowed hover-lift"
             >
-              {loading ? 'Processing...' : usePassword ? 'Sign In' : t('auth.send_link')}
+              {loading ? t('auth.processing') : usePassword ? t('auth.sign_in') : t('auth.send_link')}
             </button>
 
             <button
@@ -94,7 +94,7 @@ export const Login: React.FC = () => {
               }}
               className="w-full bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-medium py-3 px-4 rounded-xl transition-colors disabled:opacity-70 disabled:cursor-not-allowed hover-lift"
             >
-              {usePassword ? 'Use Magic Link Login' : 'Login with Password'}
+              {usePassword ? t('auth.use_magic_link') : t('auth.use_password')}
             </button>
           </div>
 

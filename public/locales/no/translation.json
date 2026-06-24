@@ -12,7 +12,14 @@
     "email": "E-postadresse",
     "phone": "Telefonnummer",
     "send_link": "Send innloggingslenke",
-    "send_code": "Send kode"
+    "send_code": "Send kode",
+    "subtitle": "Logg inn for å administrere turdetaljene dine",
+    "password": "Passord",
+    "processing": "Behandler...",
+    "sign_in": "Logg Inn",
+    "use_magic_link": "Bruk magisk innloggingslenke",
+    "use_password": "Logg inn med passord",
+    "magic_link_sent": "Magisk lenke sendt! Sjekk e-posten din for å logge inn."
   },
   "onboarding": {
     "select_language": "Velg språk / Select Language"
@@ -86,31 +93,26 @@
       "h2_desc": "Høy solfaktor UV-beskyttelse. Isbreer og snødekke reflekterer solstrålene sterkt.",
       "h3_name": "Våtservietter og håndsprit",
       "h3_desc": "For rask hygiene og rengjøring av hender underveis og wudu-opprydding.",
-
       "c5_name": "Regnbukse",
       "c5_desc": "Vanntett overbukse for fotturer i regn. Norsk fjellvær endrer seg raskt.",
       "c6_name": "Varm lue og hansker",
       "c6_desc": "Temperaturen synker kraftig på fjelloverganger og brevisningspunkter. Pakk lett merinoull.",
       "c7_name": "Solbriller",
       "c7_desc": "UV-beskyttelse er viktig nær breer, snø og åpne fjorder. Polariserte glass anbefales.",
-
       "s4_name": "Kompass / Qibla-app",
       "s4_desc": "For å finne bønneretning på avsidesliggende fjellsteder der mobildekning kan være svak.",
       "s5_name": "Duabok / Fortress of the Muslim",
       "s5_desc": "Samling av daglige duaer og reisebønner. Viktig for morgen- og kveldsadhkar.",
-
       "e4_name": "USB-billader",
       "e4_desc": "Flerports billader for Sprinter-minibussen. Hold alle enheter ladet under lange kjøreturer.",
       "e5_name": "Lommelykt / Hodelykt",
       "e5_desc": "Viktig for kveldsbønn utendørs, hytteturer om natten og nødsituasjoner.",
-
       "h4_name": "Personlige medisiner",
       "h4_desc": "Reseptbelagte medisiner, inhalatorer eller EpiPens. Ha alltid i håndbagasjen.",
       "h5_name": "Insektmiddel",
       "h5_desc": "Knott og mygg nær fjorder og daler er vanlig på norsk sommer.",
       "h6_name": "Grunnleggende førstehjelpssett",
       "h6_desc": "Plaster, antiseptiske servietter, paracetamol, ibuprofen og gnagsårplaster for fotturer.",
-
       "d1_name": "Gyldig ID / Pass",
       "d1_desc": "Påkrevd for alle deltakere. Ha det lett tilgjengelig for hotellinnsjekking og nødsituasjoner.",
       "d2_name": "Reiseforsikringskort",
@@ -119,7 +121,6 @@
       "d3_desc": "Påkrevd hvis du er en av de utpekte sjåførene. Må være gyldig i Norge.",
       "d4_name": "Kontanter og kort",
       "d4_desc": "Ha noen norske kroner (NOK) som reserve. Ikke alle fjellbutikker tar kort.",
-
       "f1_name": "Gjenbrukbar vannflaske",
       "f1_desc": "Hold deg hydrert på turer og kjøring. Norge har utmerket, rent springvann overalt.",
       "f2_name": "Snackspose",

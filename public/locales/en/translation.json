@@ -12,7 +12,14 @@
     "email": "Email Address",
     "phone": "Phone Number",
     "send_link": "Send Magic Link",
-    "send_code": "Send Code"
+    "send_code": "Send Code",
+    "subtitle": "Sign in to manage your trip details",
+    "password": "Password",
+    "processing": "Processing...",
+    "sign_in": "Sign In",
+    "use_magic_link": "Use Magic Link Login",
+    "use_password": "Login with Password",
+    "magic_link_sent": "Magic link sent! Check your email to sign in."
   },
   "onboarding": {
     "select_language": "Select Your Language"
@@ -86,31 +93,26 @@
       "h2_desc": "High-factor UV protection. Glaciers and snowy peaks amplify solar rays intensely.",
       "h3_name": "Wet Wipes & Sanitizer",
       "h3_desc": "For quick hygiene, cleaning hands on the road, and wudu cleanups.",
-
       "c5_name": "Rain Pants",
       "c5_desc": "Waterproof over-trousers for hiking in rain. Norwegian mountain weather changes fast.",
       "c6_name": "Warm Hat & Gloves",
       "c6_desc": "Temperatures drop sharply at mountain passes and glacier viewpoints. Pack lightweight merino.",
       "c7_name": "Sunglasses",
       "c7_desc": "UV protection is essential near glaciers, snow, and open fjords. Polarised lenses recommended.",
-
       "s4_name": "Compass / Qibla App",
       "s4_desc": "For finding prayer direction in remote mountain locations where signal may be weak.",
       "s5_name": "Dua Book / Fortress of the Muslim",
       "s5_desc": "Collection of daily duas and travel supplications. Essential for morning/evening adhkar.",
-
       "e4_name": "USB Car Charger",
       "e4_desc": "Multi-port car charger for the Sprinter minibus. Keep all devices topped up during long drives.",
       "e5_name": "Flashlight / Head Torch",
       "e5_desc": "Essential for evening prayers outdoors, cabin walks at night, and emergency situations.",
-
       "h4_name": "Personal Medications",
       "h4_desc": "Any prescription meds, inhalers, or EpiPens. Always carry in hand luggage, not checked bags.",
       "h5_name": "Insect Repellent",
       "h5_desc": "Midges and mosquitoes near fjords and valleys are common in Norwegian summer.",
       "h6_name": "Basic First Aid Kit",
       "h6_desc": "Plasters, antiseptic wipes, paracetamol, ibuprofen, and blister pads for hiking.",
-
       "d1_name": "Valid ID / Passport",
       "d1_desc": "Required for all participants. Keep accessible for hotel check-ins and emergencies.",
       "d2_name": "Travel Insurance Card",
@@ -119,7 +121,6 @@
       "d3_desc": "Required if you're one of the designated drivers. Must be valid in Norway.",
       "d4_name": "Cash & Cards",
       "d4_desc": "Have some Norwegian kroner (NOK) as backup. Not all mountain shops accept cards.",
-
       "f1_name": "Reusable Water Bottle",
       "f1_desc": "Stay hydrated on hikes and drives. Norway has excellent, clean tap water everywhere.",
       "f2_name": "Snack Bag",
