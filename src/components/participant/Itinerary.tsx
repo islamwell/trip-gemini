@@ -85,7 +85,9 @@ function calculateTravelPrayers(locKey: string, dayOffset: number) {
     let mins = Math.round((h - hours) * 60);
     if (mins === 60) { hours++; mins = 0; }
     hours = (hours + 24) % 24;
-    return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${String(mins).padStart(2, '0')} ${ampm}`;
   };
 
   return {
@@ -149,6 +151,14 @@ export const defaultItinerary: Record<string, any[]> = {
   ]
 };
 
+export function toAmPm(timeStr: string) {
+  if (!timeStr.match(/^\d{1,2}:\d{2}$/)) return timeStr;
+  const [h, m] = timeStr.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const displayHours = h % 12 || 12;
+  return `${displayHours}:${String(m).padStart(2, '0')} ${ampm}`;
+}
+
 // Resolve the dynamic {fajr} and {sunset} placeholders
 export function resolveStops(day: string, stops: any[]) {
   const thurTimes = calculateTravelPrayers('oslo', 0);
@@ -171,6 +181,8 @@ export function resolveStops(day: string, stops: any[]) {
       resolvedTime = dayTimes.fajr;
     } else if (stop.time === '{sunset}') {
       resolvedTime = dayTimes.sunset;
+    } else {
+      resolvedTime = toAmPm(resolvedTime);
     }
     return {
       ...stop,

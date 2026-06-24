@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Globe, Palette, Bell, Check } from 'lucide-react';
+import { Palette, Bell, Check } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
@@ -14,7 +14,6 @@ export const Header: React.FC = () => {
 
   const [latestNotif, setLatestNotif] = useState<any>(null);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-  const [showLangDropdown, setShowLangDropdown] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -33,7 +32,6 @@ export const Header: React.FC = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setShowNotifDropdown(false);
-        setShowLangDropdown(false);
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -42,7 +40,6 @@ export const Header: React.FC = () => {
 
   const closeAll = useCallback(() => {
     setShowNotifDropdown(false);
-    setShowLangDropdown(false);
   }, []);
 
   const hasUnread = latestNotif && localStorage.getItem(`dismissed_notif_${latestNotif.id}`) !== 'true';
@@ -54,18 +51,19 @@ export const Header: React.FC = () => {
     }
   };
 
-  const handleSelectLanguage = (lang: string) => {
-    setLanguage(lang);
-    setShowLangDropdown(false);
-  };
-
-  const isAnyDropdownOpen = showNotifDropdown || showLangDropdown;
+  const isAnyDropdownOpen = showNotifDropdown;
 
   const languages = [
     { code: 'en', label: 'English', flag: '🇬🇧' },
     { code: 'no', label: 'Norsk', flag: '🇳🇴' },
     { code: 'ur', label: 'اردو', flag: '🇵🇰', className: 'font-urdu' },
   ];
+
+  const handleToggleLanguage = () => {
+    const currentIndex = languages.findIndex(l => l.code === language);
+    const nextIndex = (currentIndex + 1) % languages.length;
+    setLanguage(languages[nextIndex].code);
+  };
 
   return (
     <>
@@ -85,7 +83,7 @@ export const Header: React.FC = () => {
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-primary-500 to-primary-800 shadow-md flex items-center justify-center text-white font-black text-xs sm:text-sm">
               OG
             </div>
-            <span className="font-extrabold text-lg sm:text-xl bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-500 dark:from-slate-100 dark:to-slate-400">Geiranger</span>
+            <span className="font-extrabold text-lg sm:text-xl bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-500 dark:from-slate-100 dark:to-slate-400">NurulQuran Geiranger</span>
           </Link>
    
           <div className="flex items-center gap-1 sm:gap-3">
@@ -94,7 +92,6 @@ export const Header: React.FC = () => {
               <div className="relative">
                 <button 
                   onClick={() => {
-                    setShowLangDropdown(false);
                     setShowNotifDropdown(prev => !prev);
                   }}
                   className="flex items-center p-2.5 sm:p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative active:scale-95" 
@@ -135,46 +132,14 @@ export const Header: React.FC = () => {
               <span className="text-sm font-medium capitalize hidden sm:inline">{theme}</span>
             </button>
 
-            {/* Language Selector */}
-            <div className="relative">
-              <button 
-                onClick={() => {
-                  setShowNotifDropdown(false);
-                  setShowLangDropdown(prev => !prev);
-                }}
-                className={`flex items-center gap-1.5 p-2.5 sm:p-2 rounded-xl transition-colors active:scale-95 ${
-                  showLangDropdown 
-                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' 
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-                aria-expanded={showLangDropdown}
-                aria-label="Select language"
-              >
-                <Globe className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-                <span className="text-sm font-bold uppercase hidden sm:inline">{language}</span>
-              </button>
-              {showLangDropdown && (
-                <div className="absolute right-0 mt-2 w-44 bg-card-bg border border-card-border rounded-2xl shadow-2xl z-50 animate-slide-in overflow-hidden">
-                  {languages.map((lang) => (
-                    <button 
-                      key={lang.code}
-                      onClick={() => handleSelectLanguage(lang.code)}
-                      className={`flex items-center gap-3 w-full text-left px-4 py-3 text-sm transition-colors active:bg-primary-100 dark:active:bg-primary-900/40 ${
-                        language === lang.code 
-                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 font-bold' 
-                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300'
-                      } ${lang.className || ''}`}
-                    >
-                      <span className="text-lg">{lang.flag}</span>
-                      <span className="flex-1">{lang.label}</span>
-                      {language === lang.code && (
-                        <Check className="w-4 h-4 text-primary-500" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <button 
+              onClick={handleToggleLanguage}
+              className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95 text-xl"
+              aria-label="Toggle language"
+              title="Change Language"
+            >
+              {languages.find(l => l.code === language)?.flag || '🇬🇧'}
+            </button>
             
 
           </div>
