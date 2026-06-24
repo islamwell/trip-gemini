@@ -83,6 +83,7 @@ const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboar
 const AdminLogin = React.lazy(() => import('./components/admin/AdminLogin').then(m => ({ default: m.AdminLogin })));
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { AutoUpdater } from './components/common/AutoUpdater';
 
 // Main App Component
 function AppContent() {
@@ -104,6 +105,7 @@ function AppContent() {
 
   return (
     <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen text-slate-500 font-medium">Loading Application...</div>}>
+      <AutoUpdater />
       <Routes>
         <Route path="/login" element={
           user ? <Navigate to="/" replace /> : <PublicLayout><Login /></PublicLayout>

@@ -1,11 +1,11 @@
 {
   "name": "trip-gemini",
   "private": true,
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node -e \"const fs = require('fs'); const pkg = require('./package.json'); fs.writeFileSync('public/version.json', JSON.stringify({ version: pkg.version }));\" && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
