@@ -8,21 +8,19 @@ export const Footer: React.FC = () => {
   const { role } = useAuth();
 
   return (
-    <footer className="w-full mt-auto py-6 border-t border-card-border bg-card-bg/50 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-sm text-slate-500 font-medium">
-          Version {pkg.version}
-        </div>
-        
-        {role === 'admin' && (
-          <Link 
-            to="/admin" 
-            className="inline-flex items-center gap-1.5 justify-center px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-medium transition-transform hover:scale-105"
-          >
-            <ShieldCheck className="w-4 h-4" /> Admin Panel
-          </Link>
-        )}
+    <footer className="w-full mt-auto py-2 flex flex-col items-center justify-center gap-2">
+      <div className="text-[10px] text-slate-400 font-medium">
+        Ver {pkg.version}
       </div>
+      
+      {role === 'admin' && (
+        <Link 
+          to="/admin" 
+          className="text-xs font-bold text-slate-500 hover:text-primary-500 transition-colors flex items-center gap-1"
+        >
+          <ShieldCheck className="w-3 h-3" /> Admin Panel
+        </Link>
+      )}
     </footer>
   );
 };

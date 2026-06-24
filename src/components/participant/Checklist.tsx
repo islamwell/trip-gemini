@@ -353,16 +353,16 @@ export const Checklist: React.FC = () => {
                   <Square className="w-6 h-6 text-slate-400" />
                 )}
               </div>
-              <div className="flex-1 space-y-1">
-                <h3 className={`font-semibold text-lg ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}`}>
+              <div className="flex-1 space-y-1 min-w-0">
+                <h3 className={`font-semibold text-lg break-words ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}`}>
                   {t(item.nameKey) || item.nameKey}
                 </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed break-words">
                   {t(item.descKey) || item.descKey}
                 </p>
-                <div className="pt-2 flex items-center gap-1.5 text-xs text-primary-600 dark:text-primary-400 font-medium">
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Where to buy: {t(item.storeKey) || item.storeKey}</span>
+                <div className="pt-2 flex items-start gap-1.5 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                  <ShoppingBag className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span className="break-words">Where to buy: {t(item.storeKey) || item.storeKey}</span>
                 </div>
               </div>
             </div>
