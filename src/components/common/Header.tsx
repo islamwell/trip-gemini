@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Palette, Bell } from 'lucide-react';
+import { Palette, Bell, Sun, Moon, Coffee } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
@@ -125,11 +125,13 @@ export const Header: React.FC = () => {
             {/* Theme Cycler */}
             <button 
               onClick={toggleTheme} 
-              className="flex items-center gap-2 p-2.5 sm:p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95" 
-              title="Cycle theme (Light / Dark / Sepia)"
+              className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95" 
+              title={`Cycle theme (Current: ${theme})`}
             >
-              <Palette className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-              <span className="text-sm font-medium capitalize hidden sm:inline">{theme}</span>
+              {theme === 'light' && <Sun className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
+              {theme === 'dark' && <Moon className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
+              {theme === 'sepia' && <Coffee className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
+              {!['light', 'dark', 'sepia'].includes(theme) && <Palette className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
             </button>
 
             <button 

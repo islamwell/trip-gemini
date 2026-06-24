@@ -41,7 +41,7 @@ const CountdownTimer = () => {
   return (
     <div className="mb-6 text-center bg-white/30 dark:bg-slate-900/30 p-4 rounded-2xl border border-card-border shadow-inner">
       <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Registration Deadline</h3>
-      <div className="flex justify-center gap-4">
+      <div dir="ltr" className="flex justify-center gap-4">
         {[
           { label: 'Days', value: timeLeft.days },
           { label: 'Hours', value: timeLeft.hours },
@@ -186,8 +186,8 @@ export const Registration: React.FC = () => {
             <form onSubmit={handleRegister} className="space-y-4">
               
               {/* Title & Role Row */}
-              <div className="flex gap-3">
-                <div className="w-1/3">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="w-full sm:w-1/3">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.title', 'Title')}</label>
                   <select 
                     value={salutation} 
@@ -199,7 +199,7 @@ export const Registration: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="w-2/3">
+                <div className="w-full sm:w-2/3">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.role', 'Volunteer Role')}</label>
                   <select value={duty} onChange={(e) => setDuty(e.target.value)} className={`${inputClass} px-3 py-2 text-sm truncate`}>
                     {EXTENDED_DUTY_OPTIONS.map(group => (
@@ -212,24 +212,24 @@ export const Registration: React.FC = () => {
               </div>
 
               {/* First & Last Name Row */}
-              <div className="flex gap-3">
-                <div className="w-1/2">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="w-full sm:w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.firstName', 'First Name')}</label>
                   <input required type="text" minLength={2} value={firstName} onChange={(e) => setFirstName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.firstPlaceholder', 'John')} />
                 </div>
-                <div className="w-1/2">
+                <div className="w-full sm:w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.lastName', 'Last Name')}</label>
                   <input required type="text" minLength={2} value={lastName} onChange={(e) => setLastName(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder={t('registration.lastPlaceholder', 'Doe')} />
                 </div>
               </div>
 
               {/* Phone & Email Row */}
-              <div className="flex gap-3">
-                <div className="w-1/2">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="w-full sm:w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.phone', 'Phone')}</label>
                   <input required type="tel" pattern="^\+.*" title="Must start with country code (e.g., +47)" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder="+47 123 45 678" />
                 </div>
-                <div className="w-1/2">
+                <div className="w-full sm:w-1/2">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.email', 'Email (Opt)')}</label>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder="you@mail.com" />
                 </div>
