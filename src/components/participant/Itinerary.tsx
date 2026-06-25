@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw, Play, Pause } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../../services/firebase';
@@ -208,7 +208,7 @@ export const Itinerary: React.FC = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   // Minibus animation states
-  const routePathRef = useRef<SVGPathElement>(null);
+  const [routePath, setRoutePath] = useState<SVGPathElement | null>(null);
   const [busDistance, setBusDistance] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -216,18 +216,16 @@ export const Itinerary: React.FC = () => {
   const [totalPathLength, setTotalPathLength] = useState(1500); // fallback
 
   useEffect(() => {
-    const pathEl = routePathRef.current;
-    if (pathEl) {
-      setTotalPathLength(pathEl.getTotalLength());
+    if (routePath) {
+      setTotalPathLength(routePath.getTotalLength());
     }
-  }, []);
+  }, [routePath]);
 
   useEffect(() => {
     let animationId: number;
-    const pathEl = routePathRef.current;
-    if (!pathEl || !isPlaying) return;
+    if (!routePath || !isPlaying) return;
 
-    const totalLength = pathEl.getTotalLength();
+    const totalLength = routePath.getTotalLength();
 
     const animate = () => {
       setBusDistance(prev => {
@@ -242,26 +240,25 @@ export const Itinerary: React.FC = () => {
 
     animationId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationId);
-  }, [isPlaying, speed]);
+  }, [routePath, isPlaying, speed]);
 
   useEffect(() => {
-    const pathEl = routePathRef.current;
-    if (!pathEl) return;
+    if (!routePath) return;
     try {
-      const totalLength = pathEl.getTotalLength();
+      const totalLength = routePath.getTotalLength();
       const currentDist = Math.min(totalLength, Math.max(0, busDistance));
-      const p = pathEl.getPointAtLength(currentDist);
+      const p = routePath.getPointAtLength(currentDist);
       
       // Calculate angle
       const lookAhead = Math.min(totalLength, currentDist + 2);
-      const pAhead = pathEl.getPointAtLength(lookAhead);
+      const pAhead = routePath.getPointAtLength(lookAhead);
       const angle = Math.atan2(pAhead.y - p.y, pAhead.x - p.x) * 180 / Math.PI;
       
       setBusPos({ x: p.x, y: p.y, angle });
     } catch (e) {
       // fallback
     }
-  }, [busDistance]);
+  }, [routePath, busDistance]);
 
   const stopToDayMap: Record<string, 'thursday' | 'friday' | 'saturday' | 'sunday'> = {
     oslo: 'thursday',
@@ -526,7 +523,7 @@ export const Itinerary: React.FC = () => {
               />
               {/* Draw active animated path */}
               <path
-                ref={routePathRef}
+                ref={setRoutePath}
                 d="M 608 560 Q 560 512 512 464 T 448 400 T 368 400 T 336 304 T 288 248 T 224 208 T 240 144 T 288 128 T 208 176 T 368 224 T 528 368 Z"
                 stroke="url(#route-gradient)"
                 strokeWidth="4"
@@ -549,7 +546,6 @@ export const Itinerary: React.FC = () => {
               {/* Moving Minibus */}
               <g 
                 transform={`translate(${busPos.x}, ${busPos.y}) rotate(${busPos.angle})`}
-                className="transition-transform duration-100 ease-out"
               >
                 {/* Glowing drop shadow */}
                 <circle cx="0" cy="0" r="12" fill="#3b82f6" className="opacity-40 blur-xs" />

@@ -319,7 +319,7 @@ export const Dashboard: React.FC = () => {
             {t('dashboard.title', 'Dashboard')}
           </h1>
           <p className="text-slate-500 mt-2">
-            {t('dashboard.welcome_back', 'Welcome back, {{name}}.', { name: user?.displayName || 'Participant' })}
+            {t('dashboard.welcome_back', 'Welcome back, {{name}}.', { name: profile?.name || user?.displayName || 'Participant' })}
           </p>
         </div>
       </div>

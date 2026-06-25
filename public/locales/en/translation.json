@@ -428,5 +428,28 @@
     "smsSent": "SMS code sent!",
     "smsFailed": "Failed to send SMS",
     "invalidSms": "Invalid SMS code"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome_back": "Welcome back, {{name}}.",
+    "assigned_duty": "Assigned Trip Duty",
+    "general_help": "General Help / Passenger",
+    "hide_roles": "Hide Assigned Roles",
+    "view_roles": "View Passenger Roles",
+    "duty_allocations": "👥 Trip Duty Allocations",
+    "general_help_short": "General Help",
+    "alarms_title": "⏰ Trip Departure & Prayer Alarms",
+    "alarms_desc": "Warning chimes play exactly **10 minutes before** major departures and scheduled prayer times on the road.",
+    "audio_enabled": "Audio Chime Enabled",
+    "audio_muted": "Audio Chime Muted",
+    "notif_active": "🔔 Notifications Active",
+    "notif_off": "🔕 Notifications Off",
+    "test_alarm": "🔊 Test Sound & Notification",
+    "upcoming_alarms": "Upcoming Alarms Today ({{day}})",
+    "no_alarms": "No alerts scheduled for today.",
+    "warning_at": "Warning at {{time}}",
+    "progress_title": "Trip Progress",
+    "broadcast": "🚨 BROADCAST: {{title}}",
+    "dismiss": "Dismiss"
   }
 }

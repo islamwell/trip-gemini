@@ -428,5 +428,28 @@
     "smsSent": "SMS-kode sendt!",
     "smsFailed": "Klarte ikke å sende SMS",
     "invalidSms": "Ugyldig SMS-kode"
+  },
+  "dashboard": {
+    "title": "Dashbord",
+    "welcome_back": "Velkommen tilbake, {{name}}.",
+    "assigned_duty": "Tildelt tur-oppgave",
+    "general_help": "Generell hjelp / passasjer",
+    "hide_roles": "Skjul tildelte roller",
+    "view_roles": "Vis passasjerroller",
+    "duty_allocations": "👥 Tildeling av turoppgaver",
+    "general_help_short": "Generell hjelp",
+    "alarms_title": "⏰ Bønne- og avgangsvarsler",
+    "alarms_desc": "Varselklokker ringer nøyaktig **10 minutter før** viktige avganger og planlagte bønnetider på veien.",
+    "audio_enabled": "Lydvarsel aktivert",
+    "audio_muted": "Lydvarsel dempet",
+    "notif_active": "🔔 Varslinger aktive",
+    "notif_off": "🔕 Varslinger av",
+    "test_alarm": "🔊 Test lyd og varsling",
+    "upcoming_alarms": "Kommende varsler i dag ({{day}})",
+    "no_alarms": "Ingen varsler planlagt for i dag.",
+    "warning_at": "Advarsel kl. {{time}}",
+    "progress_title": "Tur-fremdrift",
+    "broadcast": "🚨 MELDING: {{title}}",
+    "dismiss": "Avvis"
   }
 }
