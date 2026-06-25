@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import pkg from '../../../package.json';
 
 export const Footer: React.FC = () => {
   const { role } = useAuth();
@@ -36,7 +37,7 @@ export const Footer: React.FC = () => {
         className="text-[10px] text-slate-400 font-medium hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer focus:outline-none"
         title="Hard Refresh & Clear Cache"
       >
-        Ver 0.0.29
+        Ver {pkg.version}
       </button>
       
       {role === 'admin' && (
