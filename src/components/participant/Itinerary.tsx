@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw, Play, Pause, X } from 'lucide-react';
+import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw, Play, Pause, X, GripHorizontal, Minimize2 } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -220,6 +220,73 @@ export const Itinerary: React.FC = () => {
   const [busPos, setBusPos] = useState({ x: 628, y: 383, angle: 0 }); // starts at Oslo
   const [totalPathLength, setTotalPathLength] = useState(1500); // fallback
 
+  // Draggable and Collapsible UI Boxes states
+  const [legendMinimized, setLegendMinimized] = useState(false);
+  const [tooltipMinimized, setTooltipMinimized] = useState(false);
+  const [legendOffset, setLegendOffset] = useState({ x: 0, y: 0 });
+  const [tooltipOffset, setTooltipOffset] = useState({ x: 0, y: 0 });
+  const [draggingBox, setDraggingBox] = useState<'legend' | 'tooltip' | null>(null);
+  const [boxDragStart, setBoxDragStart] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    if (!draggingBox) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const offset = {
+        x: e.clientX - boxDragStart.x,
+        y: e.clientY - boxDragStart.y
+      };
+      if (draggingBox === 'legend') {
+        setLegendOffset(offset);
+      } else {
+        setTooltipOffset(offset);
+      }
+    };
+
+    const handlePointerUp = () => {
+      setDraggingBox(null);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [draggingBox, boxDragStart]);
+
+  const handleBoxDragStart = (box: 'legend' | 'tooltip', e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Prevent map panning
+    const currentOffset = box === 'legend' ? legendOffset : tooltipOffset;
+    setDraggingBox(box);
+    setBoxDragStart({
+      x: e.clientX - currentOffset.x,
+      y: e.clientY - currentOffset.y
+    });
+  };
+
+  const getLabelProps = (dir: string = 'top', x: number, y: number): { x: number; y: number; textAnchor: 'start' | 'middle' | 'end' } => {
+    switch (dir) {
+      case 'bottom':
+        return { x, y: y + 20, textAnchor: 'middle' };
+      case 'left':
+        return { x: x - 12, y: y + 4, textAnchor: 'end' };
+      case 'right':
+        return { x: x + 12, y: y + 4, textAnchor: 'start' };
+      case 'top-left':
+        return { x: x - 10, y: y - 10, textAnchor: 'end' };
+      case 'top-right':
+        return { x: x + 10, y: y - 10, textAnchor: 'start' };
+      case 'bottom-left':
+        return { x: x - 10, y: y + 16, textAnchor: 'end' };
+      case 'bottom-right':
+        return { x: x + 10, y: y + 16, textAnchor: 'start' };
+      case 'top':
+      default:
+        return { x, y: y - 18, textAnchor: 'middle' };
+    }
+  };
+
   useEffect(() => {
     if (routePath) {
       setTotalPathLength(routePath.getTotalLength());
@@ -234,7 +301,7 @@ export const Itinerary: React.FC = () => {
 
     const animate = () => {
       setBusDistance(prev => {
-        let next = prev + 0.8 * speed;
+        let next = prev + 0.15 * speed; // Slowed down from 0.8
         if (next >= totalLength) {
           return 0; // loop back
         }
@@ -401,24 +468,24 @@ export const Itinerary: React.FC = () => {
   const currentItinerary = itineraryData[activeTab];
 
   // SVG Coordinates mapping for interactive vector map
-  const mapNodes: Array<{ key: string; name: string; x: number; y: number; info: string; isReference?: boolean }> = [
-    { key: 'oslo', name: 'Oslo (Nurulquran)', x: 628, y: 383, info: 'Departure & Return: Jerikoveien 26' },
-    { key: 'fla', name: 'Flå', x: 516, y: 326, info: 'Bear Park scenic stop' },
-    { key: 'gol', name: 'Gol Mosque', x: 470, y: 294, info: 'Hallingdal Islamic Center (Furuvegen 5)' },
-    { key: 'geilo', name: 'Geilo', x: 405, y: 313, info: 'Mountain cabins check-in' },
-    { key: 'laerdal', name: 'Lærdal Tunnel', x: 341, y: 250, info: 'World longest tunnel (24.5km)' },
-    { key: 'boyabreen', name: 'Bøyabreen Glacier', x: 276, y: 207, info: 'Active branch of Jostedalsbreen' },
-    { key: 'stryn', name: 'Stryn', x: 275, y: 160, info: 'Glacier and fjord region lodging' },
-    { key: 'valldal', name: 'Valldal (Sylte)', x: 322, y: 116, info: 'Murigjerdet 11 accommodation' },
-    { key: 'trollstigen', name: 'Trollstigen', x: 358, y: 99, info: '11 spectacular hairpin turns' },
-    { key: 'geiranger', name: 'Geiranger', x: 317, y: 138, info: 'UNESCO fjord view & Eagle Road' },
-    { key: 'dalsnibba', name: 'Dalsnibba Skywalk', x: 323, y: 144, info: 'Europe\'s highest fjord view (1500m)' },
-    { key: 'lom', name: 'Lom', x: 437, y: 167, info: 'Lom Stave Church & famous bakery' },
-    { key: 'lillehammer', name: 'Lillehammer', x: 603, y: 249, info: 'Olympic park & Lillehammer Mosque' },
-    { key: 'bergen', name: 'Bergen', x: 152, y: 329, info: 'Major coastal city', isReference: true },
-    { key: 'drammen', name: 'Drammen', x: 580, y: 402, info: 'Major city near Oslo', isReference: true },
-    { key: 'alesund', name: 'Ålesund', x: 225, y: 97, info: 'Coastal Art Nouveau city', isReference: true },
-    { key: 'stavanger', name: 'Stavanger', x: 188, y: 488, info: 'Major southwestern city', isReference: true }
+  const mapNodes: Array<{ key: string; name: string; x: number; y: number; info: string; labelDir?: string; isReference?: boolean }> = [
+    { key: 'oslo', name: 'Oslo (Nurulquran)', x: 628, y: 383, info: 'Departure & Return: Jerikoveien 26', labelDir: 'right' },
+    { key: 'fla', name: 'Flå', x: 516, y: 326, info: 'Bear Park scenic stop', labelDir: 'top-left' },
+    { key: 'gol', name: 'Gol Mosque', x: 470, y: 294, info: 'Hallingdal Islamic Center (Furuvegen 5)', labelDir: 'top-right' },
+    { key: 'geilo', name: 'Geilo', x: 405, y: 313, info: 'Mountain cabins check-in', labelDir: 'bottom' },
+    { key: 'laerdal', name: 'Lærdal Tunnel', x: 341, y: 250, info: 'World longest tunnel (24.5km)', labelDir: 'left' },
+    { key: 'boyabreen', name: 'Bøyabreen Glacier', x: 276, y: 207, info: 'Active branch of Jostedalsbreen', labelDir: 'left' },
+    { key: 'stryn', name: 'Stryn', x: 275, y: 160, info: 'Glacier and fjord region lodging', labelDir: 'left' },
+    { key: 'valldal', name: 'Valldal (Sylte)', x: 322, y: 116, info: 'Murigjerdet 11 accommodation', labelDir: 'top' },
+    { key: 'trollstigen', name: 'Trollstigen', x: 358, y: 99, info: '11 spectacular hairpin turns', labelDir: 'right' },
+    { key: 'geiranger', name: 'Geiranger', x: 317, y: 138, info: 'UNESCO fjord view & Eagle Road', labelDir: 'left' },
+    { key: 'dalsnibba', name: 'Dalsnibba Skywalk', x: 323, y: 144, info: 'Europe\'s highest fjord view (1500m)', labelDir: 'bottom-right' },
+    { key: 'lom', name: 'Lom', x: 437, y: 167, info: 'Lom Stave Church & famous bakery', labelDir: 'right' },
+    { key: 'lillehammer', name: 'Lillehammer', x: 603, y: 249, info: 'Olympic park & Lillehammer Mosque', labelDir: 'right' },
+    { key: 'bergen', name: 'Bergen', x: 152, y: 329, info: 'Major coastal city', labelDir: 'left', isReference: true },
+    { key: 'drammen', name: 'Drammen', x: 580, y: 402, info: 'Major city near Oslo', labelDir: 'left', isReference: true },
+    { key: 'alesund', name: 'Ålesund', x: 225, y: 97, info: 'Coastal Art Nouveau city', labelDir: 'left', isReference: true },
+    { key: 'stavanger', name: 'Stavanger', x: 188, y: 488, info: 'Major southwestern city', labelDir: 'left', isReference: true }
   ];
 
   const getClosestStop = () => {
@@ -571,6 +638,7 @@ export const Itinerary: React.FC = () => {
               {/* Render Nodes */}
               {mapNodes.map((node) => {
                 if (node.isReference) {
+                  const labelProps = getLabelProps(node.labelDir || 'left', node.x, node.y);
                   return (
                     <g 
                       key={node.key}
@@ -583,9 +651,9 @@ export const Itinerary: React.FC = () => {
                         fill="#94a3b8"
                       />
                       <text
-                        x={node.x}
-                        y={node.y - 10}
-                        textAnchor="middle"
+                        x={labelProps.x}
+                        y={labelProps.y}
+                        textAnchor={labelProps.textAnchor}
                         fill="#94a3b8"
                         className="text-xs font-bold tracking-wider uppercase"
                       >
@@ -621,6 +689,7 @@ export const Itinerary: React.FC = () => {
                 }
                 
                 const haloRadius = 12 + Math.min(20, (elevation / 1500) * 18);
+                const labelProps = getLabelProps(node.labelDir || 'top', scaledX, scaledY);
 
                 return (
                   <g 
@@ -665,9 +734,9 @@ export const Itinerary: React.FC = () => {
                       className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     />
                     <text
-                      x={scaledX}
-                      y={scaledY - 18}
-                      textAnchor="middle"
+                      x={labelProps.x}
+                      y={labelProps.y}
+                      textAnchor={labelProps.textAnchor}
                       fill="currentColor"
                       className="text-xs font-bold select-none drop-shadow-sm opacity-80 dark:opacity-90 fill-slate-700 dark:fill-slate-300"
                     >
@@ -680,54 +749,126 @@ export const Itinerary: React.FC = () => {
           </svg>
 
           {/* Elevation Heatmap Legend */}
-          <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 px-3 py-2 rounded-xl shadow-md border border-card-border backdrop-blur text-xs space-y-1 z-20">
-            <span className="font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider mb-1">
-              {t('itinerary.elevationLegend', 'Altitude')}
-            </span>
-            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
-              <span>Low (&lt; 100m)</span>
+          {legendMinimized ? (
+            <button 
+              onClick={() => setLegendMinimized(false)}
+              className="absolute bottom-4 right-4 bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow-lg border border-card-border text-xs z-20 flex items-center gap-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-all hover:scale-105"
+              style={{ transform: `translate(${legendOffset.x}px, ${legendOffset.y}px)` }}
+              title="Show Altitude Legend"
+            >
+              🏔️ <span className="font-bold text-slate-700 dark:text-slate-300">Legend</span>
+            </button>
+          ) : (
+            <div 
+              className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 px-3 py-2 rounded-xl shadow-md border border-card-border backdrop-blur text-xs space-y-1 z-20 w-44 select-none"
+              style={{ transform: `translate(${legendOffset.x}px, ${legendOffset.y}px)` }}
+            >
+              {/* Header bar for drag and minimize */}
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/50 pb-1 mb-1.5">
+                <div 
+                  onPointerDown={(e) => handleBoxDragStart('legend', e)}
+                  className="flex items-center gap-1 cursor-move text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex-1 py-0.5"
+                  title="Drag to move"
+                >
+                  <GripHorizontal className="w-3.5 h-3.5" />
+                  <span className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
+                    {t('itinerary.elevationLegend', 'Altitude')}
+                  </span>
+                </div>
+                <button 
+                  onClick={() => setLegendMinimized(true)}
+                  className="p-0.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  title="Minimize"
+                >
+                  <Minimize2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                <span>Low (&lt; 100m)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                <span>Med (100m - 500m)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                <span>High (500m - 1000m)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block animate-pulse"></span>
+                <span>Extreme (&gt; 1000m)</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
-              <span>Med (100m - 500m)</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
-              <span>High (500m - 1000m)</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block animate-pulse"></span>
-              <span>Extreme (&gt; 1000m)</span>
-            </div>
-          </div>
+          )}
 
           {/* Map Tooltip Box */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/95 dark:bg-slate-800/95 p-4 rounded-xl shadow-lg border border-card-border max-w-sm backdrop-blur transition-all duration-300 z-20">
-            {hoveredStop ? (
-              <div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-200">
-                  {t('itinerary.map.' + hoveredStop + '.name', mapNodes.find(n => n.key === hoveredStop)?.name)}
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {t('itinerary.map.' + hoveredStop + '.info', mapNodes.find(n => n.key === hoveredStop)?.info)}
-                </p>
-                <span className="text-xs text-primary-500 font-medium mt-2 block">{t('itinerary.clickPointHint', '👉 Click point to scroll to details')}</span>
+          {tooltipMinimized ? (
+            <button 
+              onClick={() => setTooltipMinimized(false)}
+              className="absolute bottom-4 left-4 bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow-lg border border-card-border text-xs z-20 flex items-center gap-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-all hover:scale-105"
+              style={{ transform: `translate(${tooltipOffset.x}px, ${tooltipOffset.y}px)` }}
+              title="Show Status & Details"
+            >
+              🚌 <span className="font-bold text-slate-700 dark:text-slate-300">
+                {hoveredStop 
+                  ? t('itinerary.map.' + hoveredStop + '.name', mapNodes.find(n => n.key === hoveredStop)?.name)
+                  : (isPlaying ? t('itinerary.busDriving', 'Driving...') : t('itinerary.busParked', 'Parked'))
+                }
+              </span>
+            </button>
+          ) : (
+            <div 
+              className="absolute bottom-4 left-4 bg-white/95 dark:bg-slate-800/95 p-4 rounded-xl shadow-lg border border-card-border w-[calc(100%-2rem)] sm:w-80 backdrop-blur z-20 select-none"
+              style={{ transform: `translate(${tooltipOffset.x}px, ${tooltipOffset.y}px)` }}
+            >
+              {/* Header bar for drag and minimize */}
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/50 pb-1 mb-2">
+                <div 
+                  onPointerDown={(e) => handleBoxDragStart('tooltip', e)}
+                  className="flex items-center gap-1 cursor-move text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex-1 py-0.5"
+                  title="Drag to move"
+                >
+                  <GripHorizontal className="w-3.5 h-3.5" />
+                  <span className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
+                    {t('itinerary.statusAndDetails', 'Status & Details')}
+                  </span>
+                </div>
+                <button 
+                  onClick={() => setTooltipMinimized(true)}
+                  className="p-0.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  title="Minimize"
+                >
+                  <Minimize2 className="w-3.5 h-3.5" />
+                </button>
               </div>
-            ) : (
-              <div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-1.5">
-                  🚌 {isPlaying ? t('itinerary.busDriving', 'Minibus is driving...') : t('itinerary.busParked', 'Minibus is parked')}
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {t('itinerary.nearestStop', 'Nearest Stop')}: <strong>{t('itinerary.map.' + closestStop.key + '.name', closestStop.name)}</strong>
-                </p>
-                <p className="text-xs text-slate-400 mt-1">
-                  {t('itinerary.currentAltitude', 'Altitude')}: {currentElevation}m | {t('itinerary.mapInstructions', 'Drag to pan. Scroll to zoom.')}
-                </p>
-              </div>
-            )}
-          </div>
+
+              {hoveredStop ? (
+                <div>
+                  <h4 className="font-bold text-slate-800 dark:text-slate-200">
+                    {t('itinerary.map.' + hoveredStop + '.name', mapNodes.find(n => n.key === hoveredStop)?.name)}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {t('itinerary.map.' + hoveredStop + '.info', mapNodes.find(n => n.key === hoveredStop)?.info)}
+                  </p>
+                  <span className="text-xs text-primary-500 font-medium mt-2 block">{t('itinerary.clickPointHint', '👉 Click point to scroll to details')}</span>
+                </div>
+              ) : (
+                <div>
+                  <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-1.5">
+                    🚌 {isPlaying ? t('itinerary.busDriving', 'Minibus is driving...') : t('itinerary.busParked', 'Minibus is parked')}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {t('itinerary.nearestStop', 'Nearest Stop')}: <strong>{t('itinerary.map.' + closestStop.key + '.name', closestStop.name)}</strong>
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {t('itinerary.currentAltitude', 'Altitude')}: {currentElevation}m | {t('itinerary.mapInstructions', 'Drag to pan. Scroll to zoom.')}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Minibus Animation Playback Controls */}
@@ -753,7 +894,7 @@ export const Itinerary: React.FC = () => {
             
             {/* Speed Multiplier */}
             <div className="flex bg-slate-200 dark:bg-slate-800 p-0.5 rounded-lg border border-card-border">
-              {([1, 2, 4] as const).map(s => (
+              {([0.5, 1, 2] as const).map(s => (
                 <button
                   key={s}
                   onClick={() => setSpeed(s)}
