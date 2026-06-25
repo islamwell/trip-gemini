@@ -451,5 +451,28 @@
     "progress_title": "Tur-fremdrift",
     "broadcast": "🚨 MELDING: {{title}}",
     "dismiss": "Avvis"
+  },
+  "role_quran": {
+    "none": "\"Og gjør det gode; sannelig, Allah elsker de som gjør godt.\" — Surah Al-Baqarah 2:195",
+    "fajr_caller": "\"Og pålegg din familie bønn, og vær standhaftig i den.\" — Surah Ta-Ha 20:132",
+    "quran_teacher": "\"Den mest Barmhjertige lærte bort Koranen.\" — Surah Ar-Rahman 55:1-2",
+    "grocery_scout": "\"O mennesker, spis av det som er på jorden, som er tillatt og godt...\" — Surah Al-Baqarah 2:168",
+    "hydration_helper": "\"...og Vi skapte alt levende av vann. Vil de da ikke tro?\" — Surah Al-Anbya 21:30",
+    "iftar_announcer": "\"...Og spis og drikk inntil den hvite tråden av daggry blir tydelig for deg fra den svarte tråden [av natten]. Fullfør deretter fasten til solnedgang...\" — Surah Al-Baqarah 2:187",
+    "snack_distributor": "\"O dere som tror! Spis av de gode tingene Vi har gitt dere, og vær takknemlige mot Allah...\" — Surah Al-Baqarah 2:172",
+    "cleanliness_officer": "\"...Sannelig, Allah elsker de som stadig angrer, og elsker de som renser seg selv.\" — Surah Al-Baqarah 2:222",
+    "trash_helper": "\"...Og rens Mitt Hus for de som utfører Tawaf og de som står [i bønn]...\" — Surah Al-Hajj 22:26",
+    "audio_manager": "\"Og når Koranen blir lest opp, så lytt til den og vær oppmerksom så dere kan finne nåde.\" — Surah Al-A'raf 7:204",
+    "weather_commentator": "\"Det er Han som viser dere lynet, som vekker frykt og håp...\" — Surah Ar-Ra'd 13:12",
+    "elderly_support": "\"Og din Herre har bestemt... god behandling mot foreldre. Enten en eller begge når alderdommen...\" — Surah Al-Isra 17:23",
+    "entertainment_helper": "\"Si: 'Over Allahs nåde og Hans barmhjertighet - over det la dem glede seg; det er bedre enn det de samler inn.'\" — Surah Yunus 10:58",
+    "garment_organiser": "\"O Adams barn, ta på deres fineste klær ved hvert bønnested...\" — Surah Al-A'raf 7:31",
+    "lost_found": "\"Sannelig, Allah befaler dere å gi tilbake betrodde ting til de som har rett på dem...\" — Surah An-Nisa 4:58",
+    "complaint_incharge": "\"...De som demper sitt sinne og som tilgir mennesker — Allah elsker de som gjør godt.\" — Surah Aal-Imran 3:134",
+    "token_collector": "\"Samarbeid om rettferdighet og gudsfrykt, men ikke om synd og aggresjon...\" — Surah Al-Ma'idah 5:2",
+    "driver": "\"Ære være Ham som har underlagt oss dette, for vi kunne ikke ha klart det på egen hånd. Og sannelig, til vår Herre skal vi vende tilbake.\" — Surah Az-Zukhruf 43:13-14",
+    "navigator": "\"Og landemerker. Og ved stjernene blir de også ledet.\" — Surah An-Nahl 16:16",
+    "photographer": "\"Så se på virkningene av Allahs barmhjertighet - hvordan Han gir liv til jorden etter dens død...\" — Surah Ar-Rum 30:50",
+    "journalist": "\"Nun. Ved pennen og det de skriver.\" — Surah Al-Qalam 68:1"
   }
 }

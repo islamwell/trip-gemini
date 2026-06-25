@@ -31,6 +31,13 @@ export const Dashboard: React.FC = () => {
   const { t } = useLanguage();
   const { showInfo } = useToast();
 
+  const getRoleKey = (dutyDbValue: string | undefined): string => {
+    if (!dutyDbValue) return 'none';
+    const translationKey = getDutyTranslationKey(dutyDbValue);
+    if (!translationKey) return 'none';
+    return translationKey.replace('registration.roles.', '');
+  };
+
 
   // Real-time states
   const [profile, setProfile] = useState<ParticipantProfile | null>(null);
@@ -337,6 +344,9 @@ export const Dashboard: React.FC = () => {
                 ? (t(getDutyTranslationKey(profile.duty)) || profile.duty) 
                 : t('dashboard.general_help', 'General Help / Passenger')}
             </h2>
+            <p className="text-xs italic text-primary-600 dark:text-primary-400 mt-1 max-w-xl font-medium leading-relaxed">
+              {t('role_quran.' + getRoleKey(profile?.duty))}
+            </p>
           </div>
         </div>
         
@@ -354,15 +364,20 @@ export const Dashboard: React.FC = () => {
           <h3 className="font-bold text-lg mb-4">{t('dashboard.duty_allocations', '👥 Trip Duty Allocations')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {allParticipants.map((p) => (
-              <div key={p.id} className="bg-slate-50/50 dark:bg-slate-800/20 border border-card-border p-4 rounded-xl flex justify-between items-center">
-                <div>
-                  <span className="font-bold block text-slate-800 dark:text-slate-200 text-sm">{p.name}</span>
-                  <span className="text-[11px] text-slate-400 font-mono">{p.email}</span>
+              <div key={p.id} className="bg-slate-50/50 dark:bg-slate-800/20 border border-card-border p-4 rounded-xl flex flex-col justify-between space-y-2">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="min-w-0">
+                    <span className="font-bold block text-slate-800 dark:text-slate-200 text-sm truncate">{p.name}</span>
+                    <span className="text-[11px] text-slate-400 font-mono block truncate">{p.email}</span>
+                  </div>
+                  <span className="text-[10px] shrink-0 font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-full text-right max-w-[120px] truncate">
+                    {p.duty 
+                      ? (t(getDutyTranslationKey(p.duty)) || p.duty) 
+                      : t('dashboard.general_help_short', 'General Help')}
+                  </span>
                 </div>
-                <span className="text-xs font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-full text-right max-w-[120px] truncate">
-                  {p.duty 
-                    ? (t(getDutyTranslationKey(p.duty)) || p.duty) 
-                    : t('dashboard.general_help_short', 'General Help')}
+                <span className="text-[10px] italic text-slate-500 dark:text-slate-400 block leading-relaxed border-l-2 border-primary-500/30 pl-2 pt-0.5">
+                  {t('role_quran.' + getRoleKey(p.duty))}
                 </span>
               </div>
             ))}

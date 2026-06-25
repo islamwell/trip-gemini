@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../services/firebase';
-import { collection, onSnapshot, query, addDoc, getDocs, doc, setDoc, deleteDoc, serverTimestamp, where, deleteField } from 'firebase/firestore';
+import { collection, onSnapshot, query, addDoc, getDocs, doc, setDoc, deleteDoc, serverTimestamp, where, deleteField, orderBy } from 'firebase/firestore';
 import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard, Trash2, Settings, LogOut, Globe, Search } from 'lucide-react';
 import { calculateBudget } from '../../data/finances';
 import { useToast } from '../../contexts/ToastContext';
@@ -67,7 +67,197 @@ export const AdminDashboard: React.FC = () => {
   const [maxPassengers, setMaxPassengers] = useState(17);
   
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'budget' | 'duties' | 'itinerary' | 'complaints' | 'translations'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'budget' | 'duties' | 'itinerary' | 'complaints' | 'translations' | 'covenant' | 'packing'>('users');
+
+  // Real-time rules & packing list states
+  const [rules, setRules] = useState<any[]>([]);
+  const [packingList, setPackingList] = useState<any[]>([]);
+
+  // Covenant Rules forms states
+  const [newRuleTitleEn, setNewRuleTitleEn] = useState('');
+  const [newRuleTitleNo, setNewRuleTitleNo] = useState('');
+  const [newRuleTitleUr, setNewRuleTitleUr] = useState('');
+  const [newRuleIcon, setNewRuleIcon] = useState('HelpCircle');
+  const [newRuleQuoteEn, setNewRuleQuoteEn] = useState('');
+  const [newRuleQuoteNo, setNewRuleQuoteNo] = useState('');
+  const [newRuleQuoteUr, setNewRuleQuoteUr] = useState('');
+
+  // Editing items states inside Covenant rules
+  const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null);
+  const [newRuleItemEn, setNewRuleItemEn] = useState('');
+  const [newRuleItemNo, setNewRuleItemNo] = useState('');
+  const [newRuleItemUr, setNewRuleItemUr] = useState('');
+  
+  // Packing List forms states
+  const [newPackNameEn, setNewPackNameEn] = useState('');
+  const [newPackNameNo, setNewPackNameNo] = useState('');
+  const [newPackNameUr, setNewPackNameUr] = useState('');
+  const [newPackDescEn, setNewPackDescEn] = useState('');
+  const [newPackDescNo, setNewPackDescNo] = useState('');
+  const [newPackDescUr, setNewPackDescUr] = useState('');
+  const [newPackStoreEn, setNewPackStoreEn] = useState('');
+  const [newPackStoreNo, setNewPackStoreNo] = useState('');
+  const [newPackStoreUr, setNewPackStoreUr] = useState('');
+  const [newPackCategory, setNewPackCategory] = useState<'clothing' | 'spiritual' | 'electronics' | 'health' | 'documents' | 'comfort'>('clothing');
+  const [editingPackItemId, setEditingPackItemId] = useState<string | null>(null);
+
+  const handleAddRuleSection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRuleTitleEn || !newRuleTitleNo || !newRuleTitleUr) {
+      showError("Please enter the title in all languages.");
+      return;
+    }
+    try {
+      const nextId = rules.length > 0 ? Math.max(...rules.map(r => r.id || 0)) + 1 : 1;
+      const sectionData: any = {
+        id: nextId,
+        title: { en: newRuleTitleEn, no: newRuleTitleNo, ur: newRuleTitleUr },
+        iconName: newRuleIcon,
+        items: []
+      };
+      if (newRuleQuoteEn || newRuleQuoteNo || newRuleQuoteUr) {
+        sectionData.quote = { en: newRuleQuoteEn, no: newRuleQuoteNo, ur: newRuleQuoteUr };
+      }
+      await setDoc(doc(db, 'covenant', `section_${nextId}`), sectionData);
+      showSuccess("New rules section added!");
+      setNewRuleTitleEn('');
+      setNewRuleTitleNo('');
+      setNewRuleTitleUr('');
+      setNewRuleQuoteEn('');
+      setNewRuleQuoteNo('');
+      setNewRuleQuoteUr('');
+    } catch (err) {
+      console.error(err);
+      showError("Failed to add section");
+    }
+  };
+
+  const handleDeleteRuleSection = async (docId: string) => {
+    if (!window.confirm("Are you sure you want to delete this section and all its rules?")) return;
+    try {
+      await deleteDoc(doc(db, 'covenant', docId));
+      showSuccess("Rules section deleted.");
+      if (selectedRuleId && docId === `section_${selectedRuleId}`) {
+        setSelectedRuleId(null);
+      }
+    } catch (err) {
+      console.error(err);
+      showError("Failed to delete section");
+    }
+  };
+
+  const handleAddRuleItem = async (sectionDocId: string) => {
+    if (!newRuleItemEn || !newRuleItemNo || !newRuleItemUr) {
+      showError("Please fill in item text in all languages.");
+      return;
+    }
+    try {
+      const section = rules.find(r => r.docId === sectionDocId);
+      if (!section) return;
+
+      const items = section.items || [];
+      const nextItemIndex = items.length + 1;
+      const sectionNum = section.id;
+      const newItemId = `${sectionNum}_${nextItemIndex}_${Date.now()}`;
+
+      const newItem = {
+        id: newItemId,
+        en: newRuleItemEn,
+        no: newRuleItemNo,
+        ur: newRuleItemUr
+      };
+
+      const updatedItems = [...items, newItem];
+      await setDoc(doc(db, 'covenant', sectionDocId), { items: updatedItems }, { merge: true });
+      showSuccess("Rule item added!");
+      setNewRuleItemEn('');
+      setNewRuleItemNo('');
+      setNewRuleItemUr('');
+    } catch (err) {
+      console.error(err);
+      showError("Failed to add rule item");
+    }
+  };
+
+  const handleDeleteRuleItem = async (sectionDocId: string, itemId: string) => {
+    if (!window.confirm("Delete this rule item?")) return;
+    try {
+      const section = rules.find(r => r.docId === sectionDocId);
+      if (!section) return;
+      const updatedItems = (section.items || []).filter((item: any) => item.id !== itemId);
+      await setDoc(doc(db, 'covenant', sectionDocId), { items: updatedItems }, { merge: true });
+      showSuccess("Rule item deleted.");
+    } catch (err) {
+      console.error(err);
+      showError("Failed to delete rule item");
+    }
+  };
+
+  const handleAddOrEditPackingItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPackNameEn || !newPackNameNo || !newPackNameUr) {
+      showError("Please fill in the item name in all languages.");
+      return;
+    }
+    try {
+      const itemId = editingPackItemId || `pack_${Date.now()}`;
+      const itemData: any = {
+        id: itemId,
+        category: newPackCategory,
+        name: { en: newPackNameEn, no: newPackNameNo, ur: newPackNameUr },
+        desc: { en: newPackDescEn, no: newPackDescNo, ur: newPackDescUr },
+        store: { en: newPackStoreEn, no: newPackStoreNo, ur: newPackStoreUr }
+      };
+      await setDoc(doc(db, 'packing_list', itemId), itemData);
+      showSuccess(editingPackItemId ? "Packing item updated!" : "New packing item added!");
+      
+      setNewPackNameEn('');
+      setNewPackNameNo('');
+      setNewPackNameUr('');
+      setNewPackDescEn('');
+      setNewPackDescNo('');
+      setNewPackDescUr('');
+      setNewPackStoreEn('');
+      setNewPackStoreNo('');
+      setNewPackStoreUr('');
+      setEditingPackItemId(null);
+    } catch (err) {
+      console.error(err);
+      showError("Failed to save packing item");
+    }
+  };
+
+  const handleDeletePackingItem = async (itemId: string) => {
+    if (!window.confirm("Are you sure you want to delete this packing item?")) return;
+    try {
+      await deleteDoc(doc(db, 'packing_list', itemId));
+      showSuccess("Packing item deleted.");
+      if (editingPackItemId === itemId) {
+        setEditingPackItemId(null);
+      }
+    } catch (err) {
+      console.error(err);
+      showError("Failed to delete packing item");
+    }
+  };
+
+  const handleStartEditPackingItem = (item: any) => {
+    setEditingPackItemId(item.id);
+    setNewPackCategory(item.category);
+    setNewPackNameEn(item.name.en || '');
+    setNewPackNameNo(item.name.no || '');
+    setNewPackNameUr(item.name.ur || '');
+    setNewPackDescEn(item.desc.en || '');
+    setNewPackDescNo(item.desc.no || '');
+    setNewPackDescUr(item.desc.ur || '');
+    setNewPackStoreEn(item.store.en || '');
+    setNewPackStoreNo(item.store.no || '');
+    setNewPackStoreUr(item.store.ur || '');
+    const formEl = document.getElementById('packing-form');
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Translation Editor state
   const [defaultLocales, setDefaultLocales] = useState<Record<string, string>>({});
@@ -157,6 +347,24 @@ export const AdminDashboard: React.FC = () => {
       setLoading(false);
     });
 
+    // 7. Listen to covenant rules
+    const unsubRules = onSnapshot(query(collection(db, 'covenant'), orderBy('id', 'asc')), (snap) => {
+      const list: any[] = [];
+      snap.forEach(docSnap => {
+        list.push({ docId: docSnap.id, ...docSnap.data() });
+      });
+      setRules(list);
+    });
+
+    // 8. Listen to packing list items
+    const unsubPackingList = onSnapshot(collection(db, 'packing_list'), (snap) => {
+      const list: any[] = [];
+      snap.forEach(docSnap => {
+        list.push({ docId: docSnap.id, ...docSnap.data() });
+      });
+      setPackingList(list);
+    });
+
     return () => {
       unsubParticipants();
       unsubSignatures();
@@ -164,6 +372,8 @@ export const AdminDashboard: React.FC = () => {
       unsubPayments();
       unsubItinerary();
       unsubSettings();
+      unsubRules();
+      unsubPackingList();
     };
   }, [role]);
 
@@ -534,6 +744,22 @@ export const AdminDashboard: React.FC = () => {
           }`}
         >
           Translations
+        </button>
+        <button
+          onClick={() => setActiveTab('covenant')}
+          className={`px-6 py-3 font-semibold text-sm transition-all border-b-2 whitespace-nowrap ${
+            activeTab === 'covenant' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Covenant Rules
+        </button>
+        <button
+          onClick={() => setActiveTab('packing')}
+          className={`px-6 py-3 font-semibold text-sm transition-all border-b-2 whitespace-nowrap ${
+            activeTab === 'packing' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Packing List
         </button>
       </div>
 
@@ -980,6 +1206,446 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'covenant' && (
+          <div className="space-y-8">
+            <div className="bg-primary-50 dark:bg-primary-950/20 border border-primary-100 dark:border-primary-900/50 p-5 rounded-2xl">
+              <h3 className="font-bold text-sm text-primary-800 dark:text-primary-300 flex items-center gap-1.5">
+                <ShieldCheck className="w-5 h-5" /> Manage Covenant Rules & Sections
+              </h3>
+              <p className="text-xs text-primary-700 dark:text-primary-400 mt-1.5 leading-relaxed">
+                Add, edit, or remove rules sections and individual checklist rules. These rules are signed by passengers in onboarding and shown in the Covenant tab.
+              </p>
+            </div>
+
+            {/* Add Section Form */}
+            <form onSubmit={handleAddRuleSection} className="p-5 bg-slate-50 dark:bg-slate-900/30 border border-card-border rounded-2xl space-y-4 max-w-3xl">
+              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">➕ Add New Rules Section</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (EN)</label>
+                  <input
+                    type="text"
+                    value={newRuleTitleEn}
+                    onChange={(e) => setNewRuleTitleEn(e.target.value)}
+                    placeholder="e.g. Salah First"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (NO)</label>
+                  <input
+                    type="text"
+                    value={newRuleTitleNo}
+                    onChange={(e) => setNewRuleTitleNo(e.target.value)}
+                    placeholder="e.g. Salah først"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (UR)</label>
+                  <input
+                    type="text"
+                    value={newRuleTitleUr}
+                    onChange={(e) => setNewRuleTitleUr(e.target.value)}
+                    placeholder="e.g. نماز مقدم ہے"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Icon Name</label>
+                  <select
+                    value={newRuleIcon}
+                    onChange={(e) => setNewRuleIcon(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  >
+                    {['Heart', 'Clock', 'BookOpen', 'Smile', 'Users', 'Car', 'Utensils', 'PhoneOff', 'Compass', 'Coins', 'Calendar', 'Handshake', 'Navigation', 'HelpCircle'].map(icon => (
+                      <option key={icon} value={icon}>{icon}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (EN - Optional)</label>
+                    <input
+                      type="text"
+                      value={newRuleQuoteEn}
+                      onChange={(e) => setNewRuleQuoteEn(e.target.value)}
+                      placeholder="Surah / translation"
+                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (NO - Optional)</label>
+                    <input
+                      type="text"
+                      value={newRuleQuoteNo}
+                      onChange={(e) => setNewRuleQuoteNo(e.target.value)}
+                      placeholder="Surah / oversettelse"
+                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (UR - Optional)</label>
+                    <input
+                      type="text"
+                      value={newRuleQuoteUr}
+                      onChange={(e) => setNewRuleQuoteUr(e.target.value)}
+                      placeholder="آیت یا حدیث"
+                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs rounded-xl shadow transition-colors cursor-pointer"
+              >
+                Add Section
+              </button>
+            </form>
+
+            <hr className="border-card-border my-6" />
+
+            {/* List of Sections */}
+            <div className="space-y-6">
+              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">📋 Current Sections & Rules ({rules.length})</h4>
+              
+              {rules.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">No rules sections found. They will seed automatically when rules page is viewed.</p>
+              ) : (
+                rules.map((section: any) => (
+                  <div key={section.docId} className="border border-card-border rounded-2xl p-5 bg-white dark:bg-slate-800 space-y-4">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-card-border pb-3 gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono font-bold bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded">
+                            #{section.id}
+                          </span>
+                          <span className="text-sm font-semibold text-slate-400">Icon: {section.iconName}</span>
+                        </div>
+                        <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base mt-1.5">
+                          {section.title.en} | {section.title.no} | {section.title.ur}
+                        </h3>
+                        {section.quote && (
+                          <p className="text-xs italic text-slate-400 mt-1 max-w-2xl font-serif">
+                            &ldquo;{section.quote.en}&rdquo;
+                          </p>
+                        )}
+                      </div>
+                      
+                      <button
+                        onClick={() => handleDeleteRuleSection(section.docId)}
+                        className="px-3 py-1.5 bg-error/10 hover:bg-error/20 text-error font-bold text-xs rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 self-start sm:self-center"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Delete Section
+                      </button>
+                    </div>
+
+                    {/* Rule Items in this section */}
+                    <div className="space-y-3 pl-4 border-l border-slate-100 dark:border-slate-700">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rules Checklist Items ({section.items?.length || 0})</span>
+                      {(section.items || []).map((item: any, idx: number) => (
+                        <div key={item.id || idx} className="flex justify-between items-start gap-4 p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl text-xs">
+                          <div className="space-y-1 flex-1">
+                            <p className="text-slate-800 dark:text-slate-200"><strong className="text-slate-400 font-mono">EN:</strong> {item.en}</p>
+                            <p className="text-slate-600 dark:text-slate-400"><strong className="text-slate-400 font-mono">NO:</strong> {item.no}</p>
+                            <p className="text-slate-600 dark:text-slate-400"><strong className="text-slate-400 font-mono">UR:</strong> {item.ur}</p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteRuleItem(section.docId, item.id)}
+                            className="text-error hover:text-error/80 font-bold p-1 hover:bg-error/5 rounded-lg transition-colors cursor-pointer"
+                            title="Delete rule item"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* Add Item Form for this section */}
+                      <div className="pt-2 max-w-2xl">
+                        <span className="text-[10px] font-bold text-slate-500 block mb-1">Add Rule Item to Section:</span>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                          <input
+                            type="text"
+                            placeholder="Rule text in English"
+                            value={selectedRuleId === section.id ? newRuleItemEn : ''}
+                            onChange={(e) => {
+                              setSelectedRuleId(section.id);
+                              setNewRuleItemEn(e.target.value);
+                            }}
+                            className="bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Regeltekst på norsk"
+                            value={selectedRuleId === section.id ? newRuleItemNo : ''}
+                            onChange={(e) => {
+                              setSelectedRuleId(section.id);
+                              setNewRuleItemNo(e.target.value);
+                            }}
+                            className="bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                          />
+                          <input
+                            type="text"
+                            placeholder="قاعدہ اردو میں"
+                            value={selectedRuleId === section.id ? newRuleItemUr : ''}
+                            onChange={(e) => {
+                              setSelectedRuleId(section.id);
+                              setNewRuleItemUr(e.target.value);
+                            }}
+                            className="bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleAddRuleItem(section.docId)}
+                          disabled={selectedRuleId !== section.id || !newRuleItemEn || !newRuleItemNo || !newRuleItemUr}
+                          className="mt-2 px-4 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 disabled:opacity-50 text-xs font-bold rounded-lg cursor-pointer transition-colors"
+                        >
+                          Add Rule Item
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'packing' && (
+          <div className="space-y-8">
+            <div className="bg-primary-50 dark:bg-primary-950/20 border border-primary-100 dark:border-primary-900/50 p-5 rounded-2xl">
+              <h3 className="font-bold text-sm text-primary-800 dark:text-primary-300 flex items-center gap-1.5">
+                <Clipboard className="w-5 h-5" /> Manage Packing Checklist
+              </h3>
+              <p className="text-xs text-primary-700 dark:text-primary-400 mt-1.5 leading-relaxed">
+                Add, edit, or remove packing items in the trip packing list. Items are organized by categories and shown in the Checklist tab.
+              </p>
+            </div>
+
+            {/* Add/Edit Packing Item Form */}
+            <form id="packing-form" onSubmit={handleAddOrEditPackingItem} className="p-5 bg-slate-50 dark:bg-slate-900/30 border border-card-border rounded-2xl space-y-4 max-w-4xl">
+              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                {editingPackItemId ? "📝 Edit Packing Item" : "➕ Add New Packing Item"}
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Category</label>
+                  <select
+                    value={newPackCategory}
+                    onChange={(e) => setNewPackCategory(e.target.value as any)}
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  >
+                    <option value="clothing">🧥 Clothing & Gear</option>
+                    <option value="spiritual">🕋 Spiritual</option>
+                    <option value="electronics">🔋 Electronics</option>
+                    <option value="health">💊 Health & Hygiene</option>
+                    <option value="documents">📄 Documents</option>
+                    <option value="comfort">🎒 Comfort & Supplies</option>
+                  </select>
+                </div>
+                
+                <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (EN)</label>
+                    <input
+                      type="text"
+                      value={newPackNameEn}
+                      onChange={(e) => setNewPackNameEn(e.target.value)}
+                      placeholder="e.g. Waterproof Jacket"
+                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (NO)</label>
+                    <input
+                      type="text"
+                      value={newPackNameNo}
+                      onChange={(e) => setNewPackNameNo(e.target.value)}
+                      placeholder="e.g. Vanntett jakke"
+                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (UR)</label>
+                    <input
+                      type="text"
+                      value={newPackNameUr}
+                      onChange={(e) => setNewPackNameUr(e.target.value)}
+                      placeholder="e.g. واٹر پروف جیکٹ"
+                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (EN)</label>
+                  <textarea
+                    rows={2}
+                    value={newPackDescEn}
+                    onChange={(e) => setNewPackDescEn(e.target.value)}
+                    placeholder="English description"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (NO)</label>
+                  <textarea
+                    rows={2}
+                    value={newPackDescNo}
+                    onChange={(e) => setNewPackDescNo(e.target.value)}
+                    placeholder="Norsk beskrivelse"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (UR)</label>
+                  <textarea
+                    rows={2}
+                    value={newPackDescUr}
+                    onChange={(e) => setNewPackDescUr(e.target.value)}
+                    placeholder="اردو تفصیل"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (EN)</label>
+                  <input
+                    type="text"
+                    value={newPackStoreEn}
+                    onChange={(e) => setNewPackStoreEn(e.target.value)}
+                    placeholder="e.g. XXL Sport"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (NO)</label>
+                  <input
+                    type="text"
+                    value={newPackStoreNo}
+                    onChange={(e) => setNewPackStoreNo(e.target.value)}
+                    placeholder="e.g. XXL Sport"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (UR)</label>
+                  <input
+                    type="text"
+                    value={newPackStoreUr}
+                    onChange={(e) => setNewPackStoreUr(e.target.value)}
+                    placeholder="e.g. ایکس ایکس ایل اسپورٹس"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs rounded-xl shadow transition-colors cursor-pointer"
+                >
+                  {editingPackItemId ? "Update Item" : "Add Item"}
+                </button>
+                {editingPackItemId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingPackItemId(null);
+                      setNewPackNameEn('');
+                      setNewPackNameNo('');
+                      setNewPackNameUr('');
+                      setNewPackDescEn('');
+                      setNewPackDescNo('');
+                      setNewPackDescUr('');
+                      setNewPackStoreEn('');
+                      setNewPackStoreNo('');
+                      setNewPackStoreUr('');
+                    }}
+                    className="px-5 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl shadow transition-colors cursor-pointer"
+                  >
+                    Cancel Edit
+                  </button>
+                )}
+              </div>
+            </form>
+
+            <hr className="border-card-border my-6" />
+
+            {/* List of Packing Items grouped by Category */}
+            <div className="space-y-6">
+              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">📋 Packing Items ({packingList.length})</h4>
+              
+              {packingList.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">No packing items found. They will seed automatically when packing list is viewed.</p>
+              ) : (
+                ['clothing', 'spiritual', 'electronics', 'health', 'documents', 'comfort'].map((catKey) => {
+                  const catItems = packingList.filter(item => item.category === catKey);
+                  const catLabels: Record<string, string> = {
+                    clothing: '🧥 Clothing & Gear',
+                    spiritual: '🕋 Spiritual',
+                    electronics: '🔋 Electronics',
+                    health: '💊 Health & Hygiene',
+                    documents: '📄 Documents',
+                    comfort: '🎒 Comfort & Supplies'
+                  };
+
+                  if (catItems.length === 0) return null;
+
+                  return (
+                    <div key={catKey} className="space-y-3">
+                      <h5 className="font-bold text-slate-700 dark:text-slate-300 text-xs uppercase tracking-wider">{catLabels[catKey] || catKey} ({catItems.length})</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {catItems.map((item) => (
+                          <div key={item.id} className="border border-card-border rounded-xl p-4 bg-white dark:bg-slate-800 flex justify-between gap-3 text-xs">
+                            <div className="space-y-2 min-w-0 flex-1">
+                              <div>
+                                <h6 className="font-bold text-slate-800 dark:text-slate-100 truncate">{item.name.en} | {item.name.no} | {item.name.ur}</h6>
+                                {item.desc.en && <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{item.desc.en}</p>}
+                              </div>
+                              {item.store.en && (
+                                <p className="text-[11px] font-bold text-primary-500">
+                                  🛒 Store: {item.store.en}
+                                </p>
+                              )}
+                            </div>
+                            
+                            <div className="flex flex-col gap-2 shrink-0 justify-start">
+                              <button
+                                onClick={() => handleStartEditPackingItem(item)}
+                                className="px-2.5 py-1.5 bg-primary-500/10 hover:bg-primary-500/25 text-primary-500 font-bold rounded-lg transition-colors cursor-pointer text-center text-[10px]"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeletePackingItem(item.id)}
+                                className="px-2.5 py-1.5 bg-error/10 hover:bg-error/25 text-error font-bold rounded-lg transition-colors cursor-pointer text-center text-[10px]"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
       </div>

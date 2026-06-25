@@ -1,247 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { CheckSquare, Square, ShoppingBag, Info } from 'lucide-react';
-
-interface ChecklistItem {
-  id: string;
-  category: 'clothing' | 'spiritual' | 'electronics' | 'health' | 'documents' | 'comfort';
-  nameKey: string;
-  descKey: string;
-  storeKey: string;
-}
-
-const checklistItems: ChecklistItem[] = [
-  // Clothing
-  {
-    id: 'c1',
-    category: 'clothing',
-    nameKey: 'checklist.items.c1_name',
-    descKey: 'checklist.items.c1_desc',
-    storeKey: 'checklist.stores.xxl_stormberg'
-  },
-  {
-    id: 'c2',
-    category: 'clothing',
-    nameKey: 'checklist.items.c2_name',
-    descKey: 'checklist.items.c2_desc',
-    storeKey: 'checklist.stores.xxl'
-  },
-  {
-    id: 'c3',
-    category: 'clothing',
-    nameKey: 'checklist.items.c3_name',
-    descKey: 'checklist.items.c3_desc',
-    storeKey: 'checklist.stores.kiwi_rema_xxl'
-  },
-  {
-    id: 'c4',
-    category: 'clothing',
-    nameKey: 'checklist.items.c4_name',
-    descKey: 'checklist.items.c4_desc',
-    storeKey: 'checklist.stores.any'
-  },
-  // Spiritual
-  {
-    id: 's1',
-    category: 'spiritual',
-    nameKey: 'checklist.items.s1_name',
-    descKey: 'checklist.items.s1_desc',
-    storeKey: 'checklist.stores.online_mosque'
-  },
-  {
-    id: 's2',
-    category: 'spiritual',
-    nameKey: 'checklist.items.s2_name',
-    descKey: 'checklist.items.s2_desc',
-    storeKey: 'checklist.stores.biltema_clas'
-  },
-  {
-    id: 's3',
-    category: 'spiritual',
-    nameKey: 'checklist.items.s3_name',
-    descKey: 'checklist.items.s3_desc',
-    storeKey: 'checklist.stores.app'
-  },
-  // Electronics
-  {
-    id: 'e1',
-    category: 'electronics',
-    nameKey: 'checklist.items.e1_name',
-    descKey: 'checklist.items.e1_desc',
-    storeKey: 'checklist.stores.clas_kjell'
-  },
-  {
-    id: 'e2',
-    category: 'electronics',
-    nameKey: 'checklist.items.e2_name',
-    descKey: 'checklist.items.e2_desc',
-    storeKey: 'checklist.stores.clas_biltema'
-  },
-  {
-    id: 'e3',
-    category: 'electronics',
-    nameKey: 'checklist.items.e3_name',
-    descKey: 'checklist.items.e3_desc',
-    storeKey: 'checklist.stores.any'
-  },
-  // Health
-  {
-    id: 'h1',
-    category: 'health',
-    nameKey: 'checklist.items.h1_name',
-    descKey: 'checklist.items.h1_desc',
-    storeKey: 'checklist.stores.apotek'
-  },
-  {
-    id: 'h2',
-    category: 'health',
-    nameKey: 'checklist.items.h2_name',
-    descKey: 'checklist.items.h2_desc',
-    storeKey: 'checklist.stores.apotek_kiwi'
-  },
-  {
-    id: 'h3',
-    category: 'health',
-    nameKey: 'checklist.items.h3_name',
-    descKey: 'checklist.items.h3_desc',
-    storeKey: 'checklist.stores.kiwi_rema'
-  },
-  // New Clothing items
-  {
-    id: 'c5',
-    category: 'clothing',
-    nameKey: 'checklist.items.c5_name',
-    descKey: 'checklist.items.c5_desc',
-    storeKey: 'checklist.stores.xxl_stormberg'
-  },
-  {
-    id: 'c6',
-    category: 'clothing',
-    nameKey: 'checklist.items.c6_name',
-    descKey: 'checklist.items.c6_desc',
-    storeKey: 'checklist.stores.xxl_kiwi'
-  },
-  {
-    id: 'c7',
-    category: 'clothing',
-    nameKey: 'checklist.items.c7_name',
-    descKey: 'checklist.items.c7_desc',
-    storeKey: 'checklist.stores.synsam_any'
-  },
-  // New Spiritual items
-  {
-    id: 's4',
-    category: 'spiritual',
-    nameKey: 'checklist.items.s4_name',
-    descKey: 'checklist.items.s4_desc',
-    storeKey: 'checklist.stores.app'
-  },
-  {
-    id: 's5',
-    category: 'spiritual',
-    nameKey: 'checklist.items.s5_name',
-    descKey: 'checklist.items.s5_desc',
-    storeKey: 'checklist.stores.online_mosque'
-  },
-  // New Electronics items
-  {
-    id: 'e4',
-    category: 'electronics',
-    nameKey: 'checklist.items.e4_name',
-    descKey: 'checklist.items.e4_desc',
-    storeKey: 'checklist.stores.clas_kjell'
-  },
-  {
-    id: 'e5',
-    category: 'electronics',
-    nameKey: 'checklist.items.e5_name',
-    descKey: 'checklist.items.e5_desc',
-    storeKey: 'checklist.stores.clas_biltema'
-  },
-  // New Health items
-  {
-    id: 'h4',
-    category: 'health',
-    nameKey: 'checklist.items.h4_name',
-    descKey: 'checklist.items.h4_desc',
-    storeKey: 'checklist.stores.apotek'
-  },
-  {
-    id: 'h5',
-    category: 'health',
-    nameKey: 'checklist.items.h5_name',
-    descKey: 'checklist.items.h5_desc',
-    storeKey: 'checklist.stores.apotek_kiwi'
-  },
-  {
-    id: 'h6',
-    category: 'health',
-    nameKey: 'checklist.items.h6_name',
-    descKey: 'checklist.items.h6_desc',
-    storeKey: 'checklist.stores.apotek1'
-  },
-  // Documents
-  {
-    id: 'd1',
-    category: 'documents',
-    nameKey: 'checklist.items.d1_name',
-    descKey: 'checklist.items.d1_desc',
-    storeKey: 'checklist.stores.already_owned'
-  },
-  {
-    id: 'd2',
-    category: 'documents',
-    nameKey: 'checklist.items.d2_name',
-    descKey: 'checklist.items.d2_desc',
-    storeKey: 'checklist.stores.insurance'
-  },
-  {
-    id: 'd3',
-    category: 'documents',
-    nameKey: 'checklist.items.d3_name',
-    descKey: 'checklist.items.d3_desc',
-    storeKey: 'checklist.stores.already_owned'
-  },
-  {
-    id: 'd4',
-    category: 'documents',
-    nameKey: 'checklist.items.d4_name',
-    descKey: 'checklist.items.d4_desc',
-    storeKey: 'checklist.stores.bank_atm'
-  },
-  // Comfort & Supplies
-  {
-    id: 'f1',
-    category: 'comfort',
-    nameKey: 'checklist.items.f1_name',
-    descKey: 'checklist.items.f1_desc',
-    storeKey: 'checklist.stores.any_clas'
-  },
-  {
-    id: 'f2',
-    category: 'comfort',
-    nameKey: 'checklist.items.f2_name',
-    descKey: 'checklist.items.f2_desc',
-    storeKey: 'checklist.stores.kiwi_rema_any'
-  },
-  {
-    id: 'f3',
-    category: 'comfort',
-    nameKey: 'checklist.items.f3_name',
-    descKey: 'checklist.items.f3_desc',
-    storeKey: 'checklist.stores.xxl_sport1'
-  },
-  {
-    id: 'f4',
-    category: 'comfort',
-    nameKey: 'checklist.items.f4_name',
-    descKey: 'checklist.items.f4_desc',
-    storeKey: 'checklist.stores.any_store'
-  }
-];
+import { db } from '../../services/firebase';
+import { collection, doc, setDoc, query, onSnapshot } from 'firebase/firestore';
+import { defaultPackingList } from '../../data/packingList';
+import type { PackingItem } from '../../data/packingList';
 
 export const Checklist: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const getLocText = (obj: { en: string; no: string; ur: string } | undefined) => {
+    if (!obj) return '';
+    const lang = (language || 'en') as 'en' | 'no' | 'ur';
+    return obj[lang] || obj['en'];
+  };
+
+  const [checklistItems, setChecklistItems] = useState<PackingItem[]>([]);
+
+  // Fetch packing list items from Firestore
+  useEffect(() => {
+    const q = query(collection(db, 'packing_list'));
+    const unsub = onSnapshot(q, async (snap) => {
+      if (snap.empty) {
+        console.log("Seeding packing list items in Firestore...");
+        try {
+          for (const item of defaultPackingList) {
+            await setDoc(doc(db, 'packing_list', item.id), item);
+          }
+        } catch (err) {
+          console.error("Error seeding packing list items:", err);
+        }
+      } else {
+        const list: PackingItem[] = [];
+        snap.forEach(docSnap => {
+          list.push({ ...docSnap.data() } as PackingItem);
+        });
+        setChecklistItems(list);
+      }
+    });
+    return () => unsub();
+  }, []);
+
   const [activeCategory, setActiveCategory] = useState<'all' | 'clothing' | 'spiritual' | 'electronics' | 'health' | 'documents' | 'comfort'>('all');
   const [checkedIds, setCheckedIds] = useState<string[]>(() => {
     try {
@@ -251,7 +49,6 @@ export const Checklist: React.FC = () => {
         if (Array.isArray(parsed)) {
           return parsed;
         } else if (parsed && typeof parsed === 'object') {
-          // Backward compatibility: convert object { c1: true, c2: false } to array of checked IDs
           return Object.keys(parsed).filter(key => parsed[key] === true);
         }
       }
@@ -275,7 +72,9 @@ export const Checklist: React.FC = () => {
     ? checklistItems 
     : checklistItems.filter(item => item.category === activeCategory);
 
-  const percentPacked = Math.round((checkedIds.length / checklistItems.length) * 100);
+  const percentPacked = checklistItems.length > 0
+    ? Math.round((checkedIds.length / checklistItems.length) * 100)
+    : 0;
 
   const categories = [
     { id: 'all', label: t('checklist.category.all', 'All Items') },
@@ -355,14 +154,14 @@ export const Checklist: React.FC = () => {
               </div>
               <div className="flex-1 space-y-1 min-w-0">
                 <h3 className={`font-semibold text-lg break-words ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}`}>
-                  {t(item.nameKey) || item.nameKey}
+                  {getLocText(item.name)}
                 </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed break-words">
-                  {t(item.descKey) || item.descKey}
+                  {getLocText(item.desc)}
                 </p>
                 <div className="pt-2 flex items-start gap-1.5 text-xs text-primary-600 dark:text-primary-400 font-medium">
                   <ShoppingBag className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                  <span className="break-words">{t('checklist.whereToBuy', 'Where to buy')}: {t(item.storeKey) || item.storeKey}</span>
+                  <span className="break-words">{t('checklist.whereToBuy', 'Where to buy')}: {getLocText(item.store)}</span>
                 </div>
               </div>
             </div>

@@ -451,5 +451,28 @@
     "progress_title": "Trip Progress",
     "broadcast": "🚨 BROADCAST: {{title}}",
     "dismiss": "Dismiss"
+  },
+  "role_quran": {
+    "none": "\"And do good; indeed, Allah loves the doers of good.\" — Surah Al-Baqarah 2:195",
+    "fajr_caller": "\"And enjoin prayer upon your family and be steadfast therein.\" — Surah Ta-Ha 20:132",
+    "quran_teacher": "\"The Most Merciful taught the Qur'an.\" — Surah Ar-Rahman 55:1-2",
+    "grocery_scout": "\"O mankind, eat from whatever is on earth [that is] lawful and good...\" — Surah Al-Baqarah 2:168",
+    "hydration_helper": "\"...and We made from water every living thing. Will they not then believe?\" — Surah Al-Anbya 21:30",
+    "iftar_announcer": "\"...And eat and drink until the white thread of dawn becomes distinct to you from the black thread [of night]. Then complete the fast until the sunset...\" — Surah Al-Baqarah 2:187",
+    "snack_distributor": "\"O believers! Eat of the good things that We have provided for you, and be grateful to Allah...\" — Surah Al-Baqarah 2:172",
+    "cleanliness_officer": "\"...Indeed, Allah loves those who are constantly repentant and loves those who purify themselves.\" — Surah Al-Baqarah 2:222",
+    "trash_helper": "\"...And clean My House for those who perform Tawaf and those who stand...\" — Surah Al-Hajj 22:26",
+    "audio_manager": "\"And when the Qur'an is recited, then listen to it and pay attention that you may receive mercy.\" — Surah Al-A'raf 7:204",
+    "weather_commentator": "\"He is the One Who shows you the lightning, inspiring fear and hope...\" — Surah Ar-Ra'd 13:12",
+    "elderly_support": "\"And your Lord has decreed... to parents, good treatment. Whether one or both of them reach old age...\" — Surah Al-Isra 17:23",
+    "entertainment_helper": "\"Say, 'In the bounty of Allah and in His mercy - in that let them rejoice; it is better than what they accumulate.'\" — Surah Yunus 10:58",
+    "garment_organiser": "\"O children of Adam, take your adornment at every masjid...\" — Surah Al-A'raf 7:31",
+    "lost_found": "\"Indeed, Allah commands you to render trusts to whom they are due...\" — Surah An-Nisa 4:58",
+    "complaint_incharge": "\"...Who repress anger and who pardon people - and Allah loves the doers of good.\" — Surah Aal-Imran 3:134",
+    "token_collector": "\"And cooperate in righteousness and piety, but do not cooperate in sin and aggression...\" — Surah Al-Ma'idah 5:2",
+    "driver": "\"Exalted is He who has subjected this to us, and we could not have [otherwise] subdued it. And indeed, to our Lord we will return.\" — Surah Az-Zukhruf 43:13-14",
+    "navigator": "\"And landmarks. And by the stars they are [also] guided.\" — Surah An-Nahl 16:16",
+    "photographer": "\"So observe the effects of the mercy of Allah - how He gives life to the earth after its lifelessness...\" — Surah Ar-Rum 30:50",
+    "journalist": "\"Nun. By the pen and what they write.\" — Surah Al-Qalam 68:1"
   }
 }

@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../services/firebase';
-import { collection, addDoc, serverTimestamp, doc, setDoc, query, where, getDocs, limit } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc, query, where, getDocs, limit, onSnapshot, orderBy } from 'firebase/firestore';
 import * as Icons from 'lucide-react';
 import { covenantData } from '../../data/covenant';
+import type { CovenantSection } from '../../data/covenant';
 
 // Color themes for each rule card
 const ruleThemes = [
@@ -43,15 +44,41 @@ export const TripRules: React.FC = () => {
   const [error, setError] = useState('');
   const [signatureData, setSignatureData] = useState<any>(null);
 
+  const [rules, setRules] = useState<CovenantSection[]>([]);
+
+  // Fetch rules from Firestore
+  useEffect(() => {
+    const q = query(collection(db, 'covenant'), orderBy('id', 'asc'));
+    const unsub = onSnapshot(q, async (snap) => {
+      if (snap.empty) {
+        console.log("Seeding covenant rules in Firestore...");
+        try {
+          for (const section of covenantData) {
+            await setDoc(doc(db, 'covenant', `section_${section.id}`), section);
+          }
+        } catch (err) {
+          console.error("Error seeding covenant rules:", err);
+        }
+      } else {
+        const list: CovenantSection[] = [];
+        snap.forEach(docSnap => {
+          list.push({ ...docSnap.data() } as CovenantSection);
+        });
+        setRules(list);
+      }
+    });
+    return () => unsub();
+  }, []);
+
   // Calculate checklists progress
-  const allItems = covenantData.flatMap(section => section.items);
+  const allItems = rules.flatMap(section => section.items || []);
   const totalItemsCount = allItems.length;
   const checkedCount = allItems.filter(item => checkedItems[item.id]).length;
-  const allChecked = checkedCount === totalItemsCount;
-  const progressPercent = Math.round((checkedCount / totalItemsCount) * 100);
+  const allChecked = checkedCount === totalItemsCount && totalItemsCount > 0;
+  const progressPercent = totalItemsCount > 0 ? Math.round((checkedCount / totalItemsCount) * 100) : 0;
 
   useEffect(() => {
-    if (hasSignedRules) {
+    if (hasSignedRules && rules.length > 0) {
       setAgreed(true);
       // Auto-check all items if they already signed
       const autoChecked: Record<string, boolean> = {};
@@ -77,7 +104,7 @@ export const TripRules: React.FC = () => {
         fetchSignature();
       }
     }
-  }, [hasSignedRules, user]);
+  }, [hasSignedRules, user, rules]);
 
   const toggleItem = (itemId: string) => {
     if (hasSignedRules) return; // Disallow toggle after signing
@@ -188,7 +215,7 @@ export const TripRules: React.FC = () => {
 
       {/* Covenant Sections Grid */}
       <div className="space-y-8">
-        {covenantData.map((section, idx) => {
+        {rules.map((section, idx) => {
           const theme = ruleThemes[idx % ruleThemes.length];
           const IconComponent = (Icons as any)[section.iconName] || Icons.HelpCircle;
           

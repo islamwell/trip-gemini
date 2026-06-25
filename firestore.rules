@@ -40,5 +40,20 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if isAdmin();
     }
+
+    match /covenant/{sectionId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /packing_list/{itemId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /translations/{lang} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }
