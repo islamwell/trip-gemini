@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface LocationCoords {
   lat: number;
@@ -193,6 +194,7 @@ export function resolveStops(day: string, stops: any[]) {
 }
 
 export const Itinerary: React.FC = () => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'thursday' | 'friday' | 'saturday' | 'sunday'>('thursday');
   const [hoveredStop, setHoveredStop] = useState<string | null>(null);
 
@@ -361,16 +363,16 @@ export const Itinerary: React.FC = () => {
     <div className="max-w-5xl mx-auto space-y-6 px-4">
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Itinerary & Schedule</h1>
-          <p className="text-slate-500 mt-2">Oslo → Geilo → Stryn → Valldal → Geiranger</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('itinerary.title', 'Itinerary & Schedule')}</h1>
+          <p className="text-slate-500 mt-2">{t('itinerary.subtitle', 'Oslo → Geilo → Stryn → Valldal → Geiranger')}</p>
         </div>
         <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 p-4 rounded-2xl max-w-md">
           <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-1 flex items-center gap-2">
             <Info className="w-4 h-4" />
-            ⏱️ High-Latitude Traveler Rules Applied
+            {t('itinerary.travelerRulesTitle', '⏱️ High-Latitude Traveler Rules Applied')}
           </h4>
           <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
-            Fajr is calculated exactly **1 hour before sunrise** each day. Zuhr/Asr combined at Gol/Bøyabreen (14:00-15:00). Maghrib/Isha combined at **exact local sunset** (approx. 22:45-23:30).
+            {t('itinerary.travelerRulesDesc', 'Fajr is calculated exactly **1 hour before sunrise** each day. Zuhr/Asr combined at Gol/Bøyabreen (14:00-15:00). Maghrib/Isha combined at **exact local sunset** (approx. 22:45-23:30).')}
           </p>
         </div>
       </div>
@@ -378,7 +380,7 @@ export const Itinerary: React.FC = () => {
       {/* SVG Interactive Route Map */}
       <div className="glass rounded-3xl p-6 shadow-md border border-card-border overflow-hidden">
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-          🗺️ Interactive Route Progress
+          {t('itinerary.routeProgress', '🗺️ Interactive Route Progress')}
         </h3>
         
         <div className="relative w-full h-[400px] md:h-[500px] bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-card-border overflow-hidden select-none">
@@ -387,21 +389,21 @@ export const Itinerary: React.FC = () => {
             <button 
               onClick={handleZoomIn}
               className="w-10 h-10 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-card-border rounded-xl flex items-center justify-center shadow-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-              title="Zoom In"
+              title={t('itinerary.zoomIn', 'Zoom In')}
             >
               <ZoomIn className="w-5 h-5" />
             </button>
             <button 
               onClick={handleZoomOut}
               className="w-10 h-10 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-card-border rounded-xl flex items-center justify-center shadow-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-              title="Zoom Out"
+              title={t('itinerary.zoomOut', 'Zoom Out')}
             >
               <ZoomOut className="w-5 h-5" />
             </button>
             <button 
               onClick={handleResetZoom}
               className="w-10 h-10 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-card-border rounded-xl flex items-center justify-center shadow-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-              title="Reset Map"
+              title={t('itinerary.resetMap', 'Reset Map')}
             >
               <RotateCcw className="w-5 h-5" />
             </button>
@@ -500,7 +502,7 @@ export const Itinerary: React.FC = () => {
                       fill="currentColor"
                       className="text-[11px] md:text-[12px] font-bold select-none drop-shadow-sm opacity-80 dark:opacity-90 fill-slate-700 dark:fill-slate-300"
                     >
-                      {node.name}
+                      {t('itinerary.map.' + node.key + '.name', node.name)}
                     </text>
                   </g>
                 );
@@ -513,20 +515,20 @@ export const Itinerary: React.FC = () => {
             {hoveredStop ? (
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-slate-200">
-                  {mapNodes.find(n => n.key === hoveredStop)?.name}
+                  {t('itinerary.map.' + hoveredStop + '.name', mapNodes.find(n => n.key === hoveredStop)?.name)}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {mapNodes.find(n => n.key === hoveredStop)?.info}
+                  {t('itinerary.map.' + hoveredStop + '.info', mapNodes.find(n => n.key === hoveredStop)?.info)}
                 </p>
-                <span className="text-[10px] text-primary-500 font-medium mt-2 block">👉 Click point to scroll to details</span>
+                <span className="text-[10px] text-primary-500 font-medium mt-2 block">{t('itinerary.clickPointHint', '👉 Click point to scroll to details')}</span>
               </div>
             ) : (
               <div>
                 <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm flex items-center gap-1.5">
-                  ✨ Interactive Map Mode
+                  {t('itinerary.interactiveMapMode', '✨ Interactive Map Mode')}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Drag to pan. Pinch/scroll to zoom. Hover and click points to navigate details list below.
+                  {t('itinerary.mapInstructions', 'Drag to pan. Pinch/scroll to zoom. Hover and click points to navigate details list below.')}
                 </p>
               </div>
             )}
@@ -547,7 +549,7 @@ export const Itinerary: React.FC = () => {
                   : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              {day}
+              {t('common.days.' + day, day)}
             </button>
           ))}
         </div>
@@ -581,19 +583,23 @@ export const Itinerary: React.FC = () => {
                     <span className={`font-mono font-bold text-lg ${isPrayer ? 'text-amber-600 dark:text-amber-400' : 'text-primary-600 dark:text-primary-400'}`}>
                       {item.time}
                     </span>
-                    <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100">{item.label}</h3>
+                    <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
+                      {t('itinerary.' + activeTab + '.' + idx + '.label', item.label)}
+                    </h3>
                   </div>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed">{item.desc}</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed">
+                    {t('itinerary.' + activeTab + '.' + idx + '.desc', item.desc)}
+                  </p>
                   
                   {isPrayer && (
                     <div className="mt-2 inline-flex text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200 px-3 py-1 rounded-full">
-                      Men: Mandatory Congregation • Ladies: Optional
+                      {t('itinerary.prayerCongregationRule', 'Men: Mandatory Congregation • Ladies: Optional')}
                     </div>
                   )}
                   
                   {(item as any).image && (
                     <div className="mt-4 rounded-xl overflow-hidden max-w-sm shadow-md border border-slate-200 dark:border-slate-800/60 transition-transform hover:scale-[1.02]">
-                      <img src={(item as any).image} alt={item.label} className="w-full h-48 object-cover" loading="lazy" />
+                      <img src={(item as any).image} alt={t('itinerary.' + activeTab + '.' + idx + '.label', item.label)} className="w-full h-48 object-cover" loading="lazy" />
                     </div>
                   )}
                 </div>

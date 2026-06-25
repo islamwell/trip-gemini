@@ -155,14 +155,10 @@ export const TripRules: React.FC = () => {
           <Icons.BookOpen className="w-12 h-12 text-white" />
         </div>
         <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-          {language === 'no' ? 'Oslo → Geiranger Bilferie-pakt' : language === 'ur' ? 'اوسلو ← گیرانجر خاندانی روڈ ٹرپ عہد نامہ' : 'Oslo → Geiranger Family Road Trip Covenant'}
+          {t('rules.title', 'Oslo → Geiranger Family Road Trip Covenant')}
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light">
-          {language === 'no' ? 
-            'Bismillah. Vi er enige om at denne turen er for tilbedelse, familiebånd, takknemlighet og å nyte Allahs skaperverk. Vi søker barakah, ikke bare underholdning.' : 
-            language === 'ur' ? 
-            'بسم اللہ۔ ہم متفق ہیں کہ یہ سفر عبادت، خاندانی تعلقات، شکر گزاری اور اللہ کی تخلیق سے لطف اندوز ہونے کے لیے ہے۔ ہم برکت چاہتے ہیں، محض تفریح نہیں۔' : 
-            'Bismillah. We agree that this trip is for worship, family bonding, gratitude, and enjoying Allah\'s creation. We seek barakah, not merely entertainment.'}
+          {t('rules.subtitle', 'Bismillah. We agree that this trip is for worship, family bonding, gratitude, and enjoying Allah\'s creation. We seek barakah, not merely entertainment.')}
         </p>
       </div>
 
@@ -171,7 +167,7 @@ export const TripRules: React.FC = () => {
         <div className="glass p-6 rounded-3xl border border-card-border flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="space-y-1.5 w-full md:w-auto">
             <div className="flex justify-between md:justify-start items-baseline gap-2">
-              <span className="text-lg font-bold text-slate-800 dark:text-slate-200">Covenant Agreement Progress</span>
+              <span className="text-lg font-bold text-slate-800 dark:text-slate-200">{t('rules.progressTitle', 'Covenant Agreement Progress')}</span>
               <span className="text-sm font-mono text-primary-600 dark:text-primary-400 font-bold">{checkedCount} / {totalItemsCount} ({progressPercent}%)</span>
             </div>
             <div className="w-full md:w-80 bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
@@ -185,7 +181,7 @@ export const TripRules: React.FC = () => {
             onClick={handleCheckAll}
             className="w-full md:w-auto px-5 py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm font-semibold rounded-xl transition-all"
           >
-            Agree to All Sections
+            {t('rules.agreeAllBtn', 'Agree to All Sections')}
           </button>
         </div>
       )}
@@ -274,21 +270,16 @@ export const TripRules: React.FC = () => {
           {!allChecked ? (
             <div className="space-y-4 text-center py-6">
               <Icons.Lock className="w-12 h-12 mx-auto text-slate-400 dark:text-slate-600" />
-              <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300">Covenant Signature Locked</h3>
+              <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300">{t('rules.sigLockedTitle', 'Covenant Signature Locked')}</h3>
               <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto">
-                Please read and agree to all the covenant rules by checking off all checkboxes to unlock the signature box.
+                {t('rules.sigLockedDesc', 'Please read and agree to all the covenant rules by checking off all checkboxes to unlock the signature box.')}
               </p>
             </div>
           ) : (
             <div className="space-y-6">
               <div className="bg-emerald-50/50 dark:bg-emerald-950/20 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/50 text-center">
                 <p className="text-lg md:text-xl font-extrabold text-slate-800 dark:text-slate-100 leading-relaxed italic">
-                  &ldquo;{language === 'no' ? 
-                    'Vi lover, for Allahs skyld, å bevare bønn, god karakter, tålmodighet, takknemlighet og kjærlighet under denne reisen, og å gjøre denne turen til en kilde til barakah og vakre minner.' :
-                    language === 'ur' ?
-                    'ہم اللہ کی رضا کے لیے وعدہ کرتے ہیں کہ ہم اس سفر کے دوران نماز، اخلاق، صبر، شکر گزاری اور محبت کو برقرار رکھیں گے اور اس سفر کو برکت اور خوبصورت یادوں کا ذریعہ بنائیں گے۔' :
-                    'We promise, for the sake of Allah, to preserve prayer, good character, patience, gratitude, and love during this journey, and to make this trip a source of barakah and beautiful memories.'
-                  }&rdquo;
+                  &ldquo;{t('rules.promiseText', 'We promise, for the sake of Allah, to preserve prayer, good character, patience, gratitude, and love during this journey, and to make this trip a source of barakah and beautiful memories.')}&rdquo;
                 </p>
                 <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-4 font-mono font-bold">
                   اللهم بارك لنا في سفرنا، واحفظنا، واجعله سفراً مباركاً، وردنا إلى أهلنا سالمين غانمين. آمين
@@ -308,20 +299,20 @@ export const TripRules: React.FC = () => {
                   </div>
                 </div>
                 <span className="text-lg md:text-xl font-bold text-slate-700 dark:text-slate-200 select-none leading-snug pt-1">
-                  {language === 'no' ? 'Jeg godtar denne pakten for meg selv og min familie' : language === 'ur' ? 'میں اپنے اور اپنے خاندان کی طرف سے اس عہد نامے سے متفق ہوں' : 'I agree to uphold this covenant for myself and my family'}
+                  {t('rules.agreeCheckbox', 'I agree to uphold this covenant for myself and my family')}
                 </span>
               </label>
 
               {/* Name Input */}
               <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
                 <label className="block text-base font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                  ✍️ Please type your full name to sign:
+                  {t('rules.typeNameToSign', '✍️ Please type your full name to sign:')}
                 </label>
                 <input 
                   type="text" 
                   value={signatureName}
                   onChange={(e) => setSignatureName(e.target.value)}
-                  placeholder="Your Full Name"
+                  placeholder={t('rules.fullNamePlaceholder', 'Your Full Name')}
                   className="w-full px-5 py-4 text-lg rounded-xl border border-slate-200 dark:border-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 bg-white/50 dark:bg-slate-800/50 outline-none transition-all"
                 />
               </div>
@@ -338,7 +329,7 @@ export const TripRules: React.FC = () => {
                 disabled={!agreed || !signatureName.trim() || submitting}
                 className="w-full py-4 text-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:from-slate-300 disabled:to-slate-400 disabled:text-slate-500 text-white font-bold rounded-xl transition-all shadow-xl hover:shadow-emerald-500/25 hover:-translate-y-0.5 active:translate-y-0"
               >
-                {submitting ? 'Submitting...' : '✅ Sign Covenant & Enter'}
+                {submitting ? t('common.submitting', 'Submitting...') : t('rules.signBtn', '✅ Sign Covenant & Enter')}
               </button>
             </div>
           )}
@@ -349,31 +340,31 @@ export const TripRules: React.FC = () => {
             <Icons.Check className="w-10 h-10 text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
           </div>
           <div>
-            <h3 className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mb-2">Covenant Signed!</h3>
-            <p className="text-slate-600 dark:text-slate-400 text-lg">JazakAllah Khair. You have officially agreed to the trip rules.</p>
+            <h3 className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mb-2">{t('rules.signedTitle', 'Covenant Signed!')}</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-lg">{t('rules.signedDesc', 'JazakAllah Khair. You have officially agreed to the trip rules.')}</p>
           </div>
           
           {signatureData && (
             <div className="w-full max-w-lg mt-4 bg-white/60 dark:bg-slate-800/60 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 text-left space-y-3">
-              <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">Digital Signature Record</h4>
+              <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">{t('rules.sigRecordTitle', 'Digital Signature Record')}</h4>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-slate-500">Participant Name</p>
+                  <p className="text-xs text-slate-500">{t('rules.participantName', 'Participant Name')}</p>
                   <p className="font-semibold text-slate-800 dark:text-slate-200">{signatureData.participantName}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Date & Time</p>
+                  <p className="text-xs text-slate-500">{t('rules.dateTime', 'Date & Time')}</p>
                   <p className="font-semibold text-slate-800 dark:text-slate-200">
                     {signatureData.signedAt ? new Date(signatureData.signedAt).toLocaleString() : 'N/A'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">IP Address</p>
+                  <p className="text-xs text-slate-500">{t('rules.ipAddress', 'IP Address')}</p>
                   <p className="font-mono text-sm font-medium text-slate-800 dark:text-slate-200">{signatureData.ipAddress}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Location</p>
+                  <p className="text-xs text-slate-500">{t('rules.location', 'Location')}</p>
                   <p className="font-medium text-slate-800 dark:text-slate-200">{signatureData.location || 'Unknown'}</p>
                 </div>
               </div>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../services/firebase';
-import { collection, onSnapshot, query, addDoc, getDocs, doc, setDoc, deleteDoc, serverTimestamp, where } from 'firebase/firestore';
-import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard, Trash2, Settings, LogOut } from 'lucide-react';
+import { collection, onSnapshot, query, addDoc, getDocs, doc, setDoc, deleteDoc, serverTimestamp, where, deleteField } from 'firebase/firestore';
+import { ShieldCheck, Users, Wallet, CheckCircle, AlertCircle, Clock, Map, Clipboard, Trash2, Settings, LogOut, Globe, Search } from 'lucide-react';
 import { calculateBudget } from '../../data/finances';
 import { useToast } from '../../contexts/ToastContext';
 import { Finances } from '../participant/Finances';
@@ -67,7 +67,15 @@ export const AdminDashboard: React.FC = () => {
   const [maxPassengers, setMaxPassengers] = useState(17);
   
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'budget' | 'duties' | 'itinerary' | 'complaints'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'budget' | 'duties' | 'itinerary' | 'complaints' | 'translations'>('users');
+
+  // Translation Editor state
+  const [defaultLocales, setDefaultLocales] = useState<Record<string, string>>({});
+  const [selectedLang, setSelectedLang] = useState<'en' | 'no' | 'ur'>('ur');
+  const [firestoreOverrides, setFirestoreOverrides] = useState<Record<string, string>>({});
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Itinerary Edit Form State
   const [selectedDay, setSelectedDay] = useState<string>('thursday');
@@ -158,6 +166,80 @@ export const AdminDashboard: React.FC = () => {
       unsubSettings();
     };
   }, [role]);
+
+  // Load default English locales baseline keys
+  useEffect(() => {
+    fetch('/locales/en/translation.json')
+      .then(res => res.json())
+      .then(data => {
+        const flat: Record<string, string> = {};
+        const flatten = (obj: any, prefix = '') => {
+          for (const key in obj) {
+            const val = obj[key];
+            const newKey = prefix ? `${prefix}.${key}` : key;
+            if (typeof val === 'object' && val !== null) {
+              flatten(val, newKey);
+            } else {
+              flat[newKey] = String(val);
+            }
+          }
+        };
+        flatten(data);
+        setDefaultLocales(flat);
+      })
+      .catch(err => console.error("Error loading default locales:", err));
+  }, []);
+
+  // Listen to active translation overrides from Firestore
+  useEffect(() => {
+    const unsubOverrides = onSnapshot(doc(db, 'translations', selectedLang), (docSnap) => {
+      if (docSnap.exists()) {
+        setFirestoreOverrides(docSnap.data() as Record<string, string>);
+      } else {
+        setFirestoreOverrides({});
+      }
+    });
+    return () => unsubOverrides();
+  }, [selectedLang]);
+
+  // Reset page when search or lang changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedLang]);
+
+  const handleSaveOverride = async (key: string, value: string) => {
+    try {
+      await setDoc(doc(db, 'translations', selectedLang), {
+        [key]: value
+      }, { merge: true });
+      showSuccess(`Override for "${key}" saved successfully!`);
+    } catch (err) {
+      console.error(err);
+      showError("Failed to save override");
+    }
+  };
+
+  const handleDeleteOverride = async (key: string) => {
+    try {
+      await setDoc(doc(db, 'translations', selectedLang), {
+        [key]: deleteField()
+      }, { merge: true });
+      showSuccess(`Override reverted to default.`);
+    } catch (err) {
+      console.error(err);
+      showError("Failed to delete override");
+    }
+  };
+
+  const filteredKeys = Object.keys(defaultLocales).filter(key => 
+    key.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (defaultLocales[key] || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const keysPerPage = 50;
+  const totalPages = Math.ceil(filteredKeys.length / keysPerPage);
+  const startIndex = (currentPage - 1) * keysPerPage;
+  const paginatedKeys = filteredKeys.slice(startIndex, startIndex + keysPerPage);
 
   if (role !== 'admin') {
     return (
@@ -444,6 +526,14 @@ export const AdminDashboard: React.FC = () => {
           }`}
         >
           Complaints ({complaints.filter(c => c.status !== 'resolved').length})
+        </button>
+        <button
+          onClick={() => setActiveTab('translations')}
+          className={`px-6 py-3 font-semibold text-sm transition-all border-b-2 whitespace-nowrap ${
+            activeTab === 'translations' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Translations
         </button>
       </div>
 
@@ -746,6 +836,149 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 );
               })
+            )}
+          </div>
+        )}
+
+        {activeTab === 'translations' && (
+          <div className="space-y-6">
+            <div className="bg-primary-50 dark:bg-primary-950/20 border border-primary-100 dark:border-primary-900/50 p-4 rounded-2xl flex items-start gap-3">
+              <Globe className="w-5 h-5 text-primary-600 dark:text-primary-400 mt-0.5 shrink-0" />
+              <div>
+                <h3 className="font-bold text-sm text-primary-800 dark:text-primary-300">Live Translation Manager</h3>
+                <p className="text-xs text-primary-700 dark:text-primary-400 mt-1">
+                  Correct typos or translate the application text dynamically. Changes are saved directly to Firestore and update instantly in real-time on all active user devices without requiring a website redeployment.
+                </p>
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between bg-slate-50 dark:bg-slate-900/30 p-4 rounded-2xl border border-card-border">
+              {/* Language Selector */}
+              <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                {(['en', 'no', 'ur'] as const).map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => setSelectedLang(lang)}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
+                      selectedLang === lang 
+                        ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm' 
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    {lang === 'en' ? '🇬🇧 English' : lang === 'no' ? '🇳🇴 Norsk' : '🇵🇰 Urdu'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search translation keys or values..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white dark:bg-slate-800 border border-card-border pl-10 pr-4 py-2 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Keys list */}
+            <div className="space-y-4 border border-card-border rounded-2xl overflow-hidden divide-y divide-card-border bg-white/50 dark:bg-slate-900/10">
+              {paginatedKeys.length === 0 ? (
+                <div className="text-center p-8 text-slate-500">No translation keys found matching your search.</div>
+              ) : (
+                paginatedKeys.map((key) => {
+                  const defaultValue = defaultLocales[key] || '';
+                  const overrideValue = firestoreOverrides[key] || '';
+                  const activeEditValue = editingValues[key] !== undefined ? editingValues[key] : overrideValue;
+                  const isModified = activeEditValue !== overrideValue;
+
+                  return (
+                    <div key={key} className="p-4 md:p-6 flex flex-col md:flex-row gap-4 items-start justify-between">
+                      <div className="space-y-1.5 flex-1 w-full">
+                        <span className="font-mono text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded">
+                          {key}
+                        </span>
+                        <p className="text-xs text-slate-400">
+                          <strong>Default baseline (EN):</strong> {defaultValue}
+                        </p>
+                        {overrideValue && (
+                          <p className="text-xs text-success font-medium">
+                            Current Override: &ldquo;{overrideValue}&rdquo;
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Editing inputs */}
+                      <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 items-stretch sm:items-center">
+                        <input
+                          type="text"
+                          value={activeEditValue}
+                          placeholder="Type custom override here..."
+                          onChange={(e) => {
+                            setEditingValues(prev => ({ ...prev, [key]: e.target.value }));
+                          }}
+                          className="w-full sm:w-80 bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => handleSaveOverride(key, activeEditValue)}
+                            disabled={!isModified}
+                            className="px-4 py-2 bg-success text-white hover:bg-success/90 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 text-xs font-bold rounded-xl transition-all shadow-sm flex-1 sm:flex-none"
+                          >
+                            Save
+                          </button>
+                          {overrideValue && (
+                            <button
+                              onClick={() => {
+                                handleDeleteOverride(key);
+                                setEditingValues(prev => {
+                                  const next = { ...prev };
+                                  delete next[key];
+                                  return next;
+                                });
+                              }}
+                              className="px-4 py-2 bg-error/10 text-error hover:bg-error/20 text-xs font-bold rounded-xl transition-all shadow-sm flex-1 sm:flex-none"
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-card-border text-sm">
+                <span className="text-slate-500">
+                  Showing {startIndex + 1}-{Math.min(startIndex + keysPerPage, filteredKeys.length)} of {filteredKeys.length} keys
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold rounded-lg text-xs"
+                  >
+                    Previous
+                  </button>
+                  <span className="flex items-center px-2 font-bold text-xs">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold rounded-lg text-xs"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}

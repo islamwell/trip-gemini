@@ -35,7 +35,7 @@ export const Complaints: React.FC = () => {
       setSubmitSuccess(true);
       reset();
     } catch (err: any) {
-      setError(err.message || 'Failed to submit complaint. Please try again.');
+      setError(err.message || t('complaints.submitFailed', 'Failed to submit complaint. Please try again.'));
     }
   };
 
@@ -43,7 +43,7 @@ export const Complaints: React.FC = () => {
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t('nav.complaints')}</h1>
-        <p className="text-slate-500 mt-2">Submit concerns securely and privately.</p>
+        <p className="text-slate-500 mt-2">{t('complaints.subtitle', 'Submit concerns securely and privately.')}</p>
       </div>
 
       <div className="glass rounded-2xl overflow-hidden shadow-sm">
@@ -52,10 +52,9 @@ export const Complaints: React.FC = () => {
           <div className="flex items-start gap-3 bg-primary-50 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200 p-4 rounded-xl mb-6">
             <ShieldAlert className="w-6 h-6 mt-0.5 flex-shrink-0 text-primary-600 dark:text-primary-400" />
             <div>
-              <h3 className="font-semibold">Confidentiality Notice</h3>
+              <h3 className="font-semibold">{t('complaints.noticeTitle', 'Confidentiality Notice')}</h3>
               <p className="text-sm mt-1 opacity-90">
-                Your concerns will only be reviewed by the designated Complaint Handler. 
-                Other participants cannot see your submissions.
+                {t('complaints.noticeDesc', 'Your concerns will only be reviewed by the designated Complaint Handler. Other participants cannot see your submissions.')}
               </p>
             </div>
           </div>
@@ -66,34 +65,34 @@ export const Complaints: React.FC = () => {
                 <CheckCircle2 className="w-8 h-8 text-success" />
               </div>
               <div>
-                <h3 className="font-semibold text-xl text-success mb-2">Complaint Submitted</h3>
+                <h3 className="font-semibold text-xl text-success mb-2">{t('complaints.submittedTitle', 'Complaint Submitted')}</h3>
                 <p className="text-success/80">
-                  Thank you for letting us know. The Complaint Handler will review your concern and take appropriate action.
+                  {t('complaints.submittedDesc', 'Thank you for letting us know. The Complaint Handler will review your concern and take appropriate action.')}
                 </p>
               </div>
               <button 
                 onClick={() => setSubmitSuccess(false)}
                 className="mt-4 px-6 py-2 bg-success/20 text-success hover:bg-success/30 rounded-lg font-medium transition-colors"
               >
-                Submit Another
+                {t('complaints.submitAnother', 'Submit Another')}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <label htmlFor="text" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Describe your concern
+                  {t('complaints.describeConcern', 'Describe your concern')}
                 </label>
                 <div className="relative">
                   <textarea
                     id="text"
                     {...register('text', { 
-                      required: 'Please describe your concern',
-                      minLength: { value: 10, message: 'Must be at least 10 characters' },
-                      maxLength: { value: 500, message: 'Cannot exceed 500 characters' }
+                      required: t('complaints.errorRequired', 'Please describe your concern'),
+                      minLength: { value: 10, message: t('complaints.errorMinLength', 'Must be at least 10 characters') },
+                      maxLength: { value: 500, message: t('complaints.errorMaxLength', 'Cannot exceed 500 characters') }
                     })}
                     rows={5}
-                    placeholder="Please provide details..."
+                    placeholder={t('complaints.placeholder', 'Please provide details...')}
                     className={`w-full px-4 py-3 rounded-xl border bg-white/50 dark:bg-slate-800/50 focus:ring-2 outline-none transition-all resize-none ${
                       errors.text 
                         ? 'border-error focus:ring-error focus:border-error' 
@@ -126,7 +125,7 @@ export const Complaints: React.FC = () => {
                   disabled={isSubmitting}
                   className="w-full sm:w-auto px-8 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white font-medium rounded-xl transition-all hover-lift flex items-center justify-center gap-2"
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
+                  {isSubmitting ? t('common.submitting', 'Submitting...') : t('complaints.submitBtn', 'Submit Complaint')}
                   {!isSubmitting && <MessageSquare className="w-4 h-4" />}
                 </button>
               </div>

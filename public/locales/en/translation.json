@@ -7,6 +7,16 @@
     "finances": "Finances",
     "complaints": "Complaints"
   },
+  "common": {
+    "close": "Close",
+    "submitting": "Submitting...",
+    "days": {
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
+  },
   "auth": {
     "login": "Login",
     "email": "Email Address",
@@ -63,7 +73,24 @@
     "rule12_title": "Speaking Kindly or Remaining Silent",
     "rule12_desc": "If you have nothing beneficial to say, it is better to stay silent. No harsh jokes, sarcasm, or hurtful remarks. Every word should build up, not tear down.",
     "rule12_quran": "\"And speak to people good words.\" — Surah Al-Baqarah 2:83",
-    "sign_agree": "I have read carefully and agree to uphold all rules"
+    "sign_agree": "I have read carefully and agree to uphold all rules",
+    "progressTitle": "Covenant Agreement Progress",
+    "agreeAllBtn": "Agree to All Sections",
+    "sigLockedTitle": "Covenant Signature Locked",
+    "sigLockedDesc": "Please read and agree to all the covenant rules by checking off all checkboxes to unlock the signature box.",
+    "promiseText": "We promise, for the sake of Allah, to preserve prayer, good character, patience, gratitude, and love during this journey, and to make this trip a source of barakah and beautiful memories.",
+    "agreeCheckbox": "I agree to uphold this covenant for myself and my family",
+    "typeNameToSign": "✍️ Please type your full name to sign:",
+    "fullNamePlaceholder": "Your Full Name",
+    "signBtn": "✅ Sign Covenant & Enter",
+    "signedTitle": "Covenant Signed!",
+    "signedDesc": "JazakAllah Khair. You have officially agreed to the trip rules.",
+    "sigRecordTitle": "Digital Signature Record",
+    "participantName": "Participant Name",
+    "dateTime": "Date & Time",
+    "ipAddress": "IP Address",
+    "location": "Location",
+    "submitFailed": "Failed to submit agreement. Please try again."
   },
   "checklist": {
     "items": {
@@ -153,37 +180,139 @@
       "any_clas": "Any store / Clas Ohlson",
       "any_store": "Any store",
       "apotek1": "Apotek 1 / Vitusapotek"
+    },
+    "title": "Packing Checklist",
+    "subtitle": "Interactive list of mandatory and recommended items for the road trip.",
+    "progress": "Packed Progress",
+    "whereToBuy": "Where to buy",
+    "bannerTitle": "Norwegian Shopping Tips:",
+    "bannerTip1": "XXL / Sport 1 / Stormberg: Best for high-quality outdoor rainwear, hiking boots, and wool base layers.",
+    "bannerTip2": "Clas Ohlson / Biltema / Kjell & Co: Best for affordable electronics (power banks), thermos flasks, and water spray bottles.",
+    "bannerTip3": "Apotek 1 / Vitusapotek: Best for motion sickness pills (essential for Trollstigen) and high-factor sunscreen.",
+    "bannerTip4": "Kiwi / Rema 1000 / Coop: Best for daily grocery packages and snacks.",
+    "category": {
+      "all": "All Items",
+      "clothing": "🧥 Clothing & Gear",
+      "spiritual": "🕋 Spiritual",
+      "electronics": "🔋 Electronics",
+      "health": "💊 Health & Hygiene",
+      "documents": "📄 Documents",
+      "comfort": "🎒 Comfort & Supplies"
     }
   },
   "finances": {
     "loading": "Loading financial data...",
     "subtitle": "Track your payments, trip costs, and verified budget evidence transparently.",
-    "breakdown": "Trip Breakdown",
-    "total_group_cost": "Total Group Cost",
-    "passengers_capacity": "Passengers Capacity",
-    "individual_share": "Your Individual Share",
-    "payment_status": "Payment Status",
-    "paid_amount": "Paid Amount",
-    "outstanding_balance": "Outstanding Balance",
-    "paid_in_full": "Paid in Full",
-    "pending_payment_desc": "Please transfer your outstanding share before departure.",
-    "pay_with_vipps": "Pay with Vipps",
-    "itemized_breakdown_title": "Itemized Budget Breakdown & Evidence",
-    "itemized_breakdown_desc": "Click on any category below to expand itemized calculations, formulas, and verified official booking/pricing sources.",
-    "verifiable_evidence_title": "Verifiable Evidence & Sources",
-    "math_proof_title": "Verifiable Mathematical Proof",
-    "math_proof_desc": "We prove that the total group cost is distributed with absolute mathematical parity. The sum of all individual shares matches the group budget exactly:",
-    "math_proof_verified": "Verified Group Cost Balance",
-    "math_proof_balanced": "100% Balanced",
-    "vipps_modal_title": "Vipps Transfer",
-    "vipps_modal_desc": "Since you are on a desktop browser, please scan this code or perform a manual transfer in the Vipps app.",
-    "vipps_modal_scan": "Scan QR Code to Phone",
-    "vipps_modal_scan_desc": "Scan code from your phone's camera",
-    "vipps_modal_receiver": "Receiver Phone",
-    "vipps_modal_amount": "Amount",
-    "vipps_modal_account": "Bank Account",
-    "vipps_modal_close": "Close",
-    "vipps_modal_sms": "Send SMS Link"
+    "breakdownTitle": "Trip Breakdown",
+    "totalGroupCost": "Total Group Cost",
+    "passengersCapacity": "Passengers Capacity",
+    "individualShare": "Your Individual Share",
+    "paymentStatus": "Payment Status",
+    "paidAmount": "Paid Amount",
+    "outstandingBalance": "Outstanding Balance",
+    "paidInFull": "Paid in Full",
+    "transferPrompt": "Please transfer your outstanding share before departure.",
+    "payWithVipps": "Pay with Vipps",
+    "itemizedBreakdown": "📊 Itemized Budget Breakdown & Evidence",
+    "expandInstruction": "Click on any category below to expand itemized calculations, formulas, and verified official booking/pricing sources.",
+    "totalLabel": "Total: {{amount}} NOK",
+    "evidenceTitle": "Verifiable Evidence & Sources",
+    "verifyPriceSource": "Verify Price Source",
+    "mathematicalProofTitle": "🤝 Verifiable Mathematical Proof",
+    "mathematicalProofDesc": "We prove that the total group cost is distributed with absolute mathematical parity. The sum of all individual shares matches the group budget exactly:",
+    "proofFormula": "{{passengers}} Passengers × {{perPerson}} NOK = {{total}} NOK",
+    "verifiedBalance": "Verified Group Cost Balance: {{total1}} NOK / {{total2}} NOK (100% Balanced)",
+    "vippsTransfer": "Vipps Transfer",
+    "desktopVippsPrompt": "Since you are on a desktop browser, please scan this code or perform a manual transfer in the Vipps app.",
+    "scanQrPrompt": "[ Scan QR Code to Phone: {{phone}} ]",
+    "scanCodePrompt": "Scan code from your phone's camera",
+    "receiverPhone": "Receiver Phone:",
+    "amountLabel": "Amount:",
+    "bankAccount": "Bank Account:",
+    "sendSmsLink": "Send SMS Link"
+  },
+  "itinerary": {
+    "title": "Itinerary & Schedule",
+    "subtitle": "Oslo → Geilo → Stryn → Valldal → Geiranger",
+    "travelerRulesTitle": "⏱️ High-Latitude Traveler Rules Applied",
+    "travelerRulesDesc": "Fajr is calculated exactly **1 hour before sunrise** each day. Zuhr/Asr combined at Gol/Bøyabreen (14:00-15:00). Maghrib/Isha combined at **exact local sunset** (approx. 22:45-23:30).",
+    "routeProgress": "🗺️ Interactive Route Progress",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "resetMap": "Reset Map",
+    "clickPointHint": "👉 Click point to scroll to details",
+    "interactiveMapMode": "✨ Interactive Map Mode",
+    "mapInstructions": "Drag to pan. Pinch/scroll to zoom. Hover and click points to navigate details list below.",
+    "prayerCongregationRule": "Men: Mandatory Congregation • Ladies: Optional",
+    "map": {
+      "oslo": {
+        "name": "Oslo (Nurulquran)",
+        "info": "Departure & Return: Jerikoveien 26"
+      },
+      "fla": {
+        "name": "Flå",
+        "info": "Bear Park scenic stop"
+      },
+      "gol": {
+        "name": "Gol Mosque",
+        "info": "Hallingdal Islamic Center (Furuvegen 5)"
+      },
+      "geilo": {
+        "name": "Geilo",
+        "info": "Mountain cabins check-in"
+      },
+      "laerdal": {
+        "name": "Lærdal Tunnel",
+        "info": "World longest tunnel (24.5km)"
+      },
+      "boyabreen": {
+        "name": "Bøyabreen Glacier",
+        "info": "Active branch of Jostedalsbreen"
+      },
+      "stryn": {
+        "name": "Stryn",
+        "info": "Glacier and fjord region lodging"
+      },
+      "valldal": {
+        "name": "Valldal (Sylte)",
+        "info": "Murigjerdet 11 accommodation"
+      },
+      "trollstigen": {
+        "name": "Trollstigen",
+        "info": "11 spectacular hairpin turns"
+      },
+      "geiranger": {
+        "name": "Geiranger",
+        "info": "UNESCO fjord view & Eagle Road"
+      },
+      "dalsnibba": {
+        "name": "Dalsnibba Skywalk",
+        "info": "Europe's highest fjord view (1500m)"
+      },
+      "lom": {
+        "name": "Lom",
+        "info": "Lom Stave Church & famous bakery"
+      },
+      "lillehammer": {
+        "name": "Lillehammer",
+        "info": "Olympic park & Lillehammer Mosque"
+      }
+    }
+  },
+  "complaints": {
+    "subtitle": "Submit concerns securely and privately.",
+    "noticeTitle": "Confidentiality Notice",
+    "noticeDesc": "Your concerns will only be reviewed by the designated Complaint Handler. Other participants cannot see your submissions.",
+    "submittedTitle": "Complaint Submitted",
+    "submittedDesc": "Thank you for letting us know. The Complaint Handler will review your concern and take appropriate action.",
+    "submitAnother": "Submit Another",
+    "describeConcern": "Describe your concern",
+    "placeholder": "Please provide details...",
+    "submitBtn": "Submit Complaint",
+    "submitFailed": "Failed to submit complaint. Please try again.",
+    "errorRequired": "Please describe your concern",
+    "errorMinLength": "Must be at least 10 characters",
+    "errorMaxLength": "Cannot exceed 500 characters"
   },
   "countdown": {
     "title": "Registration Deadline",

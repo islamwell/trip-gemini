@@ -278,28 +278,28 @@ export const Checklist: React.FC = () => {
   const percentPacked = Math.round((checkedIds.length / checklistItems.length) * 100);
 
   const categories = [
-    { id: 'all', label: 'All Items' },
-    { id: 'clothing', label: '🧥 Clothing & Gear' },
-    { id: 'spiritual', label: '🕋 Spiritual' },
-    { id: 'electronics', label: '🔋 Electronics' },
-    { id: 'health', label: '💊 Health & Hygiene' },
-    { id: 'documents', label: '📄 Documents' },
-    { id: 'comfort', label: '🎒 Comfort & Supplies' }
+    { id: 'all', label: t('checklist.category.all', 'All Items') },
+    { id: 'clothing', label: t('checklist.category.clothing', '🧥 Clothing & Gear') },
+    { id: 'spiritual', label: t('checklist.category.spiritual', '🕋 Spiritual') },
+    { id: 'electronics', label: t('checklist.category.electronics', '🔋 Electronics') },
+    { id: 'health', label: t('checklist.category.health', '💊 Health & Hygiene') },
+    { id: 'documents', label: t('checklist.category.documents', '📄 Documents') },
+    { id: 'comfort', label: t('checklist.category.comfort', '🎒 Comfort & Supplies') }
   ];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 px-4">
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Packing Checklist</h1>
-          <p className="text-slate-500 mt-2">Interactive list of mandatory and recommended items for the road trip.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('checklist.title', 'Packing Checklist')}</h1>
+          <p className="text-slate-500 mt-2">{t('checklist.subtitle', 'Interactive list of mandatory and recommended items for the road trip.')}</p>
         </div>
         
         {/* Progress tracker */}
         <div className="glass p-4 rounded-2xl flex items-center gap-4 w-full md:w-64 border border-card-border">
           <div className="flex-1 space-y-1">
             <div className="flex justify-between text-xs font-semibold">
-              <span className="text-slate-500">Packed Progress</span>
+              <span className="text-slate-500">{t('checklist.progress', 'Packed Progress')}</span>
               <span className="text-primary-600 dark:text-primary-400">{percentPacked}%</span>
             </div>
             <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -362,7 +362,7 @@ export const Checklist: React.FC = () => {
                 </p>
                 <div className="pt-2 flex items-start gap-1.5 text-xs text-primary-600 dark:text-primary-400 font-medium">
                   <ShoppingBag className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                  <span className="break-words">Where to buy: {t(item.storeKey) || item.storeKey}</span>
+                  <span className="break-words">{t('checklist.whereToBuy', 'Where to buy')}: {t(item.storeKey) || item.storeKey}</span>
                 </div>
               </div>
             </div>
@@ -374,12 +374,12 @@ export const Checklist: React.FC = () => {
       <div className="bg-slate-100 dark:bg-slate-900/40 border border-card-border p-6 rounded-3xl flex items-start gap-4 mt-8">
         <Info className="w-6 h-6 text-primary-500 mt-0.5 shrink-0" />
         <div className="space-y-1 text-sm">
-          <h4 className="font-bold text-slate-800 dark:text-slate-200">Norwegian Shopping Tips:</h4>
+          <h4 className="font-bold text-slate-800 dark:text-slate-200">{t('checklist.bannerTitle', 'Norwegian Shopping Tips:')}</h4>
           <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
-            <li><strong>XXL / Sport 1 / Stormberg:</strong> Best for high-quality outdoor rainwear, hiking boots, and wool base layers.</li>
-            <li><strong>Clas Ohlson / Biltema / Kjell & Co:</strong> Best for affordable electronics (power banks), thermos flasks, and water spray bottles.</li>
-            <li><strong>Apotek 1 / Vitusapotek:</strong> Best for motion sickness pills (essential for Trollstigen) and high-factor sunscreen.</li>
-            <li><strong>Kiwi / Rema 1000 / Coop:</strong> Best for daily grocerie packages and snacks.</li>
+            <li>{t('checklist.bannerTip1', 'XXL / Sport 1 / Stormberg: Best for high-quality outdoor rainwear, hiking boots, and wool base layers.')}</li>
+            <li>{t('checklist.bannerTip2', 'Clas Ohlson / Biltema / Kjell & Co: Best for affordable electronics (power banks), thermos flasks, and water spray bottles.')}</li>
+            <li>{t('checklist.bannerTip3', 'Apotek 1 / Vitusapotek: Best for motion sickness pills (essential for Trollstigen) and high-factor sunscreen.')}</li>
+            <li>{t('checklist.bannerTip4', 'Kiwi / Rema 1000 / Coop: Best for daily grocerie packages and snacks.')}</li>
           </ul>
         </div>
       </div>

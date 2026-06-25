@@ -7,6 +7,7 @@ import { db } from '../../services/firebase';
 import { doc, onSnapshot, collection, query, orderBy, limit } from 'firebase/firestore';
 import { resolveStops, defaultItinerary } from './Itinerary';
 import { useToast } from '../../contexts/ToastContext';
+import { getDutyTranslationKey } from '../../utils/duty';
 
 
 interface ParticipantProfile {
@@ -258,14 +259,14 @@ export const Dashboard: React.FC = () => {
   const cards = [
     {
       title: t('nav.rules'),
-      description: 'Review and sign the mandatory trip rules.',
+      description: t('dashboard.cards.rules_desc', 'Review and sign the mandatory trip rules.'),
       icon: ScrollText,
       to: '/rules',
       color: 'bg-blue-500',
     },
     {
-      title: 'Itinerary & Stops',
-      description: 'View the route, breaks, and prayer times.',
+      title: t('dashboard.cards.itinerary_title', 'Itinerary & Stops'),
+      description: t('dashboard.cards.itinerary_desc', 'View the route, breaks, and prayer times.'),
       icon: Map,
       to: '/itinerary',
       color: 'bg-emerald-500',
@@ -273,14 +274,14 @@ export const Dashboard: React.FC = () => {
 
     {
       title: t('nav.checklist'),
-      description: 'Check your packing list and where to buy items.',
+      description: t('dashboard.cards.checklist_desc', 'Check your packing list and where to buy items.'),
       icon: CheckSquare,
       to: '/checklist',
       color: 'bg-rose-500',
     },
     {
       title: t('nav.complaints'),
-      description: 'Submit concerns privately to the handler.',
+      description: t('dashboard.cards.complaints_desc', 'Submit concerns privately to the handler.'),
       icon: MessageSquare,
       to: '/complaints',
       color: 'bg-amber-500',
@@ -297,7 +298,9 @@ export const Dashboard: React.FC = () => {
               <Bell className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">🚨 BROADCAST: {latestNotification.title}</span>
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
+                {t('dashboard.broadcast', '🚨 BROADCAST: {{title}}', { title: latestNotification.title })}
+              </span>
               <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">{latestNotification.message}</p>
             </div>
           </div>
@@ -305,15 +308,19 @@ export const Dashboard: React.FC = () => {
             onClick={dismissNotification}
             className="text-xs font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-500/35 transition-colors self-end sm:self-center"
           >
-            Dismiss
+            {t('dashboard.dismiss', 'Dismiss')}
           </button>
         </div>
       )}
 
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-900 dark:from-primary-400 dark:to-primary-200">Dashboard</h1>
-          <p className="text-slate-500 mt-2">Welcome back, {user?.displayName || 'Participant'}.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-900 dark:from-primary-400 dark:to-primary-200">
+            {t('dashboard.title', 'Dashboard')}
+          </h1>
+          <p className="text-slate-500 mt-2">
+            {t('dashboard.welcome_back', 'Welcome back, {{name}}.', { name: user?.displayName || 'Participant' })}
+          </p>
         </div>
       </div>
 
@@ -324,9 +331,11 @@ export const Dashboard: React.FC = () => {
             <UserCheck className="w-8 h-8" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Assigned Trip Duty</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">{t('dashboard.assigned_duty', 'Assigned Trip Duty')}</span>
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-0.5">
-              {profile?.duty ? profile.duty : 'General Help / Passenger'}
+              {profile?.duty 
+                ? (t(getDutyTranslationKey(profile.duty)) || profile.duty) 
+                : t('dashboard.general_help', 'General Help / Passenger')}
             </h2>
           </div>
         </div>
@@ -335,14 +344,14 @@ export const Dashboard: React.FC = () => {
           onClick={() => setShowDutiesList(!showDutiesList)}
           className="text-sm font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-5 py-2.5 rounded-xl transition-all"
         >
-          {showDutiesList ? 'Hide Assigned Roles' : 'View Passenger Roles'}
+          {showDutiesList ? t('dashboard.hide_roles', 'Hide Assigned Roles') : t('dashboard.view_roles', 'View Passenger Roles')}
         </button>
       </div>
 
       {/* Passenger Roles Collapsed Grid */}
       {showDutiesList && (
         <div className="glass p-6 rounded-3xl border border-card-border animate-slide-down">
-          <h3 className="font-bold text-lg mb-4">👥 Trip Duty Allocations</h3>
+          <h3 className="font-bold text-lg mb-4">{t('dashboard.duty_allocations', '👥 Trip Duty Allocations')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {allParticipants.map((p) => (
               <div key={p.id} className="bg-slate-50/50 dark:bg-slate-800/20 border border-card-border p-4 rounded-xl flex justify-between items-center">
@@ -351,7 +360,9 @@ export const Dashboard: React.FC = () => {
                   <span className="text-[11px] text-slate-400 font-mono">{p.email}</span>
                 </div>
                 <span className="text-xs font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-full text-right max-w-[120px] truncate">
-                  {p.duty || 'General Help'}
+                  {p.duty 
+                    ? (t(getDutyTranslationKey(p.duty)) || p.duty) 
+                    : t('dashboard.general_help_short', 'General Help')}
                 </span>
               </div>
             ))}
@@ -364,54 +375,58 @@ export const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 glass p-6 rounded-3xl border border-card-border flex flex-col justify-between space-y-6">
           <div>
             <h3 className="font-bold text-lg flex items-center gap-1.5">
-              ⏰ Trip Departure & Prayer Alarms
+              {t('dashboard.alarms_title', '⏰ Trip Departure & Prayer Alarms')}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Warning chimes play exactly **10 minutes before** major departures and scheduled prayer times on the road.
+              {t('dashboard.alarms_desc', 'Warning chimes play exactly **10 minutes before** major departures and scheduled prayer times on the road.')}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm cursor-pointer ${
                 audioEnabled ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
               }`}
             >
               {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-              {audioEnabled ? 'Audio Chime Enabled' : 'Audio Chime Muted'}
+              {audioEnabled ? t('dashboard.audio_enabled', 'Audio Chime Enabled') : t('dashboard.audio_muted', 'Audio Chime Muted')}
             </button>
 
             <button
               onClick={() => setNotifEnabled(!notifEnabled)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm cursor-pointer ${
                 notifEnabled ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
               }`}
             >
-              {notifEnabled ? '🔔 Notifications Active' : '🔕 Notifications Off'}
+              {notifEnabled ? t('dashboard.notif_active', '🔔 Notifications Active') : t('dashboard.notif_off', '🔕 Notifications Off')}
             </button>
 
             <button
               onClick={handleTestAlarm}
-              className="px-4 py-2.5 border border-card-border rounded-xl font-bold text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200"
+              className="px-4 py-2.5 border border-card-border rounded-xl font-bold text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200 cursor-pointer"
             >
-              🔊 Test Sound & Notification
+              {t('dashboard.test_alarm', '🔊 Test Sound & Notification')}
             </button>
           </div>
         </div>
 
         <div className="glass p-6 rounded-3xl border border-card-border flex flex-col justify-between">
-          <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Upcoming Alarms Today ({getActiveTripDay().toUpperCase()})</h4>
+          <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">
+            {t('dashboard.upcoming_alarms', 'Upcoming Alarms Today ({{day}})', { day: getActiveTripDay().toUpperCase() })}
+          </h4>
           
           <div className="mt-4 space-y-3 max-h-[140px] overflow-y-auto pr-1">
             {upcomingAlarms.length === 0 ? (
-              <p className="text-xs text-slate-400 italic">No alerts scheduled for today.</p>
+              <p className="text-xs text-slate-400 italic">{t('dashboard.no_alarms', 'No alerts scheduled for today.')}</p>
             ) : (
               upcomingAlarms.slice(0, 3).map((alarm, idx) => (
                 <div key={idx} className="flex justify-between items-center border-b border-card-border pb-2 last:border-b-0 text-xs">
                   <div>
                     <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-[150px]">{alarm.label}</span>
-                    <span className="text-[10px] text-slate-400">Warning at {alarm.alertTime}</span>
+                    <span className="text-[10px] text-slate-400">
+                      {t('dashboard.warning_at', 'Warning at {{time}}', { time: alarm.alertTime })}
+                    </span>
                   </div>
                   <span className="font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold px-2 py-0.5 rounded">
                     {alarm.time}
@@ -448,7 +463,7 @@ export const Dashboard: React.FC = () => {
       
       {/* Trip Progress Bar */}
       <div className="glass p-6 rounded-2xl mt-8">
-        <h2 className="text-xl font-bold mb-4">Trip Progress</h2>
+        <h2 className="text-xl font-bold mb-4">{t('dashboard.progress_title', 'Trip Progress')}</h2>
         <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-4 overflow-hidden relative">
           <div className="bg-primary-500 h-full w-1/4 rounded-full relative z-10"></div>
           {/* Stops markers */}

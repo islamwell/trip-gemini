@@ -69,34 +69,34 @@ export const Finances: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="p-8 text-center animate-pulse">Loading financial data...</div>;
+    return <div className="p-8 text-center animate-pulse">{t('finances.loading')}</div>;
   }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t('nav.finances')}</h1>
-        <p className="text-slate-500 mt-2">Track your payments, trip costs, and verified budget evidence transparently.</p>
+        <p className="text-slate-500 mt-2">{t('finances.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="glass rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 mb-4">
             <Wallet className="w-5 h-5" />
-            <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200">Trip Breakdown</h2>
+            <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200">{t('finances.breakdownTitle')}</h2>
           </div>
           
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-card-border">
-              <span className="text-slate-500 font-medium text-sm">Total Group Cost</span>
+              <span className="text-slate-500 font-medium text-sm">{t('finances.totalGroupCost')}</span>
               <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{totalTripCost.toLocaleString()} NOK</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-card-border">
-              <span className="text-slate-500 font-medium text-sm">Passengers Capacity</span>
+              <span className="text-slate-500 font-medium text-sm">{t('finances.passengersCapacity')}</span>
               <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{maxPassengers}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="font-semibold text-slate-700 dark:text-slate-300 text-sm">Your Individual Share</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300 text-sm">{t('finances.individualShare')}</span>
               <span className="font-mono font-black text-xl text-primary-600 dark:text-primary-400">{perPersonCost.toLocaleString()} NOK</span>
             </div>
           </div>
@@ -105,36 +105,36 @@ export const Finances: React.FC = () => {
         <div className="glass rounded-2xl p-6 shadow-sm relative overflow-hidden">
           <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 mb-6">
             <CreditCard className="w-5 h-5" />
-            <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200">Payment Status</h2>
+            <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200">{t('finances.paymentStatus')}</h2>
           </div>
 
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-medium text-sm">Paid Amount</span>
+              <span className="text-slate-500 font-medium text-sm">{t('finances.paidAmount')}</span>
               <span className="font-mono font-bold text-success text-base">{paidAmount.toLocaleString()} NOK</span>
             </div>
             <div className="flex justify-between items-center pb-4 border-b border-card-border">
-              <span className="text-slate-500 font-medium text-sm">Outstanding Balance</span>
+              <span className="text-slate-500 font-medium text-sm">{t('finances.outstandingBalance')}</span>
               <span className="font-mono font-bold text-error text-base">{Math.max(0, balance).toLocaleString()} NOK</span>
             </div>
 
             {isPaid ? (
               <div className="mt-4 bg-success/10 text-success p-4 rounded-xl flex items-center justify-center gap-2 border border-success/20">
                 <CheckCircle2 className="w-5 h-5" />
-                <span className="font-bold text-sm uppercase tracking-wide">Paid in Full</span>
+                <span className="font-bold text-sm uppercase tracking-wide">{t('finances.paidInFull')}</span>
               </div>
             ) : (
               <div className="mt-4 space-y-4">
                 <div className="bg-warning/10 text-warning p-3 rounded-lg flex items-start gap-2 text-sm border border-warning/20">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs">Please transfer your outstanding share before departure.</p>
+                  <p className="text-xs">{t('finances.transferPrompt')}</p>
                 </div>
                 
                 <button 
                   onClick={handleVippsPayment}
                   className="w-full flex items-center justify-center gap-2 bg-[#ff5b24] hover:bg-[#e04a1b] text-white py-3 rounded-xl font-bold transition-all hover-lift shadow-md shadow-[#ff5b24]/10"
                 >
-                  Pay with Vipps
+                  {t('finances.payWithVipps')}
                   <ExternalLink className="w-4 h-4" />
                 </button>
               </div>
@@ -146,10 +146,10 @@ export const Finances: React.FC = () => {
       {/* Detailed Expense Category Section with Accordions */}
       <div className="glass rounded-3xl p-6 md:p-8 shadow-md border border-card-border mt-8">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-          📊 Itemized Budget Breakdown & Evidence
+          {t('finances.itemizedBreakdown')}
         </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-          Click on any category below to expand itemized calculations, formulas, and verified official booking/pricing kilder (sources).
+          {t('finances.expandInstruction')}
         </p>
         <div className="space-y-4">
           {breakdown.map((item, idx) => {
@@ -167,8 +167,12 @@ export const Finances: React.FC = () => {
                   className="w-full text-left p-5 flex justify-between items-center gap-4 transition-all hover:bg-slate-50/50 dark:hover:bg-slate-900/10"
                 >
                   <div className="space-y-1">
-                    <span className="font-bold text-slate-800 dark:text-slate-200 block text-base md:text-lg">{item.category}</span>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">{item.desc}</p>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block text-base md:text-lg">
+                      {t('finances.category.' + item.id, item.category)}
+                    </span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+                      {t('finances.category.' + item.id + '_desc', item.desc)}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4 shrink-0">
                     <div className="text-right">
@@ -176,7 +180,7 @@ export const Finances: React.FC = () => {
                         {item.amountPerPerson.toLocaleString()} NOK
                       </span>
                       <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-                        Total: {item.totalAmount.toLocaleString()} NOK
+                        {t('finances.totalLabel', { amount: item.totalAmount.toLocaleString() })}
                       </span>
                     </div>
                     {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
@@ -197,7 +201,7 @@ export const Finances: React.FC = () => {
                 {isExpanded && (
                   <div className="p-5 pt-3 border-t border-card-border bg-slate-50/20 dark:bg-slate-900/5 space-y-3">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-500" /> Verifiable Evidence & Sources
+                      <ShieldCheck className="w-4 h-4 text-emerald-500" /> {t('finances.evidenceTitle')}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {item.evidence.map((ev, evIdx) => (
@@ -206,9 +210,11 @@ export const Finances: React.FC = () => {
                           className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-card-border flex flex-col justify-between space-y-2 hover:shadow-sm transition-shadow"
                         >
                           <div className="space-y-1.5">
-                            <span className="font-extrabold text-xs text-slate-700 dark:text-slate-300 block">{ev.label}</span>
+                            <span className="font-extrabold text-xs text-slate-700 dark:text-slate-300 block">
+                              {t('finances.evidence.' + item.id + '.' + evIdx + '.label', ev.label)}
+                            </span>
                             <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal font-normal">
-                              {ev.costDetail}
+                              {t('finances.evidence.' + item.id + '.' + evIdx + '.detail', ev.costDetail)}
                             </p>
                           </div>
                           {ev.sourceUrl && (
@@ -218,7 +224,8 @@ export const Finances: React.FC = () => {
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-[11px] font-bold text-primary-600 dark:text-primary-400 hover:underline pt-2 border-t border-card-border mt-2"
                             >
-                              {ev.sourceLabel || 'Verify Price Source'} <ExternalLink className="w-3 h-3" />
+                              {ev.sourceLabel ? t('finances.evidence.' + item.id + '.' + evIdx + '.sourceLabel', ev.sourceLabel) : t('finances.verifyPriceSource')}
+                              <ExternalLink className="w-3 h-3" />
                             </a>
                           )}
                         </div>
@@ -235,17 +242,17 @@ export const Finances: React.FC = () => {
       {/* Mathematical Proof Badge */}
       <div className="glass rounded-3xl p-6 md:p-8 shadow-md border border-card-border bg-gradient-to-br from-primary-500/5 to-teal-500/5 mt-8">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
-          🤝 Verifiable Mathematical Proof
+          {t('finances.mathematicalProofTitle')}
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-          We prove that the total group cost is distributed with absolute mathematical parity. The sum of all individual shares matches the group budget exactly:
+          {t('finances.mathematicalProofDesc')}
         </p>
         <div className="bg-white/50 dark:bg-slate-900/50 p-6 rounded-2xl border border-card-border flex flex-col items-center justify-center text-center space-y-3">
           <div className="font-mono font-bold text-lg md:text-2xl text-slate-800 dark:text-slate-100 tracking-tight">
-            {maxPassengers} Passengers × {perPersonCost.toLocaleString()} NOK = {totalTripCost.toLocaleString()} NOK
+            {t('finances.proofFormula', { passengers: maxPassengers, perPerson: perPersonCost.toLocaleString(), total: totalTripCost.toLocaleString() })}
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
-            Verified Group Cost Balance: {totalTripCost.toLocaleString()} NOK / {totalTripCost.toLocaleString()} NOK (100% Balanced)
+            {t('finances.verifiedBalance', { total1: totalTripCost.toLocaleString(), total2: totalTripCost.toLocaleString() })}
           </div>
         </div>
       </div>
@@ -258,29 +265,29 @@ export const Finances: React.FC = () => {
               <div className="mx-auto w-16 h-16 bg-[#ff5b24]/10 rounded-full flex items-center justify-center">
                 <span className="text-[#ff5b24] font-black text-2xl">vipps</span>
               </div>
-              <h3 className="text-2xl font-bold">Vipps Transfer</h3>
+              <h3 className="text-2xl font-bold">{t('finances.vippsTransfer')}</h3>
               <p className="text-slate-500 text-sm">
-                Since you are on a desktop browser, please scan this code or perform a manual transfer in the Vipps app.
+                {t('finances.desktopVippsPrompt')}
               </p>
               
               <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl flex flex-col items-center justify-center border border-dashed border-slate-300 dark:border-slate-700">
                 <div className="w-48 h-48 bg-slate-300 dark:bg-slate-700 rounded-xl flex items-center justify-center text-xs font-mono text-center px-4 select-none text-slate-800 dark:text-slate-200">
-                  [ Scan QR Code to Phone: {VIPPS_ADMIN_PHONE} ]
+                  {t('finances.scanQrPrompt', { phone: VIPPS_ADMIN_PHONE })}
                 </div>
-                <span className="text-xs text-slate-400 mt-2">Scan code from your phone's camera</span>
+                <span className="text-xs text-slate-400 mt-2">{t('finances.scanCodePrompt')}</span>
               </div>
 
               <div className="text-left space-y-2 pt-4 border-t border-slate-100 dark:border-slate-700 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Receiver Phone:</span>
+                  <span className="text-slate-500 font-medium">{t('finances.receiverPhone')}</span>
                   <span className="font-mono font-bold">{VIPPS_ADMIN_PHONE}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Amount:</span>
+                  <span className="text-slate-500 font-medium">{t('finances.amountLabel')}</span>
                   <span className="font-mono font-bold text-error">{balance.toLocaleString()} NOK</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Bank Account:</span>
+                  <span className="text-slate-500 font-medium">{t('finances.bankAccount')}</span>
                   <span className="font-mono font-bold">1234.56.78901</span>
                 </div>
               </div>
@@ -290,13 +297,13 @@ export const Finances: React.FC = () => {
                   onClick={() => setShowPaymentModal(false)}
                   className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-bold rounded-xl transition-all"
                 >
-                  Close
+                  {t('common.close')}
                 </button>
                 <a
                   href={`sms:${VIPPS_ADMIN_PHONE}?body=Vipps payment for Geiranger trip: ${balance} NOK`}
                   className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl text-center transition-all flex items-center justify-center"
                 >
-                  Send SMS Link
+                  {t('finances.sendSmsLink')}
                 </a>
               </div>
             </div>
