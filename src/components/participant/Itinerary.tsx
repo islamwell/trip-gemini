@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw, Play, Pause } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -207,6 +207,62 @@ export const Itinerary: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+  // Minibus animation states
+  const routePathRef = useRef<SVGPathElement>(null);
+  const [busDistance, setBusDistance] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [busPos, setBusPos] = useState({ x: 608, y: 560, angle: 0 }); // starts at Oslo
+  const [totalPathLength, setTotalPathLength] = useState(1500); // fallback
+
+  useEffect(() => {
+    const pathEl = routePathRef.current;
+    if (pathEl) {
+      setTotalPathLength(pathEl.getTotalLength());
+    }
+  }, []);
+
+  useEffect(() => {
+    let animationId: number;
+    const pathEl = routePathRef.current;
+    if (!pathEl || !isPlaying) return;
+
+    const totalLength = pathEl.getTotalLength();
+
+    const animate = () => {
+      setBusDistance(prev => {
+        let next = prev + 0.8 * speed;
+        if (next >= totalLength) {
+          return 0; // loop back
+        }
+        return next;
+      });
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, [isPlaying, speed]);
+
+  useEffect(() => {
+    const pathEl = routePathRef.current;
+    if (!pathEl) return;
+    try {
+      const totalLength = pathEl.getTotalLength();
+      const currentDist = Math.min(totalLength, Math.max(0, busDistance));
+      const p = pathEl.getPointAtLength(currentDist);
+      
+      // Calculate angle
+      const lookAhead = Math.min(totalLength, currentDist + 2);
+      const pAhead = pathEl.getPointAtLength(lookAhead);
+      const angle = Math.atan2(pAhead.y - p.y, pAhead.x - p.x) * 180 / Math.PI;
+      
+      setBusPos({ x: p.x, y: p.y, angle });
+    } catch (e) {
+      // fallback
+    }
+  }, [busDistance]);
+
   const stopToDayMap: Record<string, 'thursday' | 'friday' | 'saturday' | 'sunday'> = {
     oslo: 'thursday',
     fla: 'thursday',
@@ -359,6 +415,24 @@ export const Itinerary: React.FC = () => {
     { key: 'lillehammer', name: 'Lillehammer', x: 330, y: 230, info: 'Olympic park & Lillehammer Mosque' },
   ];
 
+  const getClosestStop = () => {
+    let minD = Infinity;
+    let closest = mapNodes[0];
+    for (const node of mapNodes) {
+      const sx = node.x * 1.6;
+      const sy = node.y * 1.6;
+      const d = Math.hypot(busPos.x - sx, busPos.y - sy);
+      if (d < minD) {
+        minD = d;
+        closest = node;
+      }
+    }
+    return { ...closest, distance: minD };
+  };
+
+  const closestStop = getClosestStop();
+  const currentElevation = locations[closestStop.key]?.elevation || 0;
+
   return (
     <div className="max-w-5xl mx-auto space-y-6 px-4">
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
@@ -423,6 +497,24 @@ export const Itinerary: React.FC = () => {
             onWheel={handleWheel}
           >
             <g transform={`translate(${position.x}, ${position.y}) scale(${scale})`} className="transition-transform duration-75 ease-out">
+              {/* Stylized Southern Norway Outline */}
+              <path
+                d="M 150 80 
+                   C 130 120, 120 160, 140 200 
+                   C 150 250, 170 300, 190 350 
+                   C 200 400, 190 450, 210 500 
+                   C 250 580, 320 620, 420 620 
+                   C 500 620, 560 590, 580 560 
+                   C 590 530, 580 500, 608 480 
+                   C 620 500, 630 530, 640 560 
+                   C 660 520, 680 400, 700 300 
+                   C 720 200, 740 100, 750 50 Z"
+                fill="currentColor"
+                className="fill-slate-100/60 dark:fill-slate-800/10 stroke-slate-200/80 dark:stroke-slate-700/40"
+                strokeWidth="3"
+                strokeLinejoin="round"
+              />
+
               {/* Draw base route paths */}
               <path
                 d="M 608 560 Q 560 512 512 464 T 448 400 T 368 400 T 336 304 T 288 248 T 224 208 T 240 144 T 288 128 T 208 176 T 368 224 T 528 368 Z"
@@ -434,6 +526,7 @@ export const Itinerary: React.FC = () => {
               />
               {/* Draw active animated path */}
               <path
+                ref={routePathRef}
                 d="M 608 560 Q 560 512 512 464 T 448 400 T 368 400 T 336 304 T 288 248 T 224 208 T 240 144 T 288 128 T 208 176 T 368 224 T 528 368 Z"
                 stroke="url(#route-gradient)"
                 strokeWidth="4"
@@ -441,7 +534,7 @@ export const Itinerary: React.FC = () => {
                 strokeLinejoin="round"
                 strokeDasharray="1500"
                 strokeDashoffset="0"
-                className="animate-[dash_10s_linear_infinite]"
+                className="animate-[dash_15s_linear_infinite]"
               />
               
               {/* Gradients */}
@@ -453,6 +546,24 @@ export const Itinerary: React.FC = () => {
                 </linearGradient>
               </defs>
 
+              {/* Moving Minibus */}
+              <g 
+                transform={`translate(${busPos.x}, ${busPos.y}) rotate(${busPos.angle})`}
+                className="transition-transform duration-100 ease-out"
+              >
+                {/* Glowing drop shadow */}
+                <circle cx="0" cy="0" r="12" fill="#3b82f6" className="opacity-40 blur-xs" />
+                {/* Bus chassis shape */}
+                <rect x="-9" y="-6" width="18" height="12" rx="2" fill="#3b82f6" stroke="#ffffff" strokeWidth="1.5" />
+                {/* Windows */}
+                <rect x="2" y="-4" width="4" height="8" rx="0.5" fill="#e2e8f0" />
+                <rect x="-3" y="-4" width="4" height="8" rx="0.5" fill="#e2e8f0" />
+                <rect x="-8" y="-4" width="4" height="8" rx="0.5" fill="#e2e8f0" />
+                {/* Headlights */}
+                <circle cx="9" cy="-3" r="1" fill="#eab308" />
+                <circle cx="9" cy="3" r="1" fill="#eab308" />
+              </g>
+
               {/* Render Nodes */}
               {mapNodes.map((node) => {
                 const isHovered = hoveredStop === node.key;
@@ -462,6 +573,23 @@ export const Itinerary: React.FC = () => {
                 const scaledX = node.x * 1.6;
                 const scaledY = node.y * 1.6;
 
+                // Elevation Heatmap properties
+                const elevation = locations[node.key]?.elevation || 0;
+                
+                // Heatmap color logic
+                let haloColor = 'rgba(16, 185, 129, 0.2)'; // low (green)
+                let pulseClass = '';
+                if (elevation >= 1000) {
+                  haloColor = 'rgba(168, 85, 247, 0.4)'; // extreme (purple)
+                  pulseClass = 'animate-pulse';
+                } else if (elevation >= 500) {
+                  haloColor = 'rgba(239, 68, 68, 0.35)'; // high (red)
+                } else if (elevation >= 100) {
+                  haloColor = 'rgba(249, 115, 22, 0.25)'; // medium (orange/yellow)
+                }
+                
+                const haloRadius = 12 + Math.min(20, (elevation / 1500) * 18);
+
                 return (
                   <g 
                     key={node.key}
@@ -470,13 +598,22 @@ export const Itinerary: React.FC = () => {
                     onClick={() => handleNodeClick(node.key)}
                     className="cursor-pointer group"
                   >
+                    {/* Heatmap Halo */}
+                    <circle
+                      cx={scaledX}
+                      cy={scaledY}
+                      r={haloRadius}
+                      fill={haloColor}
+                      className={pulseClass}
+                    />
+
                     {isCurrentDayStop && (
                       <circle
                         cx={scaledX}
                         cy={scaledY}
-                        r={16}
+                        r={haloRadius + 4}
                         fill="#10b981"
-                        className="opacity-40 animate-ping"
+                        className="opacity-20 animate-ping"
                       />
                     )}
                     <circle
@@ -510,8 +647,31 @@ export const Itinerary: React.FC = () => {
             </g>
           </svg>
 
+          {/* Elevation Heatmap Legend */}
+          <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 px-3 py-2 rounded-xl shadow-md border border-card-border backdrop-blur text-[10px] space-y-1 z-20">
+            <span className="font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider mb-1">
+              {t('itinerary.elevationLegend', 'Altitude')}
+            </span>
+            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+              <span>Low (&lt; 100m)</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+              <span>Med (100m - 500m)</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+              <span>High (500m - 1000m)</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block animate-pulse"></span>
+              <span>Extreme (&gt; 1000m)</span>
+            </div>
+          </div>
+
           {/* Map Tooltip Box */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/95 dark:bg-slate-800/95 p-4 rounded-xl shadow-lg border border-card-border max-w-sm backdrop-blur transition-all duration-300">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/95 dark:bg-slate-800/95 p-4 rounded-xl shadow-lg border border-card-border max-w-sm backdrop-blur transition-all duration-300 z-20">
             {hoveredStop ? (
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-slate-200">
@@ -524,14 +684,82 @@ export const Itinerary: React.FC = () => {
               </div>
             ) : (
               <div>
-                <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm flex items-center gap-1.5">
-                  {t('itinerary.interactiveMapMode', '✨ Interactive Map Mode')}
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-1.5">
+                  🚌 {isPlaying ? t('itinerary.busDriving', 'Minibus is driving...') : t('itinerary.busParked', 'Minibus is parked')}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {t('itinerary.mapInstructions', 'Drag to pan. Pinch/scroll to zoom. Hover and click points to navigate details list below.')}
+                  {t('itinerary.nearestStop', 'Nearest Stop')}: <strong>{t('itinerary.map.' + closestStop.key + '.name', closestStop.name)}</strong>
+                </p>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  {t('itinerary.currentAltitude', 'Altitude')}: {currentElevation}m | {t('itinerary.mapInstructions', 'Drag to pan. Scroll to zoom.')}
                 </p>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Minibus Animation Playback Controls */}
+        <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-2xl border border-card-border flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
+              className="w-10 h-10 bg-primary-500 hover:bg-primary-600 text-white rounded-xl flex items-center justify-center shadow-md transition-colors"
+              title={isPlaying ? 'Pause Animation' : 'Start Animation'}
+            >
+              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-white" />}
+            </button>
+            <button
+              onClick={() => {
+                setIsPlaying(false);
+                setBusDistance(0);
+              }}
+              className="w-10 h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-card-border rounded-xl flex items-center justify-center transition-colors"
+              title="Reset to Oslo"
+            >
+              <RotateCcw className="w-5 h-5" />
+            </button>
+            
+            {/* Speed Multiplier */}
+            <div className="flex bg-slate-200 dark:bg-slate-800 p-0.5 rounded-lg border border-card-border">
+              {([1, 2, 4] as const).map(s => (
+                <button
+                  key={s}
+                  onClick={() => setSpeed(s)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${
+                    speed === s 
+                      ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm' 
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {s}x
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Scrub Slider */}
+          <div className="flex-1 w-full flex items-center gap-3">
+            <span className="text-xs font-mono text-slate-400">Oslo</span>
+            <input
+              type="range"
+              min="0"
+              max={totalPathLength}
+              value={busDistance}
+              onChange={(e) => {
+                setBusDistance(Number(e.target.value));
+                setIsPlaying(false);
+              }}
+              className="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary-500"
+            />
+            <span className="text-xs font-mono text-slate-400">Return</span>
+          </div>
+
+          {/* Elevation Indicator Panel */}
+          <div className="bg-white/80 dark:bg-slate-800/80 px-4 py-2 rounded-xl border border-card-border text-xs flex items-center gap-2 shrink-0">
+            <span className="font-bold text-slate-400 uppercase tracking-wider">{t('itinerary.currentAltitude', 'Altitude')}:</span>
+            <span className="font-mono font-bold text-primary-600 dark:text-primary-400">
+              {currentElevation}m
+            </span>
           </div>
         </div>
       </div>

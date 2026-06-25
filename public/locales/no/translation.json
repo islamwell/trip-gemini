@@ -244,6 +244,11 @@
     "interactiveMapMode": "✨ Interaktiv kartmodus",
     "mapInstructions": "Dra for å panorere. Klyp/scroll for å zoome. Hold over og klikk på punkter for å navigere i listen nedenfor.",
     "prayerCongregationRule": "Menn: Obligatorisk menighet • Kvinner: Valgfritt",
+    "elevationLegend": "Høyde",
+    "busDriving": "Minibussen kjører...",
+    "busParked": "Minibussen er parkert",
+    "nearestStop": "Nærmeste stopp",
+    "currentAltitude": "Høyde",
     "map": {
       "oslo": {
         "name": "Oslo (Nurulquran)",
