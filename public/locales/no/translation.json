@@ -447,10 +447,21 @@
     "test_alarm": "🔊 Test lyd og varsling",
     "upcoming_alarms": "Kommende varsler i dag ({{day}})",
     "no_alarms": "Ingen varsler planlagt for i dag.",
-    "warning_at": "Advarsel kl. {{time}}",
     "progress_title": "Tur-fremdrift",
     "broadcast": "🚨 MELDING: {{title}}",
-    "dismiss": "Avvis"
+    "dismiss": "Avvis",
+    "edit_name": "Rediger navn",
+    "edit_name_title": "Rediger profilnavn",
+    "edit_name_desc": "Oppdater hvordan navnet ditt vises på passasjerens dashbord og tildelinger.",
+    "salutation": "Tittel",
+    "brother": "Bror",
+    "sister": "Søster",
+    "none": "Ingen",
+    "first_name": "Fornavn",
+    "last_name": "Etternavn",
+    "set_name_prompt": "Vennligst oppgi navn",
+    "name_required": "Fornavn og etternavn er påkrevd.",
+    "name_updated": "Navn oppdatert!"
   },
   "role_quran": {
     "none": "\"Og gjør det gode; sannelig, Allah elsker de som gjør godt.\" — Surah Al-Baqarah 2:195",

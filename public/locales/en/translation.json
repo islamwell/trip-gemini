@@ -447,10 +447,21 @@
     "test_alarm": "🔊 Test Sound & Notification",
     "upcoming_alarms": "Upcoming Alarms Today ({{day}})",
     "no_alarms": "No alerts scheduled for today.",
-    "warning_at": "Warning at {{time}}",
     "progress_title": "Trip Progress",
     "broadcast": "🚨 BROADCAST: {{title}}",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "edit_name": "Edit Name",
+    "edit_name_title": "Edit Profile Name",
+    "edit_name_desc": "Update how your name appears on the passenger dashboard and allocations.",
+    "salutation": "Salutation",
+    "brother": "Brother",
+    "sister": "Sister",
+    "none": "None",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "set_name_prompt": "Please set name",
+    "name_required": "First and Last name are required.",
+    "name_updated": "Name updated successfully!"
   },
   "role_quran": {
     "none": "\"And do good; indeed, Allah loves the doers of good.\" — Surah Al-Baqarah 2:195",

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
-import { ScrollText, Map, MessageSquare, CheckSquare, Bell, Volume2, VolumeX, UserCheck } from 'lucide-react';
+import { ScrollText, Map, MessageSquare, CheckSquare, Bell, Volume2, VolumeX, UserCheck, Pencil } from 'lucide-react';
 import { db } from '../../services/firebase';
-import { doc, onSnapshot, collection, query, orderBy, limit } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, orderBy, limit, setDoc } from 'firebase/firestore';
 import { resolveStops, defaultItinerary } from './Itinerary';
 import { useToast } from '../../contexts/ToastContext';
 import { getDutyTranslationKey } from '../../utils/duty';
@@ -29,7 +29,7 @@ interface NotificationMsg {
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { showInfo } = useToast();
+  const { showInfo, showSuccess, showError } = useToast();
 
   const getRoleKey = (dutyDbValue: string | undefined): string => {
     if (!dutyDbValue) return 'none';
@@ -41,6 +41,66 @@ export const Dashboard: React.FC = () => {
 
   // Real-time states
   const [profile, setProfile] = useState<ParticipantProfile | null>(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editSalutation, setEditSalutation] = useState('Brother');
+  const [editFirstName, setEditFirstName] = useState('');
+  const [editLastName, setEditLastName] = useState('');
+  const [savingName, setSavingName] = useState(false);
+
+  const parseName = (fullName: string | undefined) => {
+    if (!fullName || fullName === 'Participant') {
+      return { salutation: 'Brother', firstName: '', lastName: '' };
+    }
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 0) return { salutation: 'Brother', firstName: '', lastName: '' };
+    
+    let sal = 'Brother';
+    let startIdx = 0;
+    if (parts[0] === 'Brother' || parts[0] === 'Sister') {
+      sal = parts[0];
+      startIdx = 1;
+    } else {
+      sal = '';
+      startIdx = 0;
+    }
+    
+    const remaining = parts.slice(startIdx);
+    const fName = remaining[0] || '';
+    const lName = remaining.slice(1).join(' ');
+    
+    return { salutation: sal, firstName: fName, lastName: lName };
+  };
+
+  const handleOpenEditName = () => {
+    const parsed = parseName(profile?.name || user?.displayName || '');
+    setEditSalutation(parsed.salutation);
+    setEditFirstName(parsed.firstName);
+    setEditLastName(parsed.lastName);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (!editFirstName.trim() || !editLastName.trim()) {
+      showError(t('dashboard.name_required', 'First and Last name are required.'));
+      return;
+    }
+    setSavingName(true);
+    try {
+      const newFullName = `${editSalutation ? editSalutation + ' ' : ''}${editFirstName.trim()} ${editLastName.trim()}`.trim();
+      await setDoc(doc(db, 'participants', user.uid), {
+        name: newFullName
+      }, { merge: true });
+      showSuccess(t('dashboard.name_updated', 'Name updated successfully!'));
+      setIsEditingName(false);
+    } catch (err: any) {
+      console.error("Failed to update name:", err);
+      showError(err.message || 'Failed to update name. Please try again.');
+    } finally {
+      setSavingName(false);
+    }
+  };
   const [allParticipants, setAllParticipants] = useState<ParticipantProfile[]>([]);
   const [dbItinerary, setDbItinerary] = useState<Record<string, any[]>>(defaultItinerary);
   const [latestNotification, setLatestNotification] = useState<NotificationMsg | null>(null);
@@ -325,9 +385,23 @@ export const Dashboard: React.FC = () => {
           <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-900 dark:from-primary-400 dark:to-primary-200">
             {t('dashboard.title', 'Dashboard')}
           </h1>
-          <p className="text-slate-500 mt-2">
-            {t('dashboard.welcome_back', 'Welcome back, {{name}}.', { name: profile?.name || user?.displayName || 'Participant' })}
-          </p>
+          <div className="flex items-center flex-wrap gap-2 mt-2">
+            <p className="text-slate-500 font-medium">
+              {t('dashboard.welcome_back', 'Welcome back, {{name}}.', { name: profile?.name || user?.displayName || 'Participant' })}
+            </p>
+            <button
+              onClick={handleOpenEditName}
+              className="p-1 bg-slate-105 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 flex items-center justify-center cursor-pointer"
+              title={t('dashboard.edit_name', 'Edit Name')}
+            >
+              <Pencil className="w-3 h-3" />
+            </button>
+            {(!profile?.name || profile.name === 'Participant') && (
+              <span className="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-2.5 py-0.5 rounded-full animate-pulse">
+                {t('dashboard.set_name_prompt', 'Please set name')}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -496,6 +570,98 @@ export const Dashboard: React.FC = () => {
           <span>Geiranger</span>
         </div>
       </div>
+
+      {/* Edit Name Modal */}
+      {isEditingName && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full border border-card-border shadow-2xl relative space-y-6">
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                {t('dashboard.edit_name_title', 'Edit Profile Name')}
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                {t('dashboard.edit_name_desc', 'Update how your name appears on the passenger dashboard and allocations.')}
+              </p>
+            </div>
+
+            <form onSubmit={handleSaveName} className="space-y-4">
+              {/* Salutation Pill Selector */}
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  {t('dashboard.salutation', 'Salutation')}
+                </label>
+                <div className="flex gap-2">
+                  {['Brother', 'Sister', ''].map((sal) => (
+                    <button
+                      key={sal || 'none'}
+                      type="button"
+                      onClick={() => setEditSalutation(sal)}
+                      className={`flex-1 py-2 px-3 rounded-xl font-semibold text-sm border transition-all cursor-pointer ${
+                        editSalutation === sal
+                          ? 'bg-primary-500 text-white border-primary-500 shadow-md shadow-primary-500/20'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750'
+                      }`}
+                    >
+                      {sal === 'Brother' && t('dashboard.brother', 'Brother')}
+                      {sal === 'Sister' && t('dashboard.sister', 'Sister')}
+                      {sal === '' && t('dashboard.none', 'None')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* First Name Input */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t('dashboard.first_name', 'First Name')}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editFirstName}
+                  onChange={(e) => setEditFirstName(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  placeholder="e.g. Maryam"
+                />
+              </div>
+
+              {/* Last Name Input */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t('dashboard.last_name', 'Last Name')}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editLastName}
+                  onChange={(e) => setEditLastName(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  placeholder="e.g. Imran"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingName(false)}
+                  disabled={savingName}
+                  className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                >
+                  {t('dashboard.cancel', 'Cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingName}
+                  className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-primary-600 hover:bg-primary-700 text-white shadow-md shadow-primary-500/10 transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {savingName ? t('dashboard.saving', 'Saving...') : t('dashboard.save', 'Save')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
