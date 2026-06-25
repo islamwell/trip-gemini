@@ -110,7 +110,7 @@ export const Header: React.FC = () => {
                       {hasUnread && (
                         <button 
                           onClick={handleDismissNotif}
-                          className="text-[10px] bg-amber-100 dark:bg-amber-900/35 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded font-bold hover:bg-amber-200 active:bg-amber-300 transition-colors"
+                          className="text-xs bg-amber-100 dark:bg-amber-900/35 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded font-bold hover:bg-amber-200 active:bg-amber-300 transition-colors"
                         >
                           Mark Read
                         </button>

@@ -33,7 +33,7 @@ export const Navigation: React.FC = () => {
               }
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[9px] font-semibold uppercase tracking-wider mt-0.5 truncate max-w-[56px] text-center">{label}</span>
+              <span className="text-xs font-semibold uppercase tracking-wider mt-0.5 truncate max-w-[64px] text-center">{label}</span>
             </NavLink>
           ))}
         </div>

@@ -301,6 +301,22 @@
       "lillehammer": {
         "name": "Lillehammer",
         "info": "Olympiaparken & Lillehammer Moské"
+      },
+      "bergen": {
+        "name": "Bergen",
+        "info": "Stor kystby"
+      },
+      "drammen": {
+        "name": "Drammen",
+        "info": "Stor by nær Oslo"
+      },
+      "alesund": {
+        "name": "Ålesund",
+        "info": "Kystby kjent for jugendstil"
+      },
+      "stavanger": {
+        "name": "Stavanger",
+        "info": "Stor by i Sørwest-Norge"
       }
     }
   },

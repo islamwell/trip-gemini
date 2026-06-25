@@ -179,7 +179,7 @@ export const Finances: React.FC = () => {
                       <span className="font-mono font-bold text-slate-800 dark:text-slate-100 block text-sm md:text-base">
                         {item.amountPerPerson.toLocaleString()} NOK
                       </span>
-                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                      <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
                         {t('finances.totalLabel', { amount: item.totalAmount.toLocaleString() })}
                       </span>
                     </div>
@@ -222,7 +222,7 @@ export const Finances: React.FC = () => {
                               href={ev.sourceUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-[11px] font-bold text-primary-600 dark:text-primary-400 hover:underline pt-2 border-t border-card-border mt-2"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-primary-600 dark:text-primary-400 hover:underline pt-2 border-t border-card-border mt-2"
                             >
                               {ev.sourceLabel ? t('finances.evidence.' + item.id + '.' + evIdx + '.sourceLabel', ev.sourceLabel) : t('finances.verifyPriceSource')}
                               <ExternalLink className="w-3 h-3" />

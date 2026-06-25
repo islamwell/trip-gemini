@@ -397,7 +397,7 @@ export const Dashboard: React.FC = () => {
               <Pencil className="w-3 h-3" />
             </button>
             {(!profile?.name || profile.name === 'Participant') && (
-              <span className="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-2.5 py-0.5 rounded-full animate-pulse">
+              <span className="text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-2.5 py-0.5 rounded-full animate-pulse">
                 {t('dashboard.set_name_prompt', 'Please set name')}
               </span>
             )}
@@ -442,15 +442,15 @@ export const Dashboard: React.FC = () => {
                 <div className="flex justify-between items-start gap-2">
                   <div className="min-w-0">
                     <span className="font-bold block text-slate-800 dark:text-slate-200 text-sm truncate">{p.name}</span>
-                    <span className="text-[11px] text-slate-400 font-mono block truncate">{p.email}</span>
+                    <span className="text-xs text-slate-400 font-mono block truncate">{p.email}</span>
                   </div>
-                  <span className="text-[10px] shrink-0 font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-full text-right max-w-[120px] truncate">
+                  <span className="text-xs shrink-0 font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-full text-right max-w-[120px] truncate">
                     {p.duty 
                       ? (t(getDutyTranslationKey(p.duty)) || p.duty) 
                       : t('dashboard.general_help_short', 'General Help')}
                   </span>
                 </div>
-                <span className="text-[10px] italic text-slate-500 dark:text-slate-400 block leading-relaxed border-l-2 border-primary-500/30 pl-2 pt-0.5">
+                <span className="text-xs italic text-slate-500 dark:text-slate-400 block leading-relaxed border-l-2 border-primary-500/30 pl-2 pt-0.5">
                   {t('role_quran.' + getRoleKey(p.duty))}
                 </span>
               </div>
@@ -513,7 +513,7 @@ export const Dashboard: React.FC = () => {
                 <div key={idx} className="flex justify-between items-center border-b border-card-border pb-2 last:border-b-0 text-xs">
                   <div>
                     <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-[150px]">{alarm.label}</span>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-xs text-slate-400">
                       {t('dashboard.warning_at', 'Warning at {{time}}', { time: alarm.alertTime })}
                     </span>
                   </div>

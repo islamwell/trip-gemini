@@ -386,7 +386,7 @@ export const Registration: React.FC = () => {
                     ))}
                   </select>
                   {currentDutyHint && (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 italic mt-1 leading-normal">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 italic mt-1 leading-normal">
                       {currentDutyHint}
                     </p>
                   )}

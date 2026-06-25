@@ -301,6 +301,22 @@
       "lillehammer": {
         "name": "Lillehammer",
         "info": "Olympic park & Lillehammer Mosque"
+      },
+      "bergen": {
+        "name": "Bergen",
+        "info": "Major coastal city"
+      },
+      "drammen": {
+        "name": "Drammen",
+        "info": "Major city near Oslo"
+      },
+      "alesund": {
+        "name": "Ålesund",
+        "info": "Coastal Art Nouveau city"
+      },
+      "stavanger": {
+        "name": "Stavanger",
+        "info": "Major southwestern city"
       }
     }
   },

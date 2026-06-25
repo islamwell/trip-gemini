@@ -23,7 +23,11 @@ const locations: Record<string, LocationCoords> = {
   geiranger: { lat: 62.10, lng: 7.20, elevation: 10 },
   dalsnibba: { lat: 62.05, lng: 7.27, elevation: 1500 },
   lom: { lat: 61.84, lng: 8.57, elevation: 380 },
-  lillehammer: { lat: 61.11, lng: 10.47, elevation: 180 }
+  lillehammer: { lat: 61.11, lng: 10.47, elevation: 180 },
+  bergen: { lat: 60.39, lng: 5.32, elevation: 5 },
+  drammen: { lat: 59.74, lng: 10.20, elevation: 10 },
+  alesund: { lat: 62.47, lng: 6.15, elevation: 5 },
+  stavanger: { lat: 58.97, lng: 5.73, elevation: 5 }
 };
 
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -213,7 +217,7 @@ export const Itinerary: React.FC = () => {
   const [busDistance, setBusDistance] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [busPos, setBusPos] = useState({ x: 608, y: 560, angle: 0 }); // starts at Oslo
+  const [busPos, setBusPos] = useState({ x: 628, y: 383, angle: 0 }); // starts at Oslo
   const [totalPathLength, setTotalPathLength] = useState(1500); // fallback
 
   useEffect(() => {
@@ -397,29 +401,32 @@ export const Itinerary: React.FC = () => {
   const currentItinerary = itineraryData[activeTab];
 
   // SVG Coordinates mapping for interactive vector map
-  const mapNodes = [
-    { key: 'oslo', name: 'Oslo (Nurulquran)', x: 380, y: 350, info: 'Departure & Return: Jerikoveien 26' },
-    { key: 'fla', name: 'Flå', x: 320, y: 290, info: 'Bear Park scenic stop' },
-    { key: 'gol', name: 'Gol Mosque', x: 280, y: 250, info: 'Hallingdal Islamic Center (Furuvegen 5)' },
-    { key: 'geilo', name: 'Geilo', x: 230, y: 250, info: 'Mountain cabins check-in' },
-    { key: 'laerdal', name: 'Lærdal Tunnel', x: 210, y: 190, info: 'World longest tunnel (24.5km)' },
-    { key: 'boyabreen', name: 'Bøyabreen Glacier', x: 180, y: 155, info: 'Active branch of Jostedalsbreen' },
-    { key: 'stryn', name: 'Stryn', x: 140, y: 130, info: 'Glacier and fjord region lodging' },
-    { key: 'valldal', name: 'Valldal (Sylte)', x: 150, y: 90, info: 'Murigjerdet 11 accommodation' },
-    { key: 'trollstigen', name: 'Trollstigen', x: 180, y: 80, info: '11 spectacular hairpin turns' },
-    { key: 'geiranger', name: 'Geiranger', x: 130, y: 110, info: 'UNESCO fjord view & Eagle Road' },
-    { key: 'dalsnibba', name: 'Dalsnibba Skywalk', x: 195, y: 125, info: 'Europe\'s highest fjord view (1500m)' },
-    { key: 'lom', name: 'Lom', x: 230, y: 140, info: 'Lom Stave Church & famous bakery' },
-    { key: 'lillehammer', name: 'Lillehammer', x: 330, y: 230, info: 'Olympic park & Lillehammer Mosque' },
+  const mapNodes: Array<{ key: string; name: string; x: number; y: number; info: string; isReference?: boolean }> = [
+    { key: 'oslo', name: 'Oslo (Nurulquran)', x: 628, y: 383, info: 'Departure & Return: Jerikoveien 26' },
+    { key: 'fla', name: 'Flå', x: 516, y: 326, info: 'Bear Park scenic stop' },
+    { key: 'gol', name: 'Gol Mosque', x: 470, y: 294, info: 'Hallingdal Islamic Center (Furuvegen 5)' },
+    { key: 'geilo', name: 'Geilo', x: 405, y: 313, info: 'Mountain cabins check-in' },
+    { key: 'laerdal', name: 'Lærdal Tunnel', x: 341, y: 250, info: 'World longest tunnel (24.5km)' },
+    { key: 'boyabreen', name: 'Bøyabreen Glacier', x: 276, y: 207, info: 'Active branch of Jostedalsbreen' },
+    { key: 'stryn', name: 'Stryn', x: 275, y: 160, info: 'Glacier and fjord region lodging' },
+    { key: 'valldal', name: 'Valldal (Sylte)', x: 322, y: 116, info: 'Murigjerdet 11 accommodation' },
+    { key: 'trollstigen', name: 'Trollstigen', x: 358, y: 99, info: '11 spectacular hairpin turns' },
+    { key: 'geiranger', name: 'Geiranger', x: 317, y: 138, info: 'UNESCO fjord view & Eagle Road' },
+    { key: 'dalsnibba', name: 'Dalsnibba Skywalk', x: 323, y: 144, info: 'Europe\'s highest fjord view (1500m)' },
+    { key: 'lom', name: 'Lom', x: 437, y: 167, info: 'Lom Stave Church & famous bakery' },
+    { key: 'lillehammer', name: 'Lillehammer', x: 603, y: 249, info: 'Olympic park & Lillehammer Mosque' },
+    { key: 'bergen', name: 'Bergen', x: 152, y: 329, info: 'Major coastal city', isReference: true },
+    { key: 'drammen', name: 'Drammen', x: 580, y: 402, info: 'Major city near Oslo', isReference: true },
+    { key: 'alesund', name: 'Ålesund', x: 225, y: 97, info: 'Coastal Art Nouveau city', isReference: true },
+    { key: 'stavanger', name: 'Stavanger', x: 188, y: 488, info: 'Major southwestern city', isReference: true }
   ];
 
   const getClosestStop = () => {
     let minD = Infinity;
-    let closest = mapNodes[0];
+    let closest = mapNodes.find(n => !n.isReference) || mapNodes[0];
     for (const node of mapNodes) {
-      const sx = node.x * 1.6;
-      const sy = node.y * 1.6;
-      const d = Math.hypot(busPos.x - sx, busPos.y - sy);
+      if (node.isReference) continue;
+      const d = Math.hypot(busPos.x - node.x, busPos.y - node.y);
       if (d < minD) {
         minD = d;
         closest = node;
@@ -515,7 +522,7 @@ export const Itinerary: React.FC = () => {
 
               {/* Draw base route paths */}
               <path
-                d="M 608 560 Q 560 512 512 464 T 448 400 T 368 400 T 336 304 T 288 248 T 224 208 T 240 144 T 288 128 T 208 176 T 368 224 T 528 368 Z"
+                d="M 628 383 L 516 326 L 470 294 L 405 313 L 341 250 L 276 207 L 275 160 L 322 116 L 358 99 L 317 138 L 323 144 L 437 167 L 603 249 L 628 383"
                 stroke="var(--color-primary-100)"
                 strokeWidth="4"
                 strokeLinecap="round"
@@ -525,7 +532,7 @@ export const Itinerary: React.FC = () => {
               {/* Draw active animated path */}
               <path
                 ref={setRoutePath}
-                d="M 608 560 Q 560 512 512 464 T 448 400 T 368 400 T 336 304 T 288 248 T 224 208 T 240 144 T 288 128 T 208 176 T 368 224 T 528 368 Z"
+                d="M 628 383 L 516 326 L 470 294 L 405 313 L 341 250 L 276 207 L 275 160 L 322 116 L 358 99 L 317 138 L 323 144 L 437 167 L 603 249 L 628 383"
                 stroke="url(#route-gradient)"
                 strokeWidth="4"
                 strokeLinecap="round"
@@ -563,12 +570,36 @@ export const Itinerary: React.FC = () => {
 
               {/* Render Nodes */}
               {mapNodes.map((node) => {
+                if (node.isReference) {
+                  return (
+                    <g 
+                      key={node.key}
+                      className="pointer-events-none select-none opacity-60"
+                    >
+                      <circle
+                        cx={node.x}
+                        cy={node.y}
+                        r="4"
+                        fill="#94a3b8"
+                      />
+                      <text
+                        x={node.x}
+                        y={node.y - 10}
+                        textAnchor="middle"
+                        fill="#94a3b8"
+                        className="text-xs font-bold tracking-wider uppercase"
+                      >
+                        {t('itinerary.map.' + node.key + '.name', node.name)}
+                      </text>
+                    </g>
+                  );
+                }
+
                 const isHovered = hoveredStop === node.key;
                 const isCurrentDayStop = currentItinerary.some(item => (item as any).stopKey === node.key);
                 
-                // Scale coordinate points by 1.6
-                const scaledX = node.x * 1.6;
-                const scaledY = node.y * 1.6;
+                const scaledX = node.x;
+                const scaledY = node.y;
 
                 // Elevation Heatmap properties
                 const elevation = locations[node.key]?.elevation || 0;
@@ -638,7 +669,7 @@ export const Itinerary: React.FC = () => {
                       y={scaledY - 18}
                       textAnchor="middle"
                       fill="currentColor"
-                      className="text-[11px] md:text-[12px] font-bold select-none drop-shadow-sm opacity-80 dark:opacity-90 fill-slate-700 dark:fill-slate-300"
+                      className="text-xs font-bold select-none drop-shadow-sm opacity-80 dark:opacity-90 fill-slate-700 dark:fill-slate-300"
                     >
                       {t('itinerary.map.' + node.key + '.name', node.name)}
                     </text>
@@ -649,7 +680,7 @@ export const Itinerary: React.FC = () => {
           </svg>
 
           {/* Elevation Heatmap Legend */}
-          <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 px-3 py-2 rounded-xl shadow-md border border-card-border backdrop-blur text-[10px] space-y-1 z-20">
+          <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 px-3 py-2 rounded-xl shadow-md border border-card-border backdrop-blur text-xs space-y-1 z-20">
             <span className="font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider mb-1">
               {t('itinerary.elevationLegend', 'Altitude')}
             </span>
@@ -681,7 +712,7 @@ export const Itinerary: React.FC = () => {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   {t('itinerary.map.' + hoveredStop + '.info', mapNodes.find(n => n.key === hoveredStop)?.info)}
                 </p>
-                <span className="text-[10px] text-primary-500 font-medium mt-2 block">{t('itinerary.clickPointHint', '👉 Click point to scroll to details')}</span>
+                <span className="text-xs text-primary-500 font-medium mt-2 block">{t('itinerary.clickPointHint', '👉 Click point to scroll to details')}</span>
               </div>
             ) : (
               <div>
@@ -691,7 +722,7 @@ export const Itinerary: React.FC = () => {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   {t('itinerary.nearestStop', 'Nearest Stop')}: <strong>{t('itinerary.map.' + closestStop.key + '.name', closestStop.name)}</strong>
                 </p>
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   {t('itinerary.currentAltitude', 'Altitude')}: {currentElevation}m | {t('itinerary.mapInstructions', 'Drag to pan. Scroll to zoom.')}
                 </p>
               </div>

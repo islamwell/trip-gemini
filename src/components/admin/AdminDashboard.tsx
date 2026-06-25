@@ -730,7 +730,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-card-border gap-2 overflow-x-auto">
+      <div className="flex flex-wrap border-b border-card-border gap-2 mb-4">
         <button
           onClick={() => setActiveTab('users')}
           className={`px-6 py-3 font-semibold text-sm transition-all border-b-2 whitespace-nowrap ${
@@ -806,97 +806,142 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Tab Panels */}
-      <div className="glass rounded-3xl p-6 border border-card-border overflow-x-auto">
+      <div className="glass rounded-3xl p-6 border border-card-border">
         {activeTab === 'users' && (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-card-border text-slate-400 text-sm uppercase font-semibold">
-                <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-4">Email</th>
-                <th className="py-3 px-4">Rule Signing Status</th>
-                <th className="py-3 px-4">Signing IP Address</th>
-                <th className="py-3 px-4">Timestamp</th>
-                <th className="py-3 px-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div className="space-y-4">
+            {/* Mobile View: Cards */}
+            <div className="block md:hidden space-y-4">
               {participants.map((p) => {
                 const sig = signatures.find(s => s.participantId === p.id);
                 return (
-                  <tr key={p.id} className="border-b border-card-border hover:bg-slate-50/50 dark:hover:bg-slate-900/20 text-slate-700 dark:text-slate-300">
-                     <td className="py-4 px-4 font-bold">{p.name}</td>
-                    <td className="py-4 px-4 font-mono text-sm">{p.email}</td>
-                    <td className="py-4 px-4">
-                      {sig ? (
-                        <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2.5 py-1 rounded-full">
-                           <CheckCircle className="w-3.5 h-3.5" />
-                          Signed Rules
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 bg-warning/10 text-warning text-xs font-semibold px-2.5 py-1 rounded-full">
-                           <Clock className="w-3.5 h-3.5" />
-                          Pending Sign
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-4 px-4 font-mono text-xs">{sig ? sig.ipAddress : 'N/A'}</td>
-                    <td className="py-4 px-4 text-xs text-slate-500">
-                      {sig ? new Date(sig.signedAt).toLocaleString() : 'N/A'}
-                    </td>
-                    <td className="py-4 px-4">
+                  <div key={p.id} className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-card-border space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{p.name}</span>
                       <button
                         onClick={() => handleDeleteParticipant(p.id, p.name)}
-                        className="flex items-center gap-1 text-xs font-bold text-error bg-error/10 hover:bg-error/20 px-3 py-1.5 rounded-xl transition-all shadow-sm"
+                        className="flex items-center gap-1 text-xs font-bold text-error bg-error/10 hover:bg-error/20 px-2 py-1 rounded-lg transition-all"
                         title="Delete passenger permanently"
                       >
-                        <Trash2 className="w-3.5 h-3.5" /> Remove
+                        <Trash2 className="w-3 h-3" /> Remove
                       </button>
-                    </td>
-                  </tr>
+                    </div>
+                    <div className="text-slate-500 font-mono break-all">{p.email}</div>
+                    <div className="flex justify-between items-center pt-2 border-t border-card-border/50">
+                      <span className="text-slate-400 font-semibold">Rules Status</span>
+                      {sig ? (
+                        <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2 py-0.5 rounded-full">
+                          <CheckCircle className="w-3 h-3" /> Signed
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 bg-warning/10 text-warning text-xs font-semibold px-2 py-0.5 rounded-full">
+                          <Clock className="w-3 h-3" /> Pending
+                        </span>
+                      )}
+                    </div>
+                    {sig && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">IP Address</span>
+                          <span className="font-mono text-slate-600 dark:text-slate-355">{sig.ipAddress}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">Timestamp</span>
+                          <span className="text-slate-500">{new Date(sig.signedAt).toLocaleString()}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Desktop View: Table */}
+            <table className="hidden md:table w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-card-border text-slate-400 text-sm uppercase font-semibold">
+                  <th className="py-3 px-4">Name</th>
+                  <th className="py-3 px-4">Email</th>
+                  <th className="py-3 px-4">Rule Signing Status</th>
+                  <th className="py-3 px-4">Signing IP Address</th>
+                  <th className="py-3 px-4">Timestamp</th>
+                  <th className="py-3 px-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {participants.map((p) => {
+                  const sig = signatures.find(s => s.participantId === p.id);
+                  return (
+                    <tr key={p.id} className="border-b border-card-border hover:bg-slate-50/50 dark:hover:bg-slate-900/20 text-slate-700 dark:text-slate-300">
+                      <td className="py-4 px-4 font-bold">{p.name}</td>
+                      <td className="py-4 px-4 font-mono text-sm">{p.email}</td>
+                      <td className="py-4 px-4">
+                        {sig ? (
+                          <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2.5 py-1 rounded-full">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            Signed Rules
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-warning/10 text-warning text-xs font-semibold px-2.5 py-1 rounded-full">
+                            <Clock className="w-3.5 h-3.5" />
+                            Pending Sign
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4 font-mono text-xs">{sig ? sig.ipAddress : 'N/A'}</td>
+                      <td className="py-4 px-4 text-xs text-slate-500">
+                        {sig ? new Date(sig.signedAt).toLocaleString() : 'N/A'}
+                      </td>
+                      <td className="py-4 px-4">
+                        <button
+                          onClick={() => handleDeleteParticipant(p.id, p.name)}
+                          className="flex items-center gap-1 text-xs font-bold text-error bg-error/10 hover:bg-error/20 px-3 py-1.5 rounded-xl transition-all shadow-sm"
+                          title="Delete passenger permanently"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Remove
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {activeTab === 'payments' && (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-card-border text-slate-400 text-sm uppercase font-semibold">
-                <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-4">Required Share</th>
-                <th className="py-3 px-4">Paid Status</th>
-                <th className="py-3 px-4">Outstanding Balance</th>
-                <th className="py-3 px-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div className="space-y-4">
+            {/* Mobile View: Cards */}
+            <div className="block md:hidden space-y-4">
               {participants.map((p) => {
                 const totalPaid = payments.filter(pay => pay.participantId === p.id).reduce((sum, pay) => sum + pay.amount, 0);
                 const isPaid = totalPaid >= perPersonCost;
                 
                 return (
-                  <tr key={p.id} className="border-b border-card-border hover:bg-slate-50/50 dark:hover:bg-slate-900/20 text-slate-700 dark:text-slate-300">
-                    <td className="py-4 px-4 font-bold">{p.name}</td>
-                    <td className="py-4 px-4 font-mono">{perPersonCost.toLocaleString()} NOK</td>
-                    <td className="py-4 px-4">
+                  <div key={p.id} className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-card-border space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{p.name}</span>
                       {isPaid ? (
-                        <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2.5 py-0.5 rounded-full">
                           Paid in Full
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 bg-error/10 text-error text-xs font-semibold px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 bg-error/10 text-error text-xs font-semibold px-2.5 py-0.5 rounded-full">
                           Unpaid
                         </span>
                       )}
-                    </td>
-                    <td className="py-4 px-4 font-mono text-sm">
-                      {Math.max(0, perPersonCost - totalPaid).toLocaleString()} NOK
-                    </td>
-                    <td className="py-4 px-4">
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-card-border/50">
+                      <span className="text-slate-400 font-semibold">Required Share</span>
+                      <span className="font-mono text-slate-700 dark:text-slate-300">{perPersonCost.toLocaleString()} NOK</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400 font-semibold">Outstanding Balance</span>
+                      <span className="font-mono text-slate-700 dark:text-slate-300">{Math.max(0, perPersonCost - totalPaid).toLocaleString()} NOK</span>
+                    </div>
+                    <div className="pt-2 flex justify-end">
                       <button
                         onClick={() => handleTogglePayment(p.id, isPaid)}
-                        className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-sm ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm ${
                           isPaid 
                             ? 'bg-error/10 text-error hover:bg-error/25' 
                             : 'bg-success/10 text-success hover:bg-success/25'
@@ -904,12 +949,64 @@ export const AdminDashboard: React.FC = () => {
                       >
                         {isPaid ? 'Mark as Unpaid' : 'Mark as Paid'}
                       </button>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Desktop View: Table */}
+            <table className="hidden md:table w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-card-border text-slate-400 text-sm uppercase font-semibold">
+                  <th className="py-3 px-4">Name</th>
+                  <th className="py-3 px-4">Required Share</th>
+                  <th className="py-3 px-4">Paid Status</th>
+                  <th className="py-3 px-4">Outstanding Balance</th>
+                  <th className="py-3 px-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {participants.map((p) => {
+                  const totalPaid = payments.filter(pay => pay.participantId === p.id).reduce((sum, pay) => sum + pay.amount, 0);
+                  const isPaid = totalPaid >= perPersonCost;
+                  
+                  return (
+                    <tr key={p.id} className="border-b border-card-border hover:bg-slate-50/50 dark:hover:bg-slate-900/20 text-slate-700 dark:text-slate-300">
+                      <td className="py-4 px-4 font-bold">{p.name}</td>
+                      <td className="py-4 px-4 font-mono">{perPersonCost.toLocaleString()} NOK</td>
+                      <td className="py-4 px-4">
+                        {isPaid ? (
+                          <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2.5 py-1 rounded-full">
+                            Paid in Full
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-error/10 text-error text-xs font-semibold px-2.5 py-1 rounded-full">
+                            Unpaid
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4 font-mono text-sm">
+                        {Math.max(0, perPersonCost - totalPaid).toLocaleString()} NOK
+                      </td>
+                      <td className="py-4 px-4">
+                        <button
+                          onClick={() => handleTogglePayment(p.id, isPaid)}
+                          className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-sm ${
+                            isPaid 
+                              ? 'bg-error/10 text-error hover:bg-error/25' 
+                              : 'bg-success/10 text-success hover:bg-success/25'
+                          }`}
+                        >
+                          {isPaid ? 'Mark as Unpaid' : 'Mark as Paid'}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {activeTab === 'budget' && (
@@ -927,7 +1024,41 @@ export const AdminDashboard: React.FC = () => {
               </p>
             </div>
 
-            <table className="w-full text-left border-collapse">
+            {/* Mobile View: Cards */}
+            <div className="block md:hidden space-y-4">
+              {participants.map((p) => (
+                <div key={p.id} className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-card-border space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{p.name}</span>
+                    {p.duty ? (
+                      <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 font-semibold px-2.5 py-0.5 rounded-full">
+                        {p.duty}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 italic">No Duty Assigned</span>
+                    )}
+                  </div>
+                  <div className="text-slate-500 font-mono break-all">{p.email}</div>
+                  <div className="flex justify-between items-center pt-2 border-t border-card-border/50">
+                    <span className="text-slate-400 font-semibold">Assign Duty</span>
+                    <select
+                      value={p.duty || 'None / General Help'}
+                      onChange={(e) => handleAssignDuty(p.id, e.target.value)}
+                      className="bg-white dark:bg-slate-800 border border-card-border px-2.5 py-1 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    >
+                      {DUTY_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop View: Table */}
+            <table className="hidden md:table w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-card-border text-slate-400 text-sm uppercase font-semibold">
                   <th className="py-3 px-4">Name</th>
@@ -1267,7 +1398,7 @@ export const AdminDashboard: React.FC = () => {
               <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">➕ Add New Rules Section</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (EN)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (EN)</label>
                   <input
                     type="text"
                     value={newRuleTitleEn}
@@ -1277,7 +1408,7 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (NO)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (NO)</label>
                   <input
                     type="text"
                     value={newRuleTitleNo}
@@ -1287,7 +1418,7 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (UR)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Section Title (UR)</label>
                   <input
                     type="text"
                     value={newRuleTitleUr}
@@ -1300,7 +1431,7 @@ export const AdminDashboard: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Icon Name</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Icon Name</label>
                   <select
                     value={newRuleIcon}
                     onChange={(e) => setNewRuleIcon(e.target.value)}
@@ -1313,7 +1444,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
                 <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (EN - Optional)</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (EN - Optional)</label>
                     <input
                       type="text"
                       value={newRuleQuoteEn}
@@ -1323,7 +1454,7 @@ export const AdminDashboard: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (NO - Optional)</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (NO - Optional)</label>
                     <input
                       type="text"
                       value={newRuleQuoteNo}
@@ -1333,7 +1464,7 @@ export const AdminDashboard: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (UR - Optional)</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (UR - Optional)</label>
                     <input
                       type="text"
                       value={newRuleQuoteUr}
@@ -1382,8 +1513,8 @@ export const AdminDashboard: React.FC = () => {
                               onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
                               onBlur={() => handleSaveInlineEdit()}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSaveInlineEdit(editingField);
-                                if (e.key === 'Escape') setEditingField(null);
+                                  if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                  if (e.key === 'Escape') setEditingField(null);
                               }}
                               className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-sm font-semibold focus:ring-1 focus:ring-primary-500 outline-none w-fit"
                             />
@@ -1406,8 +1537,8 @@ export const AdminDashboard: React.FC = () => {
                               onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
                               onBlur={() => handleSaveInlineEdit()}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSaveInlineEdit(editingField);
-                                if (e.key === 'Escape') setEditingField(null);
+                                  if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                  if (e.key === 'Escape') setEditingField(null);
                               }}
                               className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-sm font-semibold focus:ring-1 focus:ring-primary-500 outline-none w-fit"
                             />
@@ -1430,8 +1561,8 @@ export const AdminDashboard: React.FC = () => {
                               onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
                               onBlur={() => handleSaveInlineEdit()}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSaveInlineEdit(editingField);
-                                if (e.key === 'Escape') setEditingField(null);
+                                  if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                  if (e.key === 'Escape') setEditingField(null);
                               }}
                               className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-sm font-semibold focus:ring-1 focus:ring-primary-500 outline-none w-fit text-right"
                             />
@@ -1450,7 +1581,7 @@ export const AdminDashboard: React.FC = () => {
                         <div className="text-xs space-y-1 mt-2 text-slate-400 font-serif">
                           {/* EN Quote */}
                           <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[10px] text-slate-400 shrink-0">Quote (EN):</span>
+                            <span className="font-mono text-xs text-slate-400 shrink-0">Quote (EN):</span>
                             {editingField?.type === 'section_quote' && editingField.sectionDocId === section.docId && editingField.lang === 'en' ? (
                               <input
                                 autoFocus
@@ -1469,13 +1600,13 @@ export const AdminDashboard: React.FC = () => {
                                 onClick={() => setEditingField({ type: 'section_quote', sectionDocId: section.docId, lang: 'en', value: section.quote?.en || '' })} 
                                 className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1 rounded transition-colors italic block min-w-[100px]"
                               >
-                                {section.quote?.en ? `"${section.quote.en}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-[10px] not-italic">(Click to add English quote/Ayat)</span>}
+                                {section.quote?.en ? `"${section.quote.en}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-xs not-italic">(Click to add English quote/Ayat)</span>}
                               </span>
                             )}
                           </div>
                           {/* NO Quote */}
                           <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[10px] text-slate-400 shrink-0">Quote (NO):</span>
+                            <span className="font-mono text-xs text-slate-400 shrink-0">Quote (NO):</span>
                             {editingField?.type === 'section_quote' && editingField.sectionDocId === section.docId && editingField.lang === 'no' ? (
                               <input
                                 autoFocus
@@ -1494,13 +1625,13 @@ export const AdminDashboard: React.FC = () => {
                                 onClick={() => setEditingField({ type: 'section_quote', sectionDocId: section.docId, lang: 'no', value: section.quote?.no || '' })} 
                                 className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1 rounded transition-colors italic block min-w-[100px]"
                               >
-                                {section.quote?.no ? `"${section.quote.no}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-[10px] not-italic">(Klikk for å legge til norsk sitat)</span>}
+                                {section.quote?.no ? `"${section.quote.no}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-xs not-italic">(Klikk for å legge til norsk sitat)</span>}
                               </span>
                             )}
                           </div>
                           {/* UR Quote */}
                           <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[10px] text-slate-400 shrink-0">Quote (UR):</span>
+                            <span className="font-mono text-xs text-slate-400 shrink-0">Quote (UR):</span>
                             {editingField?.type === 'section_quote' && editingField.sectionDocId === section.docId && editingField.lang === 'ur' ? (
                               <input
                                 autoFocus
@@ -1519,7 +1650,7 @@ export const AdminDashboard: React.FC = () => {
                                 onClick={() => setEditingField({ type: 'section_quote', sectionDocId: section.docId, lang: 'ur', value: section.quote?.ur || '' })} 
                                 className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1 rounded transition-colors italic block min-w-[100px]"
                               >
-                                {section.quote?.ur ? `"${section.quote.ur}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-[10px] not-italic">(اردو اقتباس شامل کرنے کے لیے کلک کریں)</span>}
+                                {section.quote?.ur ? `"${section.quote.ur}"` : <span className="text-slate-355 dark:text-slate-500 font-sans text-xs not-italic">(اردو اقتباس شامل کرنے کے لیے کلک کریں)</span>}
                               </span>
                             )}
                           </div>
@@ -1536,7 +1667,7 @@ export const AdminDashboard: React.FC = () => {
 
                     {/* Rule Items in this section */}
                     <div className="space-y-3 pl-4 border-l border-slate-100 dark:border-slate-700">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rules Checklist Items ({section.items?.length || 0})</span>
+                      <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Rules Checklist Items ({section.items?.length || 0})</span>
                       {(section.items || []).map((item: any, idx: number) => (
                         <div key={item.id || idx} className="flex justify-between items-start gap-4 p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl text-xs">
                           <div className="space-y-1 flex-1">
@@ -1633,7 +1764,7 @@ export const AdminDashboard: React.FC = () => {
 
                       {/* Add Item Form for this section */}
                       <div className="pt-2 max-w-2xl">
-                        <span className="text-[10px] font-bold text-slate-500 block mb-1">Add Rule Item to Section:</span>
+                        <span className="text-xs font-bold text-slate-500 block mb-1">Add Rule Item to Section:</span>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                           <input
                             type="text"
@@ -1702,7 +1833,7 @@ export const AdminDashboard: React.FC = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Category</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Category</label>
                   <select
                     value={newPackCategory}
                     onChange={(e) => setNewPackCategory(e.target.value as any)}
@@ -1719,7 +1850,7 @@ export const AdminDashboard: React.FC = () => {
                 
                 <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (EN)</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (EN)</label>
                     <input
                       type="text"
                       value={newPackNameEn}
@@ -1729,7 +1860,7 @@ export const AdminDashboard: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (NO)</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (NO)</label>
                     <input
                       type="text"
                       value={newPackNameNo}
@@ -1739,7 +1870,7 @@ export const AdminDashboard: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (UR)</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name (UR)</label>
                     <input
                       type="text"
                       value={newPackNameUr}
@@ -1753,7 +1884,7 @@ export const AdminDashboard: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (EN)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (EN)</label>
                   <textarea
                     rows={2}
                     value={newPackDescEn}
@@ -1763,7 +1894,7 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (NO)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (NO)</label>
                   <textarea
                     rows={2}
                     value={newPackDescNo}
@@ -1773,7 +1904,7 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (UR)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description (UR)</label>
                   <textarea
                     rows={2}
                     value={newPackDescUr}
@@ -1786,7 +1917,7 @@ export const AdminDashboard: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (EN)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (EN)</label>
                   <input
                     type="text"
                     value={newPackStoreEn}
@@ -1796,7 +1927,7 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (NO)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (NO)</label>
                   <input
                     type="text"
                     value={newPackStoreNo}
@@ -1806,7 +1937,7 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (UR)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Where to buy (UR)</label>
                   <input
                     type="text"
                     value={newPackStoreUr}
@@ -1878,10 +2009,10 @@ export const AdminDashboard: React.FC = () => {
                             <div className="space-y-2 min-w-0 flex-1">
                               <div>
                                 <h6 className="font-bold text-slate-800 dark:text-slate-100 truncate">{item.name.en} | {item.name.no} | {item.name.ur}</h6>
-                                {item.desc.en && <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{item.desc.en}</p>}
+                                {item.desc.en && <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{item.desc.en}</p>}
                               </div>
                               {item.store.en && (
-                                <p className="text-[11px] font-bold text-primary-500">
+                                <p className="text-xs font-bold text-primary-500">
                                   🛒 Store: {item.store.en}
                                 </p>
                               )}
@@ -1890,13 +2021,13 @@ export const AdminDashboard: React.FC = () => {
                             <div className="flex flex-col gap-2 shrink-0 justify-start">
                               <button
                                 onClick={() => handleStartEditPackingItem(item)}
-                                className="px-2.5 py-1.5 bg-primary-500/10 hover:bg-primary-500/25 text-primary-500 font-bold rounded-lg transition-colors cursor-pointer text-center text-[10px]"
+                                className="px-2.5 py-1.5 bg-primary-500/10 hover:bg-primary-500/25 text-primary-500 font-bold rounded-lg transition-colors cursor-pointer text-center text-xs"
                               >
                                 Edit
                               </button>
                               <button
                                 onClick={() => handleDeletePackingItem(item.id)}
-                                className="px-2.5 py-1.5 bg-error/10 hover:bg-error/25 text-error font-bold rounded-lg transition-colors cursor-pointer text-center text-[10px]"
+                                className="px-2.5 py-1.5 bg-error/10 hover:bg-error/25 text-error font-bold rounded-lg transition-colors cursor-pointer text-center text-xs"
                               >
                                 Delete
                               </button>
