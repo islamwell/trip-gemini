@@ -204,11 +204,11 @@ const CountdownTimer = () => {
           { key: 'secs', label: t('countdown.secs', 'Secs'), value: timeLeft.seconds },
         ].map(item => (
           <div key={item.key} className="flex flex-col items-center min-w-[60px] sm:min-w-[70px]">
-            <span className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-b from-red-500 to-orange-500 drop-shadow-sm">
+            <div className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-b from-red-500 to-orange-500 drop-shadow-sm">
               {item.value.toString().padStart(2, '0')}
-            </span>
+            </div>
             {item.label && (
-              <span className="text-xs font-medium text-slate-400 mt-1 uppercase">
+              <span className="block text-xs font-medium text-slate-400 mt-1 uppercase">
                 {item.label}
               </span>
             )}
