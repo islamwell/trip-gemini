@@ -82,6 +82,15 @@ export const AdminDashboard: React.FC = () => {
   const [newRuleQuoteNo, setNewRuleQuoteNo] = useState('');
   const [newRuleQuoteUr, setNewRuleQuoteUr] = useState('');
 
+  // Inline editing state for covenant rules
+  const [editingField, setEditingField] = useState<{
+    type: 'section_title' | 'section_quote' | 'rule_item';
+    sectionDocId: string;
+    itemId?: string;
+    lang: 'en' | 'no' | 'ur';
+    value: string;
+  } | null>(null);
+
   // Editing items states inside Covenant rules
   const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null);
   const [newRuleItemEn, setNewRuleItemEn] = useState('');
@@ -190,6 +199,39 @@ export const AdminDashboard: React.FC = () => {
     } catch (err) {
       console.error(err);
       showError("Failed to delete rule item");
+    }
+  };
+
+  const handleSaveInlineEdit = async (currentFieldState?: typeof editingField) => {
+    const field = currentFieldState || editingField;
+    if (!field) return;
+    const { type, sectionDocId, itemId, lang, value } = field;
+    setEditingField(null);
+    const section = rules.find(s => s.docId === sectionDocId);
+    if (!section) return;
+
+    try {
+      if (type === 'section_title') {
+        const updatedTitle = { ...section.title, [lang]: value.trim() };
+        await setDoc(doc(db, 'covenant', sectionDocId), { title: updatedTitle }, { merge: true });
+        showSuccess("Section title updated!");
+      } else if (type === 'section_quote') {
+        const updatedQuote = { ...(section.quote || { en: '', no: '', ur: '' }), [lang]: value.trim() };
+        await setDoc(doc(db, 'covenant', sectionDocId), { quote: updatedQuote }, { merge: true });
+        showSuccess("Section quote updated!");
+      } else if (type === 'rule_item') {
+        const updatedItems = (section.items || []).map((item: any) => {
+          if (item.id === itemId) {
+            return { ...item, [lang]: value.trim() };
+          }
+          return item;
+        });
+        await setDoc(doc(db, 'covenant', sectionDocId), { items: updatedItems }, { merge: true });
+        showSuccess("Rule item updated!");
+      }
+    } catch (err) {
+      console.error("Failed to save inline edit:", err);
+      showError("Failed to save change.");
     }
   };
 
@@ -1330,14 +1372,158 @@ export const AdminDashboard: React.FC = () => {
                           </span>
                           <span className="text-sm font-semibold text-slate-400">Icon: {section.iconName}</span>
                         </div>
-                        <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base mt-1.5">
-                          {section.title.en} | {section.title.no} | {section.title.ur}
-                        </h3>
-                        {section.quote && (
-                          <p className="text-xs italic text-slate-400 mt-1 max-w-2xl font-serif">
-                            &ldquo;{section.quote.en}&rdquo;
-                          </p>
-                        )}
+                        <div className="mt-1.5 text-slate-800 dark:text-slate-100 text-base font-bold flex flex-wrap items-center gap-1.5">
+                          {/* EN */}
+                          {editingField?.type === 'section_title' && editingField.sectionDocId === section.docId && editingField.lang === 'en' ? (
+                            <input
+                              autoFocus
+                              type="text"
+                              value={editingField.value}
+                              onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                              onBlur={() => handleSaveInlineEdit()}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                if (e.key === 'Escape') setEditingField(null);
+                              }}
+                              className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-sm font-semibold focus:ring-1 focus:ring-primary-500 outline-none w-fit"
+                            />
+                          ) : (
+                            <span 
+                              onClick={() => setEditingField({ type: 'section_title', sectionDocId: section.docId, lang: 'en', value: section.title.en })} 
+                              className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1.5 py-0.5 rounded transition-colors"
+                              title="Click to edit English title"
+                            >
+                              {section.title.en}
+                            </span>
+                          )}
+                          <span className="text-slate-300 dark:text-slate-600">|</span>
+                          {/* NO */}
+                          {editingField?.type === 'section_title' && editingField.sectionDocId === section.docId && editingField.lang === 'no' ? (
+                            <input
+                              autoFocus
+                              type="text"
+                              value={editingField.value}
+                              onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                              onBlur={() => handleSaveInlineEdit()}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                if (e.key === 'Escape') setEditingField(null);
+                              }}
+                              className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-sm font-semibold focus:ring-1 focus:ring-primary-500 outline-none w-fit"
+                            />
+                          ) : (
+                            <span 
+                              onClick={() => setEditingField({ type: 'section_title', sectionDocId: section.docId, lang: 'no', value: section.title.no })} 
+                              className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1.5 py-0.5 rounded transition-colors"
+                              title="Click to edit Norwegian title"
+                            >
+                              {section.title.no}
+                            </span>
+                          )}
+                          <span className="text-slate-300 dark:text-slate-600">|</span>
+                          {/* UR */}
+                          {editingField?.type === 'section_title' && editingField.sectionDocId === section.docId && editingField.lang === 'ur' ? (
+                            <input
+                              autoFocus
+                              type="text"
+                              value={editingField.value}
+                              onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                              onBlur={() => handleSaveInlineEdit()}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                if (e.key === 'Escape') setEditingField(null);
+                              }}
+                              className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-sm font-semibold focus:ring-1 focus:ring-primary-500 outline-none w-fit text-right"
+                            />
+                          ) : (
+                            <span 
+                              onClick={() => setEditingField({ type: 'section_title', sectionDocId: section.docId, lang: 'ur', value: section.title.ur })} 
+                              className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1.5 py-0.5 rounded transition-colors"
+                              title="Click to edit Urdu title"
+                            >
+                              {section.title.ur}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Inline Quotes list */}
+                        <div className="text-xs space-y-1 mt-2 text-slate-400 font-serif">
+                          {/* EN Quote */}
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[10px] text-slate-400 shrink-0">Quote (EN):</span>
+                            {editingField?.type === 'section_quote' && editingField.sectionDocId === section.docId && editingField.lang === 'en' ? (
+                              <input
+                                autoFocus
+                                type="text"
+                                value={editingField.value}
+                                onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                                onBlur={() => handleSaveInlineEdit()}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                  if (e.key === 'Escape') setEditingField(null);
+                                }}
+                                className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-xs focus:ring-1 focus:ring-primary-500 outline-none w-full font-sans text-slate-800 dark:text-slate-100"
+                              />
+                            ) : (
+                              <span 
+                                onClick={() => setEditingField({ type: 'section_quote', sectionDocId: section.docId, lang: 'en', value: section.quote?.en || '' })} 
+                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1 rounded transition-colors italic block min-w-[100px]"
+                              >
+                                {section.quote?.en ? `"${section.quote.en}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-[10px] not-italic">(Click to add English quote/Ayat)</span>}
+                              </span>
+                            )}
+                          </div>
+                          {/* NO Quote */}
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[10px] text-slate-400 shrink-0">Quote (NO):</span>
+                            {editingField?.type === 'section_quote' && editingField.sectionDocId === section.docId && editingField.lang === 'no' ? (
+                              <input
+                                autoFocus
+                                type="text"
+                                value={editingField.value}
+                                onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                                onBlur={() => handleSaveInlineEdit()}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                  if (e.key === 'Escape') setEditingField(null);
+                                }}
+                                className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-xs focus:ring-1 focus:ring-primary-500 outline-none w-full font-sans text-slate-800 dark:text-slate-100"
+                              />
+                            ) : (
+                              <span 
+                                onClick={() => setEditingField({ type: 'section_quote', sectionDocId: section.docId, lang: 'no', value: section.quote?.no || '' })} 
+                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1 rounded transition-colors italic block min-w-[100px]"
+                              >
+                                {section.quote?.no ? `"${section.quote.no}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-[10px] not-italic">(Klikk for å legge til norsk sitat)</span>}
+                              </span>
+                            )}
+                          </div>
+                          {/* UR Quote */}
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[10px] text-slate-400 shrink-0">Quote (UR):</span>
+                            {editingField?.type === 'section_quote' && editingField.sectionDocId === section.docId && editingField.lang === 'ur' ? (
+                              <input
+                                autoFocus
+                                type="text"
+                                value={editingField.value}
+                                onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                                onBlur={() => handleSaveInlineEdit()}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                  if (e.key === 'Escape') setEditingField(null);
+                                }}
+                                className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-xs focus:ring-1 focus:ring-primary-500 outline-none w-full font-sans text-slate-800 dark:text-slate-100"
+                              />
+                            ) : (
+                              <span 
+                                onClick={() => setEditingField({ type: 'section_quote', sectionDocId: section.docId, lang: 'ur', value: section.quote?.ur || '' })} 
+                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1 rounded transition-colors italic block min-w-[100px]"
+                              >
+                                {section.quote?.ur ? `"${section.quote.ur}"` : <span className="text-slate-350 dark:text-slate-500 font-sans text-[10px] not-italic">(اردو اقتباس شامل کرنے کے لیے کلک کریں)</span>}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       
                       <button
@@ -1354,9 +1540,86 @@ export const AdminDashboard: React.FC = () => {
                       {(section.items || []).map((item: any, idx: number) => (
                         <div key={item.id || idx} className="flex justify-between items-start gap-4 p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl text-xs">
                           <div className="space-y-1 flex-1">
-                            <p className="text-slate-800 dark:text-slate-200"><strong className="text-slate-400 font-mono">EN:</strong> {item.en}</p>
-                            <p className="text-slate-600 dark:text-slate-400"><strong className="text-slate-400 font-mono">NO:</strong> {item.no}</p>
-                            <p className="text-slate-600 dark:text-slate-400"><strong className="text-slate-400 font-mono">UR:</strong> {item.ur}</p>
+                            {/* EN Rule Item */}
+                            <div className="flex items-center gap-1.5">
+                              <strong className="text-slate-400 font-mono shrink-0">EN:</strong>
+                              {editingField?.type === 'rule_item' && editingField.sectionDocId === section.docId && editingField.itemId === item.id && editingField.lang === 'en' ? (
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={editingField.value}
+                                  onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                                  onBlur={() => handleSaveInlineEdit()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                    if (e.key === 'Escape') setEditingField(null);
+                                  }}
+                                  className="bg-white dark:bg-slate-800 border border-primary-500/50 px-2 py-0.5 rounded text-xs focus:ring-1 focus:ring-primary-500 outline-none w-full"
+                                />
+                              ) : (
+                                <span 
+                                  onClick={() => setEditingField({ type: 'rule_item', sectionDocId: section.docId, itemId: item.id, lang: 'en', value: item.en })} 
+                                  className="cursor-pointer hover:bg-slate-150 dark:hover:bg-slate-700/55 px-1 rounded transition-colors text-slate-800 dark:text-slate-200 w-full block"
+                                  title="Click to edit English rule"
+                                >
+                                  {item.en}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* NO Rule Item */}
+                            <div className="flex items-center gap-1.5">
+                              <strong className="text-slate-400 font-mono shrink-0">NO:</strong>
+                              {editingField?.type === 'rule_item' && editingField.sectionDocId === section.docId && editingField.itemId === item.id && editingField.lang === 'no' ? (
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={editingField.value}
+                                  onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                                  onBlur={() => handleSaveInlineEdit()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                    if (e.key === 'Escape') setEditingField(null);
+                                  }}
+                                  className="bg-white dark:bg-slate-800 border border-primary-500/50 px-2 py-0.5 rounded text-xs focus:ring-1 focus:ring-primary-500 outline-none w-full"
+                                />
+                              ) : (
+                                <span 
+                                  onClick={() => setEditingField({ type: 'rule_item', sectionDocId: section.docId, itemId: item.id, lang: 'no', value: item.no })} 
+                                  className="cursor-pointer hover:bg-slate-150 dark:hover:bg-slate-700/55 px-1 rounded transition-colors text-slate-650 dark:text-slate-400 w-full block"
+                                  title="Click to edit Norwegian rule"
+                                >
+                                  {item.no}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* UR Rule Item */}
+                            <div className="flex items-center gap-1.5">
+                              <strong className="text-slate-400 font-mono shrink-0">UR:</strong>
+                              {editingField?.type === 'rule_item' && editingField.sectionDocId === section.docId && editingField.itemId === item.id && editingField.lang === 'ur' ? (
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={editingField.value}
+                                  onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                                  onBlur={() => handleSaveInlineEdit()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                    if (e.key === 'Escape') setEditingField(null);
+                                  }}
+                                  className="bg-white dark:bg-slate-800 border border-primary-500/50 px-2 py-0.5 rounded text-xs focus:ring-1 focus:ring-primary-500 outline-none w-full text-right"
+                                />
+                              ) : (
+                                <span 
+                                  onClick={() => setEditingField({ type: 'rule_item', sectionDocId: section.docId, itemId: item.id, lang: 'ur', value: item.ur })} 
+                                  className="cursor-pointer hover:bg-slate-150 dark:hover:bg-slate-700/55 px-1 rounded transition-colors text-slate-650 dark:text-slate-400 w-full block"
+                                  title="Click to edit Urdu rule"
+                                >
+                                  {item.ur}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <button
                             onClick={() => handleDeleteRuleItem(section.docId, item.id)}

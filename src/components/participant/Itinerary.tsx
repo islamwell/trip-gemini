@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw, Play, Pause } from 'lucide-react';
+import { MapPin, Coffee, Sunrise, Sun, Sunset, Info, ZoomIn, ZoomOut, RotateCcw, Play, Pause, X } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -197,6 +197,7 @@ export const Itinerary: React.FC = () => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'thursday' | 'friday' | 'saturday' | 'sunday'>('thursday');
   const [hoveredStop, setHoveredStop] = useState<string | null>(null);
+  const [modalImage, setModalImage] = useState<{ src: string; alt: string } | null>(null);
 
   // Firestore state
   const [dbItinerary, setDbItinerary] = useState<Record<string, any[]>>(defaultItinerary);
@@ -573,15 +574,19 @@ export const Itinerary: React.FC = () => {
                 const elevation = locations[node.key]?.elevation || 0;
                 
                 // Heatmap color logic
-                let haloColor = 'rgba(16, 185, 129, 0.2)'; // low (green)
+                let elevationColor = '#10b981'; // low (green)
+                let haloColor = 'rgba(16, 185, 129, 0.2)';
                 let pulseClass = '';
                 if (elevation >= 1000) {
-                  haloColor = 'rgba(168, 85, 247, 0.4)'; // extreme (purple)
+                  elevationColor = '#a855f7'; // extreme (purple)
+                  haloColor = 'rgba(168, 85, 247, 0.4)';
                   pulseClass = 'animate-pulse';
                 } else if (elevation >= 500) {
-                  haloColor = 'rgba(239, 68, 68, 0.35)'; // high (red)
+                  elevationColor = '#ef4444'; // high (red)
+                  haloColor = 'rgba(239, 68, 68, 0.35)';
                 } else if (elevation >= 100) {
-                  haloColor = 'rgba(249, 115, 22, 0.25)'; // medium (orange/yellow)
+                  elevationColor = '#f97316'; // medium (orange)
+                  haloColor = 'rgba(249, 115, 22, 0.25)';
                 }
                 
                 const haloRadius = 12 + Math.min(20, (elevation / 1500) * 18);
@@ -609,16 +614,16 @@ export const Itinerary: React.FC = () => {
                         cy={scaledY}
                         r={haloRadius + 4}
                         fill="#10b981"
-                        className="opacity-20 animate-ping"
+                        className="opacity-25 animate-ping"
                       />
                     )}
                     <circle
                       cx={scaledX}
                       cy={scaledY}
                       r={isHovered ? 12 : 8}
-                      fill={isCurrentDayStop ? '#10b981' : '#0ea5e9'}
-                      className={`transition-all duration-300 shadow-lg`}
-                      style={{ filter: isCurrentDayStop ? 'drop-shadow(0 0 8px rgba(16,185,129,0.8))' : 'drop-shadow(0 0 4px rgba(14,165,233,0.5))' }}
+                      fill={elevationColor}
+                      className={`transition-[r,fill] duration-300 shadow-lg`}
+                      style={{ filter: `drop-shadow(0 0 5px ${elevationColor}80)` }}
                     />
                     <circle
                       cx={scaledX}
@@ -822,7 +827,10 @@ export const Itinerary: React.FC = () => {
                   )}
                   
                   {(item as any).image && (
-                    <div className="mt-4 rounded-xl overflow-hidden max-w-sm shadow-md border border-slate-200 dark:border-slate-800/60 transition-transform hover:scale-[1.02]">
+                    <div 
+                      onClick={() => setModalImage({ src: (item as any).image, alt: t('itinerary.' + activeTab + '.' + idx + '.label', item.label) })}
+                      className="mt-4 rounded-xl overflow-hidden max-w-sm shadow-md border border-slate-200 dark:border-slate-800/60 transition-transform hover:scale-[1.02] cursor-zoom-in"
+                    >
                       <img src={(item as any).image} alt={t('itinerary.' + activeTab + '.' + idx + '.label', item.label)} className="w-full h-48 object-cover" loading="lazy" />
                     </div>
                   )}
@@ -832,6 +840,34 @@ export const Itinerary: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Enlarged Image Modal */}
+      {modalImage && (
+        <div 
+          onClick={() => setModalImage(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-fade-in cursor-zoom-out"
+        >
+          <div className="relative max-w-4xl w-full max-h-[85vh] flex items-center justify-center">
+            <button 
+              onClick={() => setModalImage(null)}
+              className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img 
+              src={modalImage.src} 
+              alt={modalImage.alt} 
+              onClick={(e) => e.stopPropagation()} 
+              className="max-w-full max-h-[80vh] rounded-3xl object-contain shadow-2xl border border-white/10 animate-scale-in"
+            />
+            {modalImage.alt && (
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md text-white text-sm px-4 py-1.5 rounded-full font-semibold pointer-events-none">
+                {modalImage.alt}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
