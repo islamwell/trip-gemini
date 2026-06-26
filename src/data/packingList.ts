@@ -4,6 +4,7 @@ export interface PackingItem {
   name: { en: string; no: string; ur: string };
   desc: { en: string; no: string; ur: string };
   store: { en: string; no: string; ur: string };
+  imageUrl?: string;
 }
 
 export const defaultPackingList: PackingItem[] = [
@@ -24,7 +25,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "XXL Sport / Stormberg Store",
       "no": "XXL Sport / Stormberg-butikk",
       "ur": "ایکس ایکس ایل اسپورٹس یا اسٹورمبرگ اسٹور"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "c2",
@@ -43,7 +45,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "XXL Sport / Sport 1",
       "no": "XXL Sport / Sport 1",
       "ur": "ایکس ایکس ایل اسپورٹس یا اسپورٹ 1"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "c3",
@@ -62,7 +65,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Kiwi, Rema 1000, or XXL",
       "no": "Kiwi, Rema 1000 eller XXL",
       "ur": "کیوی، ریما 1000، یا ایکس ایکس ایل"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1508216813474-05d11f10dedc?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "c4",
@@ -81,7 +85,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Any supermarket / Online",
       "no": "Hvilken som helst matbutikk / Online",
       "ur": "کوئی بھی سپر مارکیٹ یا آن لائن"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1582966772680-860e372bb558?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "s1",
@@ -100,7 +105,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Islamic bookstore / Online",
       "no": "Islamsk bokhandel / Online",
       "ur": "اسلامک بک اسٹور یا آن لائن"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "s2",
@@ -119,7 +125,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Clas Ohlson / Biltema",
       "no": "Clas Ohlson / Biltema",
       "ur": "کلاس اوہلسن یا بلتیما"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "s3",
@@ -138,7 +145,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "App Store / Google Play",
       "no": "App Store / Google Play",
       "ur": "ایپ اسٹور یا گوگل پلے"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "e1",
@@ -157,7 +165,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Clas Ohlson / Kjell & Co",
       "no": "Clas Ohlson / Kjell & Co",
       "ur": "کلاس اوہلسن یا شیل اینڈ کمپنی"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1609592806453-6a991a03eefb?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "e2",
@@ -176,7 +185,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Clas Ohlson / Biltema / Jula",
       "no": "Clas Ohlson / Biltema / Jula",
       "ur": "کلاس اوہلسن یا بلتیما"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1576016770956-debb63d900cc?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "e3",
@@ -195,7 +205,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Any supermarket / Online",
       "no": "Hvilken som helst matbutikk / Online",
       "ur": "کوئی بھی سپر مارکیٹ یا آن لائن"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1520038410233-7141be7e6f97?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "h1",
@@ -214,7 +225,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Pharmacy (Apotek 1 / Vitusapotek)",
       "no": "Apotek (Apotek 1 / Vitusapotek)",
       "ur": "فارمیسی (اپوتیک 1)"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "h2",
@@ -232,8 +244,9 @@ export const defaultPackingList: PackingItem[] = [
     "store": {
       "en": "Pharmacy / Kiwi / Rema 1000",
       "no": "Apotek / Kiwi / Rema 1000",
-      "ur": "فارمیسی یا سپر مارکیٹ"
-    }
+      "ur": "ایم آئی ایم آر پی یا سپر مارکیٹ"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "h3",
@@ -252,7 +265,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Kiwi / Rema 1000 / Coop Extra",
       "no": "Kiwi / Rema 1000 / Coop Extra",
       "ur": "کیوی، ریما 1000 یا کوپ ایکسٹرا"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1614859324967-bdf461f57e2c?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "c5",
@@ -271,7 +285,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "XXL Sport / Stormberg Store",
       "no": "XXL Sport / Stormberg-butikk",
       "ur": "ایکس ایکس ایل اسپورٹس یا اسٹورمبرگ اسٹور"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1551854838-212c50b4c184?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "c6",
@@ -290,7 +305,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "XXL / Kiwi / Rema 1000",
       "no": "XXL / Kiwi / Rema 1000",
       "ur": "ایکس ایکس ایل / کیوی / ریما 1000"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1576871337622-98d48d4aa53e?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "c7",
@@ -309,7 +325,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Any store / Synsam",
       "no": "Hvilken som helst butikk / Synsam",
       "ur": "کوئی بھی دکان / سن سیم"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "s4",
@@ -328,7 +345,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "App Store / Google Play",
       "no": "App Store / Google Play",
       "ur": "ایپ اسٹور یا گوگل پلے"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1530907851079-af602d550799?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "s5",
@@ -347,7 +365,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Islamic bookstore / Online",
       "no": "Islamsk bokhandel / Online",
       "ur": "اسلامک بک اسٹور یا آن لائن"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "e4",
@@ -366,7 +385,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Clas Ohlson / Kjell & Co",
       "no": "Clas Ohlson / Kjell & Co",
       "ur": "کلاس اوہلسن یا شیل اینڈ کمپنی"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "e5",
@@ -385,7 +405,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Clas Ohlson / Biltema / Jula",
       "no": "Clas Ohlson / Biltema / Jula",
       "ur": "کلاس اوہلسن یا بلتیما"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1504221507732-5246c045949b?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "h4",
@@ -404,7 +425,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Pharmacy (Apotek 1 / Vitusapotek)",
       "no": "Apotek (Apotek 1 / Vitusapotek)",
       "ur": "فارمیسی (اپوتیک 1)"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "h5",
@@ -423,7 +445,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Pharmacy / Kiwi / Rema 1000",
       "no": "Apotek / Kiwi / Rema 1000",
       "ur": "فارمیسی یا سپر مارکیٹ"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1578991624414-276ef23a534f?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "h6",
@@ -442,7 +465,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Apotek 1 / Vitusapotek",
       "no": "Apotek 1 / Vitusapotek",
       "ur": "اپوتیک 1 / ویتوس اپوتیک"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "d1",
@@ -461,7 +485,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Already owned",
       "no": "Allerede eid",
       "ur": "پہلے سے موجود ہے"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "d2",
@@ -480,7 +505,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Insurance provider / Bank",
       "no": "Forsikringsselskap / Bank",
       "ur": "انشورنس کمپنی / بینک"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1589758438368-0ad531db3366?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "d3",
@@ -499,7 +525,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Already owned",
       "no": "Allerede eid",
       "ur": "پہلے سے موجود ہے"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "d4",
@@ -518,7 +545,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Bank / ATM",
       "no": "Bank / Minibank",
       "ur": "بینک / اے ٹی ایم"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "f1",
@@ -537,7 +565,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Any store / Clas Ohlson",
       "no": "Hvilken som helst butikk / Clas Ohlson",
       "ur": "کوئی بھی دکان / کلاس اوہلسن"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "f2",
@@ -556,7 +585,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "Kiwi / Rema 1000 / Any store",
       "no": "Kiwi / Rema 1000 / Hvilken som helst butikk",
       "ur": "کیوی / ریما 1000 / کوئی بھی دکان"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1599420186946-7b6fb4e297f0?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "f3",
@@ -575,7 +605,8 @@ export const defaultPackingList: PackingItem[] = [
       "en": "XXL / Sport 1",
       "no": "XXL / Sport 1",
       "ur": "ایکس ایکس ایل / اسپورٹ 1"
-    }
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80"
   },
   {
     "id": "f4",
@@ -593,7 +624,8 @@ export const defaultPackingList: PackingItem[] = [
     "store": {
       "en": "Any store",
       "no": "Hvilken som helst butikk",
-      "ur": "کوئی بھی دکان"
-    }
+      "ur": "کوئی भी دکان"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1526951521990-620dc14c214b?auto=format&fit=crop&w=600&q=80"
   }
 ];

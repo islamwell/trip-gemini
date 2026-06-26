@@ -108,6 +108,7 @@ export const AdminDashboard: React.FC = () => {
   const [newPackStoreEn, setNewPackStoreEn] = useState('');
   const [newPackStoreNo, setNewPackStoreNo] = useState('');
   const [newPackStoreUr, setNewPackStoreUr] = useState('');
+  const [newPackImageUrl, setNewPackImageUrl] = useState('');
   const [newPackCategory, setNewPackCategory] = useState<'clothing' | 'spiritual' | 'electronics' | 'health' | 'documents' | 'comfort'>('clothing');
   const [editingPackItemId, setEditingPackItemId] = useState<string | null>(null);
 
@@ -256,7 +257,8 @@ export const AdminDashboard: React.FC = () => {
         category: newPackCategory,
         name: { en: newPackNameEn, no: newPackNameNo, ur: newPackNameUr },
         desc: { en: newPackDescEn, no: newPackDescNo, ur: newPackDescUr },
-        store: { en: newPackStoreEn, no: newPackStoreNo, ur: newPackStoreUr }
+        store: { en: newPackStoreEn, no: newPackStoreNo, ur: newPackStoreUr },
+        imageUrl: newPackImageUrl.trim() || undefined
       };
       await setDoc(doc(db, 'packing_list', itemId), itemData);
       showSuccess(editingPackItemId ? "Packing item updated!" : "New packing item added!");
@@ -270,6 +272,7 @@ export const AdminDashboard: React.FC = () => {
       setNewPackStoreEn('');
       setNewPackStoreNo('');
       setNewPackStoreUr('');
+      setNewPackImageUrl('');
       setEditingPackItemId(null);
     } catch (err) {
       console.error(err);
@@ -303,6 +306,7 @@ export const AdminDashboard: React.FC = () => {
     setNewPackStoreEn(item.store.en || '');
     setNewPackStoreNo(item.store.no || '');
     setNewPackStoreUr(item.store.ur || '');
+    setNewPackImageUrl(item.imageUrl || '');
     const formEl = document.getElementById('packing-form');
     if (formEl) {
       formEl.scrollIntoView({ behavior: 'smooth' });
@@ -1994,6 +1998,17 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Image URL (Optional)</label>
+                <input
+                  type="text"
+                  value={newPackImageUrl}
+                  onChange={(e) => setNewPackImageUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/photo-..."
+                  className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                />
+              </div>
+
               <div className="flex gap-2">
                 <button
                   type="submit"
@@ -2015,6 +2030,7 @@ export const AdminDashboard: React.FC = () => {
                       setNewPackStoreEn('');
                       setNewPackStoreNo('');
                       setNewPackStoreUr('');
+                      setNewPackImageUrl('');
                     }}
                     className="px-5 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl shadow transition-colors cursor-pointer"
                   >
@@ -2052,6 +2068,13 @@ export const AdminDashboard: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {catItems.map((item) => (
                           <div key={item.id} className="border border-card-border rounded-xl p-4 bg-white dark:bg-slate-800 flex justify-between gap-3 text-xs">
+                            {item.imageUrl && (
+                              <img 
+                                src={item.imageUrl} 
+                                alt={item.name.en} 
+                                className="w-12 h-12 rounded-lg object-cover border border-card-border shrink-0" 
+                              />
+                            )}
                             <div className="space-y-2 min-w-0 flex-1">
                               <div>
                                 <h6 className="font-bold text-slate-800 dark:text-slate-100 truncate">{item.name.en} | {item.name.no} | {item.name.ur}</h6>

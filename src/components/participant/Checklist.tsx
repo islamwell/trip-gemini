@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { CheckSquare, Square, ShoppingBag, Info } from 'lucide-react';
+import { CheckSquare, Square, ShoppingBag, Info, ZoomIn, X } from 'lucide-react';
 import { db } from '../../services/firebase';
-import { collection, doc, setDoc, query, onSnapshot } from 'firebase/firestore';
+import { collection, doc, setDoc, query, onSnapshot, getDocs } from 'firebase/firestore';
 import { defaultPackingList } from '../../data/packingList';
 import type { PackingItem } from '../../data/packingList';
 
@@ -15,21 +15,46 @@ export const Checklist: React.FC = () => {
   };
 
   const [checklistItems, setChecklistItems] = useState<PackingItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState<{ url: string; name: string; desc: string } | null>(null);
 
-  // Fetch packing list items from Firestore
+  // Fetch packing list items from Firestore and handle seeding/syncing
   useEffect(() => {
-    const q = query(collection(db, 'packing_list'));
-    const unsub = onSnapshot(q, async (snap) => {
-      if (snap.empty) {
-        console.log("Seeding packing list items in Firestore...");
-        try {
+    const checkAndSync = async () => {
+      try {
+        const querySnapshot = await getDocs(query(collection(db, 'packing_list')));
+        if (querySnapshot.empty) {
+          console.log("Seeding packing list items in Firestore...");
           for (const item of defaultPackingList) {
             await setDoc(doc(db, 'packing_list', item.id), item);
           }
-        } catch (err) {
-          console.error("Error seeding packing list items:", err);
+        } else {
+          let needsSync = false;
+          querySnapshot.forEach(docSnap => {
+            const data = docSnap.data() as PackingItem;
+            const defaultItem = defaultPackingList.find(i => i.id === data.id);
+            if (defaultItem && defaultItem.imageUrl && !data.imageUrl) {
+              needsSync = true;
+            }
+          });
+
+          if (needsSync) {
+            console.log("Syncing packing list items with new image URLs...");
+            for (const item of defaultPackingList) {
+              await setDoc(doc(db, 'packing_list', item.id), item, { merge: true });
+            }
+          }
         }
-      } else {
+      } catch (err) {
+        console.error("Error during packing list check/sync:", err);
+      }
+    };
+
+    checkAndSync();
+
+    // Real-time listener to track updates
+    const q = query(collection(db, 'packing_list'));
+    const unsub = onSnapshot(q, (snap) => {
+      if (!snap.empty) {
         const list: PackingItem[] = [];
         snap.forEach(docSnap => {
           list.push({ ...docSnap.data() } as PackingItem);
@@ -38,6 +63,17 @@ export const Checklist: React.FC = () => {
       }
     });
     return () => unsub();
+  }, []);
+
+  // Listen for Escape key to close the lightbox modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedImage(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const [activeCategory, setActiveCategory] = useState<'all' | 'clothing' | 'spiritual' | 'electronics' | 'health' | 'documents' | 'comfort'>('all');
@@ -152,6 +188,32 @@ export const Checklist: React.FC = () => {
                   <Square className="w-6 h-6 text-slate-400" />
                 )}
               </div>
+
+              {/* Mini picture preview */}
+              {item.imageUrl && (
+                <div 
+                  className="relative w-16 h-16 rounded-xl overflow-hidden group/img border border-slate-200 dark:border-slate-800 shrink-0 cursor-zoom-in"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Avoid checking/unchecking card
+                    setSelectedImage({ 
+                      url: item.imageUrl!, 
+                      name: getLocText(item.name), 
+                      desc: getLocText(item.desc) 
+                    });
+                  }}
+                >
+                  <img 
+                    src={item.imageUrl} 
+                    alt={getLocText(item.name)}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-110"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                    <ZoomIn className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              )}
+
               <div className="flex-1 space-y-1 min-w-0">
                 <h3 className={`font-semibold text-lg break-words ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}`}>
                   {getLocText(item.name)}
@@ -182,6 +244,38 @@ export const Checklist: React.FC = () => {
           </ul>
         </div>
       </div>
+
+      {/* Lightbox / Zoom Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all duration-300"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button 
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all cursor-pointer shadow-lg"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div 
+            className="relative max-w-2xl w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-card-border shadow-2xl flex flex-col scale-100 transition-transform"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative w-full aspect-video md:aspect-[4/3] bg-slate-950 flex items-center justify-center">
+              <img 
+                src={selectedImage.url} 
+                alt={selectedImage.name}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="p-6 space-y-2">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">{selectedImage.name}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{selectedImage.desc}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
