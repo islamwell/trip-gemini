@@ -61,9 +61,27 @@ export const TripRules: React.FC = () => {
         }
       } else {
         const list: CovenantSection[] = [];
+        let needsSync = false;
         snap.forEach(docSnap => {
-          list.push({ ...docSnap.data() } as CovenantSection);
+          const data = docSnap.data() as CovenantSection;
+          list.push(data);
+          // If a section is in covenantData and has a quranAyat, but the database version doesn't, we need to sync!
+          const defaultSec = covenantData.find(s => s.id === data.id);
+          if (defaultSec && defaultSec.quranAyat && !data.quranAyat) {
+            needsSync = true;
+          }
         });
+
+        if (needsSync) {
+          console.log("Syncing covenant rules with new Quranic Ayats...");
+          try {
+            for (const section of covenantData) {
+              await setDoc(doc(db, 'covenant', `section_${section.id}`), section, { merge: true });
+            }
+          } catch (err) {
+            console.error("Error syncing covenant rules:", err);
+          }
+        }
         setRules(list);
       }
     });
@@ -249,6 +267,12 @@ export const TripRules: React.FC = () => {
                     {section.quote && (
                       <div className={`p-4 rounded-xl ${theme.quranBg} border ${theme.border} italic text-sm md:text-base text-slate-700 dark:text-slate-300`}>
                         📖 {getLocText(section.quote)}
+                      </div>
+                    )}
+
+                    {section.quranAyat && (
+                      <div className={`p-4 rounded-xl ${theme.quranBg} border ${theme.border} text-center font-serif text-lg md:text-xl text-slate-800 dark:text-slate-200 font-medium leading-relaxed`} dir="rtl">
+                        ﴿ {section.quranAyat} ﴾
                       </div>
                     )}
 

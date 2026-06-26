@@ -116,6 +116,17 @@ export const Dashboard: React.FC = () => {
   });
   const [upcomingAlarms, setUpcomingAlarms] = useState<any[]>([]);
   const triggeredAlarmsRef = useRef<Set<string>>(new Set());
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCleanupRef = useRef<(() => void) | null>(null);
+
+  // Cleanup audio on component unmount
+  useEffect(() => {
+    return () => {
+      if (audioCleanupRef.current) {
+        audioCleanupRef.current();
+      }
+    };
+  }, []);
 
   // Subscribe to real-time databases
   useEffect(() => {
@@ -175,6 +186,10 @@ export const Dashboard: React.FC = () => {
   // Sync alarm settings to localStorage
   useEffect(() => {
     localStorage.setItem('alarm_audio_enabled', String(audioEnabled));
+    if (!audioEnabled && audioCleanupRef.current) {
+      audioCleanupRef.current();
+      audioCleanupRef.current = null;
+    }
   }, [audioEnabled]);
 
   useEffect(() => {
@@ -194,41 +209,133 @@ export const Dashboard: React.FC = () => {
     return 'thursday'; // Default/mock fallback during development
   };
 
-  // Sound Alarm Chime generator (Web Audio Synth - ding-dong sound)
-  const playAlarmSound = () => {
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-
-      // First chime: 880Hz (A5)
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(880, ctx.currentTime);
-      gain1.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.start();
-      osc1.stop(ctx.currentTime + 0.45);
-
-      // Second chime: 660Hz (E5) at 0.28s delay
-      setTimeout(() => {
-        const osc2 = ctx.createOscillator();
-        const gain2 = ctx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(660, ctx.currentTime);
-        gain2.gain.setValueAtTime(0.12, ctx.currentTime);
-        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-        osc2.connect(gain2);
-        gain2.connect(ctx.destination);
-        osc2.start();
-        osc2.stop(ctx.currentTime + 0.55);
-      }, 280);
-    } catch (err) {
-      console.error("Synthesizer playback error:", err);
+  // Play beautiful Quran verses from everyayah.com for about 20 seconds, with synth fallback
+  const playAlarmSound = (alarmType?: 'location' | 'prayer' | 'test') => {
+    // Stop any existing playback and clear timeouts/intervals
+    if (audioCleanupRef.current) {
+      audioCleanupRef.current();
+      audioCleanupRef.current = null;
     }
+
+    // Determine the verses to play (Alafasy_128kbps recitation)
+    let verses: { surah: number; ayah: number }[] = [];
+    if (alarmType === 'prayer') {
+      // Surah Taha 20:14 ("Indeed, I am Allah... establish prayer for My remembrance")
+      verses = [{ surah: 20, ayah: 14 }];
+    } else if (alarmType === 'location') {
+      // Surah Az-Zukhruf 43:13-14 (Travel supplication: "Subhanalladhi sakhkhara lana...")
+      verses = [
+        { surah: 43, ayah: 13 },
+        { surah: 43, ayah: 14 }
+      ];
+    } else {
+      // Default / test alarm: Ayat al-Kursi (Surah 2:255)
+      verses = [{ surah: 2, ayah: 255 }];
+    }
+
+    const urls = verses.map(v => {
+      const surahStr = String(v.surah).padStart(3, '0');
+      const ayahStr = String(v.ayah).padStart(3, '0');
+      return `https://everyayah.com/data/Alafasy_128kbps/${surahStr}${ayahStr}.mp3`;
+    });
+
+    // Fallback synth function (ding-dong sound)
+    const playSynthFallback = () => {
+      try {
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        // First chime: 880Hz (A5)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(880, ctx.currentTime);
+        gain1.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start();
+        osc1.stop(ctx.currentTime + 0.45);
+
+        // Second chime: 660Hz (E5) at 0.28s delay
+        setTimeout(() => {
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(660, ctx.currentTime);
+          gain2.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.start();
+          osc2.stop(ctx.currentTime + 0.55);
+        }, 280);
+      } catch (err) {
+        console.error("Synthesizer playback error:", err);
+      }
+    };
+
+    let currentIndex = 0;
+    let mainTimeoutId: any = null;
+    let fadeIntervalId: any = null;
+    let isFading = false;
+
+    const playNext = () => {
+      if (currentIndex >= urls.length || isFading) return;
+
+      const audio = new Audio(urls[currentIndex]);
+      activeAudioRef.current = audio;
+
+      audio.play().catch(err => {
+        console.warn("Audio playback failed, falling back to synth chime:", err);
+        playSynthFallback();
+      });
+
+      audio.onended = () => {
+        currentIndex++;
+        if (currentIndex < urls.length && !isFading) {
+          playNext();
+        }
+      };
+    };
+
+    // Start playing first verse
+    playNext();
+
+    // Fade-out setup: Limit playback to 20 seconds total
+    const playDuration = 20000; // 20 seconds total
+    const fadeDuration = 1500;  // Fade out over last 1.5 seconds
+
+    mainTimeoutId = setTimeout(() => {
+      isFading = true;
+      const audio = activeAudioRef.current;
+      if (audio) {
+        let volume = 1.0;
+        fadeIntervalId = setInterval(() => {
+          volume -= 0.1;
+          if (volume <= 0) {
+            clearInterval(fadeIntervalId);
+            audio.pause();
+            if (activeAudioRef.current === audio) {
+              activeAudioRef.current = null;
+            }
+          } else {
+            audio.volume = Math.max(0, volume);
+          }
+        }, fadeDuration / 10);
+      }
+    }, playDuration - fadeDuration);
+
+    const cleanup = () => {
+      clearTimeout(mainTimeoutId);
+      if (fadeIntervalId) clearInterval(fadeIntervalId);
+      if (activeAudioRef.current) {
+        activeAudioRef.current.pause();
+        activeAudioRef.current = null;
+      }
+    };
+
+    audioCleanupRef.current = cleanup;
   };
 
   // Fire a Browser Notification
@@ -243,7 +350,7 @@ export const Dashboard: React.FC = () => {
 
   // Test Alarm triggers instantly
   const handleTestAlarm = () => {
-    playAlarmSound();
+    playAlarmSound('test');
     triggerNotification("🔔 Alarm Test", "This is a test notification from the road trip alarm chimer!");
     showInfo("Test alarm chime triggered! Verify audio sound and notification popups.");
   };
@@ -299,7 +406,7 @@ export const Dashboard: React.FC = () => {
             triggeredAlarmsRef.current.add(alarmKey);
             
             // Trigger effects
-            if (audioEnabled) playAlarmSound();
+            if (audioEnabled) playAlarmSound(alarm.type);
             triggerNotification(
               "⚠️ Upcoming Trip Event (10 mins)",
               `"${alarm.label}" scheduled at ${alarm.time}. Please prepare!`

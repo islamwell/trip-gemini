@@ -19,6 +19,7 @@ export interface CovenantSection {
     no: string;
     ur: string;
   };
+  quranAyat?: string;
 }
 
 export const covenantData: CovenantSection[] = [
@@ -30,6 +31,7 @@ export const covenantData: CovenantSection[] = [
       ur: "ہماری نیت (Niyyah)"
     },
     iconName: "Heart",
+    quranAyat: "قُلْ إِنَّ صَلَاتِي وَنُسُكِي وَمَحْيَايَ وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ",
     items: [
       { id: "1_1", en: "We travel seeking Allah's pleasure.", no: "Vi reiser for å søke Allahs velbehag.", ur: "ہم اللہ کی رضا کے لیے سفر کر رہے ہیں۔" },
       { id: "1_2", en: "We remember that enjoying nature is worship when accompanied by gratitude.", no: "Vi husker at det å nyte naturen er tilbedelse når det ledsages av takknemlighet.", ur: "ہم یاد رکھیں گے کہ شکر گزاری کے ساتھ قدرت سے لطف اندوز ہونا بھی عبادت ہے۔" },
@@ -45,6 +47,7 @@ export const covenantData: CovenantSection[] = [
       ur: "نماز ہر چیز پر مقدم ہے"
     },
     iconName: "Clock",
+    quranAyat: "إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَوْقُوتًا",
     items: [
       { id: "2_1", en: "No activity, sightseeing, restaurant, or schedule is more important than prayer.", no: "Ingen aktivitet, sightseeing, restaurant eller tidsplan er viktigere enn bønn.", ur: "کوئی بھی سرگرمی، سیر و تفریح، ریستوراں یا شیڈول نماز سے زیادہ اہم نہیں ہے۔" },
       { id: "2_2", en: "We will pray every salah on time.", no: "Vi vil be hver salah i tide.", ur: "ہم ہر نماز وقت پر ادا کریں گے۔" },
@@ -64,9 +67,10 @@ export const covenantData: CovenantSection[] = [
       ur: "قرآن اور ذکر"
     },
     iconName: "BookOpen",
+    quranAyat: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
     items: [
       { id: "3_1", en: "Begin every day with Quran.", no: "Start hver dag med Koranen.", ur: "ہر دن کا آغاز قرآن سے کریں۔" },
-      { id: "3_2", en: "Read or listen to Quran during driving.", no: "Les eller lytt til Koranen under kjøring.", ur: "کوشش کریں کہ گاڑی چلاتے وقت قرآن پڑھیں یا سنیں۔" },
+      { id: "3_2", en: "Read or listen to Quran during driving.", no: "Les eller lytt to Koranen under kjøring.", ur: "کوشش کریں کہ گاڑی چلاتے وقت قرآن پڑھیں یا سنیں۔" },
       { id: "3_3", en: "Make dhikr frequently (SubhanAllah, Alhamdulillah, Allahu Akbar, La ilaha illa Allah).", no: "Gjør dhikr ofte (SubhanAllah, Alhamdulillah, Allahu Akbar, La ilaha illa Allah).", ur: "کثرت سے ذکر کریں (سبحان اللہ، الحمد للہ، اللہ اکبر، لا الہ الا اللہ)۔" },
       { id: "3_4", en: "Read morning and evening adhkar.", no: "Les morgen- og kveldsadhkar.", ur: "صبح اور شام کے اذکار پڑھیں۔" },
       { id: "3_5", en: "Make dua before departing and entering destinations.", no: "Gjør dua før avreise og ankomst.", ur: "سفر پر روانہ ہونے اور منزل میں داخل ہونے سے پہلے دعا کریں۔" }
@@ -80,6 +84,7 @@ export const covenantData: CovenantSection[] = [
       ur: "اخلاق کے قوانین"
     },
     iconName: "Smile",
+    quranAyat: "وَقُولُوا لِلنَّاسِ حُسْنًا",
     items: [
       { id: "4_1", en: "No shouting, sarcasm, insults, or mockery.", no: "Ingen roping, sarkasme, fornærmelser eller spott.", ur: "کوئی چیخ و پکار، طنز، توہین یا مذاق اڑانا نہیں ہوگا۔" },
       { id: "4_2", en: "No complaining excessively.", no: "Ingen overdreven klaging.", ur: "حد سے زیادہ شکایتیں کرنے سے گریز کریں۔" },
@@ -96,9 +101,10 @@ export const covenantData: CovenantSection[] = [
       ur: "خاندانی اتحاد"
     },
     iconName: "Users",
+    quranAyat: "وَاعْتَصِمُوا بِحَبْلِ اللَّهِ جَمِيعًا وَلَا تَفَرَّقُوا",
     items: [
       { id: "5_1", en: "Nobody walks alone without informing others.", no: "Ingen går alene uten å informere andre.", ur: "کوئی بھی دوسروں کو بتائے بغیر اکیلا نہیں چلے گا۔" },
-      { id: "5_2", en: "Nobody disappears without communication.", no: "Ingen forsvinner uten kommunikasjon.", ur: "کوئی بھی رابطے کے بغیر غائب نہیں ہوگا۔" },
+      { id: "5_2", en: "Nobody disappears without communication.", no: "Ingen forsvinner uten kommunikasjon.", ur: "کوئی भी رابطے کے بغیر غائب نہیں ہوگا۔" },
       { id: "5_3", en: "We move together as a family and help elderly members first.", no: "Vi beveger oss sammen som en familie og hjelper eldre medlemmer først.", ur: "ہم ایک خاندان کے طور پر مل کر چلیں گے اور پہلے بزرگوں کی مدد کریں گے۔" },
       { id: "5_4", en: "Children are everyone's responsibility and parents are respected.", no: "Barn er alles ansvar og foreldre respekteres.", ur: "بچے سب کی ذمہ داری ہیں اور والدین کا احترام کیا جائے گا۔" },
       { id: "5_5", en: "Decisions are made with shura (consultation).", no: "Avgjørelser tas med shura (konsultasjon).", ur: "فیصلے شوریٰ (مشورے) سے کیے جائیں گے۔" },
@@ -113,6 +119,7 @@ export const covenantData: CovenantSection[] = [
       ur: "نظم و ضبط"
     },
     iconName: "FileCheck",
+    quranAyat: "وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ",
     items: [
       { id: "6_1", en: "Be punctual and ready on time.", no: "Vær punktlig og klar i tide.", ur: "وقت کے پابند رہیں اور وقت پر تیار رہیں۔" },
       { id: "6_2", en: "Respect agreed departure times.", no: "Respekter avtalte avreisetider.", ur: "طے شدہ روانگی کے اوقات کا احترام کریں۔" },
@@ -129,6 +136,7 @@ export const covenantData: CovenantSection[] = [
       ur: "گاڑی کے آداب"
     },
     iconName: "Car",
+    quranAyat: "وَاقْصِدْ فِي مَشْيِكَ وَاغْضُضْ مِنْ صَوْتِكَ",
     items: [
       { id: "7_1", en: "Driver is never distracted and passenger assists with navigation.", no: "Føreren blir aldri avsporet og passasjeren hjelper til med navigasjon.", ur: "ڈرائیور کا دھیان کبھی نہ بٹے اور مسافر نیویگیشن میں مدد کرے۔" },
       { id: "7_2", en: "No unnecessary criticism of the driver.", no: "Ingen unødvendig kritikk av føreren.", ur: "ڈرائیور پر بلاوجہ تنقید نہ کی جائے۔" },
@@ -146,6 +154,7 @@ export const covenantData: CovenantSection[] = [
       ur: "کھانے کے قوانین"
     },
     iconName: "Utensils",
+    quranAyat: "وَكُلُوا وَاشْرَبُوا وَلَا تُسْرِفُوا ۚ إِنَّهُ لَا يُحِبُّ الْمُسْرِفِينَ",
     items: [
       { id: "8_1", en: "Eat halal and avoid waste.", no: "Spis halal og unngå svinn.", ur: "حلال کھائیں اور ضائع کرنے سے بچیں۔" },
       { id: "8_2", en: "Begin with Bismillah and finish with Alhamdulillah.", no: "Start med Bismillah og avslutt med Alhamdulillah.", ur: "بسم اللہ سے شروع کریں اور الحمد للہ پر ختم کریں۔" },
@@ -162,6 +171,7 @@ export const covenantData: CovenantSection[] = [
       ur: "فون اور میڈیا"
     },
     iconName: "PhoneOff",
+    quranAyat: "وَالَّذِينَ هُمْ عَنِ اللَّغْوِ مُعْرِضُونَ",
     items: [
       { id: "9_1", en: "No haram content and no music.", no: "Ingen haram innhold og ingen musikk.", ur: "کوئی حرام مواد اور کوئی موسیقی نہیں ہوگی۔" },
       { id: "9_2", en: "Quran, lectures, nasheeds, or beneficial conversations are preferred.", no: "Koranen, foredrag, nasheeds eller nyttige samtaler foretrekkes.", ur: "قرآن، لیکچرز، نعتیں یا تعمیری گفتگو کو ترجیح دی جائے گی۔" },
@@ -177,6 +187,7 @@ export const covenantData: CovenantSection[] = [
       ur: "شکر گزاری"
     },
     iconName: "Compass",
+    quranAyat: "لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
     quote: {
       en: "\"Rabbana ma khalaqta hadha batilan.\" (Our Lord, You did not create this in vain.)",
       no: "\"Rabbana ma khalaqta hadha batilan.\" (Vår Herre, Du har ikke skapt dette forgjeves.)",
@@ -196,6 +207,7 @@ export const covenantData: CovenantSection[] = [
       ur: "مالی معاملات"
     },
     iconName: "Coins",
+    quranAyat: "وَالَّذِينَ إِذَا أَنْفَقُوا لَمْ يُسْرِفُوا وَلَمْ يَقْتُرُوا وَكَانَ بَيْنَ ذَٰلِكَ قَوَامًا",
     items: [
       { id: "11_1", en: "Spend moderately and avoid extravagance/debt.", no: "Bruk penger moderat og unngå sløsing/gjeld.", ur: "اعتدال سے خرچ کریں اور فضول خرچی/قرض سے بچیں۔" },
       { id: "11_2", en: "Share expenses fairly.", no: "Del utgifter rettferdig.", ur: "اخراجات کو انصاف کے ساتھ شیئر کریں۔" },
@@ -211,6 +223,7 @@ export const covenantData: CovenantSection[] = [
       ur: "وقت کا انتظام"
     },
     iconName: "Calendar",
+    quranAyat: "إِنَّ الْإِنْسَانَ لَفِي خُسْرٍ",
     items: [
       { id: "12_1", en: "Fajr: Wake without arguments; begin with dhikr and Quran.", no: "Fajr: Våkn opp uten diskusjoner; start med dhikr og Koranen.", ur: "فجر: بغیر کسی بحث کے جاگیں؛ ذکر اور قرآن سے آغاز کریں۔" },
       { id: "12_2", en: "Driving: Productive conversation, Quran, or beneficial lectures.", no: "Kjøring: Produktiv samtale, Koranen eller nyttige foredrag.", ur: "ڈرائیونگ: تعمیری گفتگو، قرآن یا مفید لیکچرز۔" },
@@ -226,6 +239,7 @@ export const covenantData: CovenantSection[] = [
       ur: "تنازعات کا حل"
     },
     iconName: "Handshake",
+    quranAyat: "فَاتَّقُوا اللَّهَ وَأَصْلِحُوا ذَاتَ بَيْنِكُمْ",
     quote: {
       en: "\"May Allah reward you. Let us solve this peacefully.\"",
       no: "\"Måtte Allah belønne deg. La oss løse dette på en fredelig måte.\"",
@@ -245,11 +259,12 @@ export const covenantData: CovenantSection[] = [
       ur: "سفر کی سنتیں"
     },
     iconName: "Navigation",
+    quranAyat: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ",
     items: [
       { id: "14_1", en: "Read travel dua.", no: "Les reisedua.", ur: "سفر کی دعا پڑھیں۔" },
       { id: "14_2", en: "Say Takbir when ascending, and Tasbih when descending.", no: "Si Takbir ved oppstigning og Tasbih ved nedstigning.", ur: "بلندی پر جاتے ہوئے تکبیر (اللہ اکبر) اور نیچے آتے ہوئے تسبیح (سبحان اللہ) کہیں۔" },
       { id: "14_3", en: "Make dua often, for the traveler's dua is accepted.", no: "Gjør dua ofte, for den reisendes dua blir hørt.", ur: "کثرت سے دعا مانگیں کیونکہ مسافر کی دعا قبول ہوتی ہے۔" },
-      { id: "14_4", en: "Help strangers if possible, smile often, and give charity.", no: "Hjelp fremmede om mulig, smil ofte og gi veldedighet.", ur: "اگر ممکن ہو تو اجنبیوں کی مدد کریں، مسکرائیں اور صدقہ دیں۔" }
+      { id: "14_4", en: "Help strangers if possible, smile often, and give charity.", no: "Hjelp fremmede om mulig, smil ofte og gi veldedighet.", ur: "اگر mulig ho to ajnabiyo ki madad karein, muskurayein aur sadqa dein." }
     ]
   },
   {
@@ -260,6 +275,7 @@ export const covenantData: CovenantSection[] = [
       ur: "ہنگامی اصول"
     },
     iconName: "AlertTriangle",
+    quranAyat: "فَاتَّقُوا اللَّهَ مَا اسْتَطَعْتُمْ",
     quote: {
       en: "Nothing is more important than Taqwa! Everything else is secondary.",
       no: "Ingenting er viktigere enn Taqwa! Alt annet er sekundært.",
@@ -277,6 +293,7 @@ export const covenantData: CovenantSection[] = [
       ur: "زیرو ریگریٹ رول"
     },
     iconName: "Award",
+    quranAyat: "وَمَنْ يُطِعِ اللَّهَ وَرَسُولَهُ فَقَدْ فَازَ فَوْزًا عَظِيمًا",
     quote: {
       en: "\"Alhamdulillah, we saw Allah's signs, prayed together, laughed together, helped one another, and returned home better Muslims and a stronger family.\"",
       no: "\"Alhamdulillah, vi så Allahs tegn, ba sammen, lo sammen, hjalp hverandre og vendte hjem som bedre muslimer og en sterkere familie.\"",
@@ -294,6 +311,7 @@ export const covenantData: CovenantSection[] = [
       ur: "فطرت اور ماحولیات کی ذمہ داری"
     },
     iconName: "Trees",
+    quranAyat: "وَلَا تُفْسِدُوا فِي الْأَرْضِ بَعْدَ إِصْلَاحِهَا",
     quote: {
       en: "\"If the Hour (Day of Judgment) is about to be established and one of you was holding a palm shoot, let him plant it if he can.\" — Prophet Muhammad ﷺ",
       no: "\"Hvis Timen (Dommedagen) er i ferd med å bli etablert og en av dere holder et palmeskudd, la ham plante det om han kan.\" — Profeten Muhammad ﷺ",
@@ -315,6 +333,7 @@ export const covenantData: CovenantSection[] = [
       ur: "قیام اور صفائی کے قوانین"
     },
     iconName: "Home",
+    quranAyat: "إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ وَيُحِبُّ الْمُتَطَهِّرِينَ",
     items: [
       { id: "18_1", en: "Keep shared cabins/rooms tidy — make beds, clean surfaces, and pack belongings neatly.", no: "Hold delte hytter/rom ryddige — re opp senger, rengjør overflater og pakk eiendelene pent.", ur: "مشترکہ کیبنز/کمرے صاف ستھرے رکھیں — بستر درست کریں، سطحیں صاف کریں اور سامان منظم رکھیں۔" },
       { id: "18_2", en: "Bathroom etiquette — leave it clean for the next person. Wipe surfaces dry after wudu.", no: "Badetikette — forlat det rent for neste person. Tørk overflater etter wudu.", ur: "باتھ روم کے آداب — اگلے شخص کے لیے صاف چھوڑیں۔ وضو کے بعد سطحیں خشک کریں۔" },
@@ -332,6 +351,7 @@ export const covenantData: CovenantSection[] = [
       ur: "بچوں کا طرزِ عمل"
     },
     iconName: "Baby",
+    quranAyat: "يَا أَيُّهَا الَّذِينَ آمَنُوا قُوا أَنْفُسَكُمْ وَأَهْلِيكُمْ نَارًا",
     quote: {
       en: "\"Be kind to your children and teach them beautiful manners.\" — Prophet Muhammad ﷺ",
       no: "\"Vær snill mot barna deres og lær dem vakre manerer.\" — Profeten Muhammad ﷺ",
@@ -353,6 +373,7 @@ export const covenantData: CovenantSection[] = [
       ur: "فوٹوگرافی اور سوشل میڈیا کے آداب"
     },
     iconName: "Camera",
+    quranAyat: "يَا أَيُّهَا الَّذِينَ آمَنُوا لَا تَدْخُلُوا بُيُوتًا غَيْرَ بُيُوتِكُمْ حَتَّىٰ تَسْتَأْنِسُوا",
     items: [
       { id: "20_1", en: "Ask permission before photographing or filming other participants.", no: "Spør om tillatelse før du fotograferer eller filmer andre deltakere.", ur: "دوسرے شرکاء کی تصویر یا ویڈیو بنانے سے پہلے اجازت لیں۔" },
       { id: "20_2", en: "Do not share group photos on social media without consent of everyone visible.", no: "Ikke del gruppebilder på sosiale medier uten samtykke fra alle som er synlige.", ur: "تصویر میں نظر آنے والے ہر شخص کی اجازت کے بغیر سوشل میڈیا پر گروپ تصاویر شیئر نہ کریں۔" },
@@ -369,6 +390,7 @@ export const covenantData: CovenantSection[] = [
       ur: "صحت اور حفاظت کی تیاری"
     },
     iconName: "ShieldCheck",
+    quranAyat: "وَلَا تُلْقُوا بِأَيْدِيكُمْ إِلَى التَّهْلُكَةِ",
     items: [
       { id: "21_1", en: "Inform the trip leader of any medical conditions, allergies, or dietary restrictions.", no: "Informer turlederen om eventuelle medisinske tilstander, allergier eller diettrestriksjoner.", ur: "سفر کے ذمہ دار کو کسی بھی طبی حالت، الرجی یا غذائی پابندیوں سے آگاہ کریں۔" },
       { id: "21_2", en: "Carry personal medications and a basic first aid kit.", no: "Ha med personlige medisiner og et grunnleggende førstehjelpsskrin.", ur: "ذاتی دوائیں اور ابتدائی طبی امداد کا بنیادی سامان ساتھ رکھیں۔" },

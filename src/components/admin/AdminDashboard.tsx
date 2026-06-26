@@ -81,13 +81,14 @@ export const AdminDashboard: React.FC = () => {
   const [newRuleQuoteEn, setNewRuleQuoteEn] = useState('');
   const [newRuleQuoteNo, setNewRuleQuoteNo] = useState('');
   const [newRuleQuoteUr, setNewRuleQuoteUr] = useState('');
+  const [newRuleQuranAyat, setNewRuleQuranAyat] = useState('');
 
   // Inline editing state for covenant rules
   const [editingField, setEditingField] = useState<{
-    type: 'section_title' | 'section_quote' | 'rule_item';
+    type: 'section_title' | 'section_quote' | 'section_quran_ayat' | 'rule_item';
     sectionDocId: string;
     itemId?: string;
-    lang: 'en' | 'no' | 'ur';
+    lang?: 'en' | 'no' | 'ur';
     value: string;
   } | null>(null);
 
@@ -127,6 +128,9 @@ export const AdminDashboard: React.FC = () => {
       if (newRuleQuoteEn || newRuleQuoteNo || newRuleQuoteUr) {
         sectionData.quote = { en: newRuleQuoteEn, no: newRuleQuoteNo, ur: newRuleQuoteUr };
       }
+      if (newRuleQuranAyat) {
+        sectionData.quranAyat = newRuleQuranAyat.trim();
+      }
       await setDoc(doc(db, 'covenant', `section_${nextId}`), sectionData);
       showSuccess("New rules section added!");
       setNewRuleTitleEn('');
@@ -135,6 +139,7 @@ export const AdminDashboard: React.FC = () => {
       setNewRuleQuoteEn('');
       setNewRuleQuoteNo('');
       setNewRuleQuoteUr('');
+      setNewRuleQuranAyat('');
     } catch (err) {
       console.error(err);
       showError("Failed to add section");
@@ -212,17 +217,20 @@ export const AdminDashboard: React.FC = () => {
 
     try {
       if (type === 'section_title') {
-        const updatedTitle = { ...section.title, [lang]: value.trim() };
+        const updatedTitle = { ...section.title, [lang!]: value.trim() };
         await setDoc(doc(db, 'covenant', sectionDocId), { title: updatedTitle }, { merge: true });
         showSuccess("Section title updated!");
       } else if (type === 'section_quote') {
-        const updatedQuote = { ...(section.quote || { en: '', no: '', ur: '' }), [lang]: value.trim() };
+        const updatedQuote = { ...(section.quote || { en: '', no: '', ur: '' }), [lang!]: value.trim() };
         await setDoc(doc(db, 'covenant', sectionDocId), { quote: updatedQuote }, { merge: true });
         showSuccess("Section quote updated!");
+      } else if (type === 'section_quran_ayat') {
+        await setDoc(doc(db, 'covenant', sectionDocId), { quranAyat: value.trim() }, { merge: true });
+        showSuccess("Section Quranic Verse updated!");
       } else if (type === 'rule_item') {
         const updatedItems = (section.items || []).map((item: any) => {
           if (item.id === itemId) {
-            return { ...item, [lang]: value.trim() };
+            return { ...item, [lang!]: value.trim() };
           }
           return item;
         });
@@ -1429,7 +1437,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Icon Name</label>
                   <select
@@ -1442,37 +1450,46 @@ export const AdminDashboard: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (EN - Optional)</label>
-                    <input
-                      type="text"
-                      value={newRuleQuoteEn}
-                      onChange={(e) => setNewRuleQuoteEn(e.target.value)}
-                      placeholder="Surah / translation"
-                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (NO - Optional)</label>
-                    <input
-                      type="text"
-                      value={newRuleQuoteNo}
-                      onChange={(e) => setNewRuleQuoteNo(e.target.value)}
-                      placeholder="Surah / oversettelse"
-                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (UR - Optional)</label>
-                    <input
-                      type="text"
-                      value={newRuleQuoteUr}
-                      onChange={(e) => setNewRuleQuoteUr(e.target.value)}
-                      placeholder="آیت یا حدیث"
-                      className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (EN - Optional)</label>
+                  <input
+                    type="text"
+                    value={newRuleQuoteEn}
+                    onChange={(e) => setNewRuleQuoteEn(e.target.value)}
+                    placeholder="Surah / translation"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (NO - Optional)</label>
+                  <input
+                    type="text"
+                    value={newRuleQuoteNo}
+                    onChange={(e) => setNewRuleQuoteNo(e.target.value)}
+                    placeholder="Surah / oversettelse"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quote/Ayat (UR - Optional)</label>
+                  <input
+                    type="text"
+                    value={newRuleQuoteUr}
+                    onChange={(e) => setNewRuleQuoteUr(e.target.value)}
+                    placeholder="آیت یا حدیث"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quran Ayat (AR Only)</label>
+                  <input
+                    type="text"
+                    value={newRuleQuranAyat}
+                    onChange={(e) => setNewRuleQuranAyat(e.target.value)}
+                    placeholder="﴿الآية الكريمة﴾"
+                    className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:outline-none text-right font-serif"
+                    dir="rtl"
+                  />
                 </div>
               </div>
 
@@ -1629,6 +1646,7 @@ export const AdminDashboard: React.FC = () => {
                               </span>
                             )}
                           </div>
+                          
                           {/* UR Quote */}
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-xs text-slate-400 shrink-0">Quote (UR):</span>
@@ -1648,9 +1666,37 @@ export const AdminDashboard: React.FC = () => {
                             ) : (
                               <span 
                                 onClick={() => setEditingField({ type: 'section_quote', sectionDocId: section.docId, lang: 'ur', value: section.quote?.ur || '' })} 
-                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 px-1 rounded transition-colors italic block min-w-[100px]"
+                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-755 px-1 rounded transition-colors italic block min-w-[100px]"
                               >
                                 {section.quote?.ur ? `"${section.quote.ur}"` : <span className="text-slate-355 dark:text-slate-500 font-sans text-xs not-italic">(اردو اقتباس شامل کرنے کے لیے کلک کریں)</span>}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Quranic Verse (Arabic Only) */}
+                          <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-700/50 mt-1">
+                            <span className="font-mono text-xs text-slate-400 shrink-0">Quran (AR):</span>
+                            {editingField?.type === 'section_quran_ayat' && editingField.sectionDocId === section.docId ? (
+                              <input
+                                autoFocus
+                                type="text"
+                                value={editingField.value}
+                                onChange={(e) => setEditingField({ ...editingField, value: e.target.value })}
+                                onBlur={() => handleSaveInlineEdit()}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveInlineEdit(editingField);
+                                  if (e.key === 'Escape') setEditingField(null);
+                                }}
+                                className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-xs focus:ring-1 focus:ring-primary-500 outline-none w-full font-serif text-slate-800 dark:text-slate-100 text-right dir-rtl"
+                                dir="rtl"
+                              />
+                            ) : (
+                              <span 
+                                onClick={() => setEditingField({ type: 'section_quran_ayat', sectionDocId: section.docId, value: section.quranAyat || '' })} 
+                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-755 px-1 rounded block min-w-[100px] text-right font-serif dir-rtl font-bold"
+                                dir="rtl"
+                              >
+                                {section.quranAyat ? `﴿ ${section.quranAyat} ﴾` : <span className="text-slate-350 dark:text-slate-500 font-sans text-xs not-italic font-normal">(Click to add Arabic Quranic Verse)</span>}
                               </span>
                             )}
                           </div>
