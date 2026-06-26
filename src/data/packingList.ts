@@ -624,8 +624,128 @@ export const defaultPackingList: PackingItem[] = [
     "store": {
       "en": "Any store",
       "no": "Hvilken som helst butikk",
-      "ur": "کوئی भी دکان"
+      "ur": "کوئی بھی دکان"
     },
     "imageUrl": "https://images.unsplash.com/photo-1526951521990-620dc14c214b?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "f5",
+    "category": "comfort",
+    "name": {
+      "en": "Medjool Dates",
+      "no": "Medjool-dadler",
+      "ur": "میڈجول کھجوریں"
+    },
+    "desc": {
+      "en": "Highly energetic, nutritious, and a Sunnah food. Ideal for immediate energy during long road segments.",
+      "no": "Svært energirike, næringsrike og en Sunnah-mat. Ideell for umiddelbar energi under lange kjøreetapper.",
+      "ur": "انتہائی توانائی بخش، غذائیت سے بھرپور سنت غذا۔ سفر کے دوران فوری توانائی کے لیے بہترین۔"
+    },
+    "store": {
+      "en": "Halal grocers / Immigrant shops / Meny",
+      "no": "Innvandrerbutikker / Meny / Internasjonale butikker",
+      "ur": "حلال اسٹور یا سپر مارکیٹ"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1505252585461-04db1ebb846d?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "f6",
+    "category": "comfort",
+    "name": {
+      "en": "Raw Nuts & Seeds",
+      "no": "Rå nøtter og frø",
+      "ur": "خام گری دار میوے اور بیج"
+    },
+    "desc": {
+      "en": "Almonds, walnuts, and pumpkin seeds. Rich in healthy fats and proteins, keeping you full for hours.",
+      "no": "Mandler, valnøtter og gresskarfrø. Rike på sunt fett og proteiner, holder deg mett i timer.",
+      "ur": "بادام، اخروٹ اور کدو کے بیج۔ صحت مند چربی اور پروٹین سے بھرپور، جو گھنٹوں بھوک نہیں لگنے دیتے۔"
+    },
+    "store": {
+      "en": "Kiwi / Rema 1000 / Europris",
+      "no": "Kiwi / Rema 1000 / Europris",
+      "ur": "کیوی، ریما 1000، یا یوروپریس"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "f7",
+    "category": "comfort",
+    "name": {
+      "en": "Halal Energy Bars",
+      "no": "Halal energibarer",
+      "ur": "حلال انرجی بارز"
+    },
+    "desc": {
+      "en": "High-quality oat or protein bars. Check ingredients to ensure they are halal-compliant (gelatin/alcohol-free).",
+      "no": "Havre- eller proteinbarer av høy kvalitet. Sjekk ingrediensene for å sikre at de er halal (uten gelatin/alkohol).",
+      "ur": "معیاری اوٹ یا پروٹین بارز۔ جیلیٹن اور ممنوعہ اجزاء سے پاک حلال انرجی بارز۔"
+    },
+    "store": {
+      "en": "Apotek 1 / XXL / Health stores",
+      "no": "Apotek 1 / XXL / Helsekostbutikker",
+      "ur": "فارمیسی یا سپورٹس اسٹور"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1604497074176-e557e744043e?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "f8",
+    "category": "comfort",
+    "name": {
+      "en": "Instant Oatmeal Cups",
+      "no": "Porsjonshavregrøt",
+      "ur": "فوری تیار دلیہ (اوٹ میل)"
+    },
+    "desc": {
+      "en": "Quick, nutritious breakfast. Just add hot water from your thermos. Satisfying and easy to prepare anywhere.",
+      "no": "Rask, næringsrik frokost. Bare tilsett varmt vann fra termosen. Enkelt å tilberede overalt.",
+      "ur": "فوری اور غذائیت سے بھرپور ناشتہ۔ بس تھرماس سے گرم پانی شامل کریں۔"
+    },
+    "store": {
+      "en": "Kiwi / Rema 1000 / Coop",
+      "no": "Kiwi / Rema 1000 / Coop",
+      "ur": "کیوی، ریما 1000 یا کوپ"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "f9",
+    "category": "comfort",
+    "name": {
+      "en": "Halal Beef Jerky",
+      "no": "Halal tørket kjøtt",
+      "ur": "حلال بیف جرکی (خشک گوشت)"
+    },
+    "desc": {
+      "en": "Lightweight, savory, high-protein snack. Extremely satisfying during long hikes.",
+      "no": "Lett, salt og proteinrik snack. Svært tilfredsstillende under lange fotturer.",
+      "ur": "ہلکا، نمکین اور پروٹین سے بھرپور اسنیک۔ لمبی ہائیکنگ کے دوران توانائی برقرار رکھنے کے لیے بہترین۔"
+    },
+    "store": {
+      "en": "Halal butchers / Online",
+      "no": "Halal-slaktere / Internasjonale butikker / Online",
+      "ur": "حلال قصاب یا آن لائن"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1608228088998-57828365d486?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "f10",
+    "category": "comfort",
+    "name": {
+      "en": "Honey Sachets / Straws",
+      "no": "Porsjonshonning",
+      "ur": "شہد کے ساشے (پیکٹ)"
+    },
+    "desc": {
+      "en": "Natural quick sweetener and throat healer. Great for physical stamina and immediate energy boost.",
+      "no": "Naturlig raskt søtningsmiddel. Flott for fysisk utholdenhet og rask energipåfyll.",
+      "ur": "قدرتی مٹھاس اور فوری توانائی کا ذریعہ۔ حلق کی خشکی دور کرنے اور جسمانی طاقت کے لیے لاجواب۔"
+    },
+    "store": {
+      "en": "Any supermarket / Health store",
+      "no": "Dagligvarebutikker / Helsekost",
+      "ur": "سپر مارکیٹ یا ہیلتھ اسٹور"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80"
   }
 ];
