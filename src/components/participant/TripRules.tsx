@@ -46,45 +46,53 @@ export const TripRules: React.FC = () => {
 
   const [rules, setRules] = useState<CovenantSection[]>([]);
 
-  // Fetch rules from Firestore
+  // Fetch rules from Firestore and handle seeding/syncing
   useEffect(() => {
-    const q = query(collection(db, 'covenant'), orderBy('id', 'asc'));
-    const unsub = onSnapshot(q, async (snap) => {
-      if (snap.empty) {
-        console.log("Seeding covenant rules in Firestore...");
-        try {
+    // 1. One-time check and sync to avoid infinite write/snapshot feedback loops
+    const checkAndSync = async () => {
+      try {
+        const querySnapshot = await getDocs(query(collection(db, 'covenant')));
+        if (querySnapshot.empty) {
+          console.log("Seeding covenant rules in Firestore...");
           for (const section of covenantData) {
             await setDoc(doc(db, 'covenant', `section_${section.id}`), section);
           }
-        } catch (err) {
-          console.error("Error seeding covenant rules:", err);
-        }
-      } else {
-        const list: CovenantSection[] = [];
-        let needsSync = false;
-        snap.forEach(docSnap => {
-          const data = docSnap.data() as CovenantSection;
-          list.push(data);
-          // If a section is in covenantData and has a quranAyat, but the database version doesn't, we need to sync!
-          const defaultSec = covenantData.find(s => s.id === data.id);
-          if (defaultSec && defaultSec.quranAyat && !data.quranAyat) {
-            needsSync = true;
-          }
-        });
+        } else {
+          let needsSync = false;
+          querySnapshot.forEach(docSnap => {
+            const data = docSnap.data() as CovenantSection;
+            const defaultSec = covenantData.find(s => s.id === data.id);
+            if (defaultSec && defaultSec.quranAyat && !data.quranAyat) {
+              needsSync = true;
+            }
+          });
 
-        if (needsSync) {
-          console.log("Syncing covenant rules with new Quranic Ayats...");
-          try {
+          if (needsSync) {
+            console.log("Syncing covenant rules with new Quranic Ayats...");
             for (const section of covenantData) {
               await setDoc(doc(db, 'covenant', `section_${section.id}`), section, { merge: true });
             }
-          } catch (err) {
-            console.error("Error syncing covenant rules:", err);
           }
         }
+      } catch (err) {
+        console.error("Error during rules check/sync:", err);
+      }
+    };
+
+    checkAndSync();
+
+    // 2. Real-time read-only listener to track admin edits
+    const q = query(collection(db, 'covenant'), orderBy('id', 'asc'));
+    const unsub = onSnapshot(q, (snap) => {
+      if (!snap.empty) {
+        const list: CovenantSection[] = [];
+        snap.forEach(docSnap => {
+          list.push(docSnap.data() as CovenantSection);
+        });
         setRules(list);
       }
     });
+
     return () => unsub();
   }, []);
 
