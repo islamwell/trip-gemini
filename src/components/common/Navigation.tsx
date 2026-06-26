@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Home, ScrollText, MessageSquare, Map, CheckSquare } from 'lucide-react';
+import { Home, ScrollText, MessageSquare, Map, CheckSquare, Wallet } from 'lucide-react';
 
 export const Navigation: React.FC = () => {
   const { t } = useLanguage();
@@ -11,7 +11,7 @@ export const Navigation: React.FC = () => {
     { to: '/rules', icon: ScrollText, label: t('nav.rules') },
     { to: '/itinerary', icon: Map, label: t('nav.itinerary') || 'Itinerary' },
     { to: '/checklist', icon: CheckSquare, label: t('nav.checklist') || 'Checklist' },
-
+    { to: '/finances', icon: Wallet, label: t('nav.finances') || 'Finances' },
     { to: '/complaints', icon: MessageSquare, label: t('nav.complaints') },
   ];
 

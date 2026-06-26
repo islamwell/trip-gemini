@@ -21,28 +21,25 @@ export const Checklist: React.FC = () => {
   useEffect(() => {
     const checkAndSync = async () => {
       try {
-        const querySnapshot = await getDocs(query(collection(db, 'packing_list')));
-        if (querySnapshot.empty) {
-          console.log("Seeding packing list items in Firestore...");
-          for (const item of defaultPackingList) {
-            await setDoc(doc(db, 'packing_list', item.id), item);
-          }
-        } else {
-          let needsSync = false;
-          querySnapshot.forEach(docSnap => {
-            const data = docSnap.data() as PackingItem;
-            const defaultItem = defaultPackingList.find(i => i.id === data.id);
-            if (defaultItem && defaultItem.imageUrl && !data.imageUrl) {
-              needsSync = true;
-            }
-          });
+        const querySnapshot = await getDocs(collection(db, 'packing_list'));
+        const existingDocs: Record<string, any> = {};
+        querySnapshot.forEach(docSnap => {
+          existingDocs[docSnap.id] = docSnap.data();
+        });
 
-          if (needsSync) {
-            console.log("Syncing packing list items with new image URLs...");
-            for (const item of defaultPackingList) {
-              await setDoc(doc(db, 'packing_list', item.id), item, { merge: true });
-            }
+        let writePromises = [];
+        for (const item of defaultPackingList) {
+          const existing = existingDocs[item.id];
+          // If completely missing, or if local default has an image but Firestore has empty/missing image URL
+          if (!existing || (item.imageUrl && (!existing.imageUrl || existing.imageUrl !== item.imageUrl))) {
+            console.log(`Syncing packing list item ${item.id} to Firestore...`);
+            writePromises.push(setDoc(doc(db, 'packing_list', item.id), item, { merge: true }));
           }
+        }
+
+        if (writePromises.length > 0) {
+          await Promise.all(writePromises);
+          console.log("Successfully synced packing list items.");
         }
       } catch (err) {
         console.error("Error during packing list check/sync:", err);
@@ -51,13 +48,12 @@ export const Checklist: React.FC = () => {
 
     checkAndSync();
 
-    // Real-time listener to track updates
     const q = query(collection(db, 'packing_list'));
     const unsub = onSnapshot(q, (snap) => {
       if (!snap.empty) {
         const list: PackingItem[] = [];
         snap.forEach(docSnap => {
-          list.push({ ...docSnap.data() } as PackingItem);
+          list.push({ ...docSnap.data(), id: docSnap.id } as PackingItem);
         });
         setChecklistItems(list);
       }

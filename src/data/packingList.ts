@@ -329,6 +329,86 @@ export const defaultPackingList: PackingItem[] = [
     "imageUrl": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80"
   },
   {
+    "id": "c8",
+    "category": "clothing",
+    "name": {
+      "en": "Sun Hat / Cap",
+      "no": "Solhatt / Skyggelue",
+      "ur": "دھوپ کی ٹوپی / کیپ"
+    },
+    "desc": {
+      "en": "Protects face and eyes from direct sunlight during hikes or outdoor stops. Lightweight and packable.",
+      "no": "Beskytter ansikt og øyne mot direkte sollys under turer. Lett og enkel å pakke.",
+      "ur": "ہائیکنگ اور باہر گھومنے کے دوران چہرے اور آنکھوں کو دھوپ سے بچانے کے لیے ہلکی ٹوپی۔"
+    },
+    "store": {
+      "en": "XXL Sport / H&M / Sport 1",
+      "no": "XXL Sport / H&M / Sport 1",
+      "ur": "ایکس ایکس ایل اسپورٹس / ایچ اینڈ ایم / اسپورٹ 1"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "c9",
+    "category": "clothing",
+    "name": {
+      "en": "Swimwear",
+      "no": "Badetøy",
+      "ur": "تیرکی کا لباس (سوئم ویئر)"
+    },
+    "desc": {
+      "en": "Required if you plan to swim in local indoor pools, spas, hot tubs, or brave the cold fjords.",
+      "no": "Påkrevd hvis du planlegger å svømme i lokale bassenger, spa, badestamper eller de kalde fjordene.",
+      "ur": "ہوٹل کے تالاب، سپا، گرم غسل یا فیورڈز میں نہانے کے لیے ضروری تیرکی کا لباس۔"
+    },
+    "store": {
+      "en": "H&M / Lindex / Sportsbutikker",
+      "no": "H&M / Lindex / Sportsbutikker",
+      "ur": "ایچ اینڈ ایم / لنڈیکس / اسپورٹس کی دکانیں"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1501901609772-df0848060b33?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "c10",
+    "category": "clothing",
+    "name": {
+      "en": "Microfibre Towel",
+      "no": "Mikrofiberhåndkle",
+      "ur": "مائیکرو فائبر تولیہ"
+    },
+    "desc": {
+      "en": "Lightweight, highly absorbent, and quick-drying. Ideal for outdoor wudu, rain wipes, or spontaneous swims.",
+      "no": "Lett, svært absorberende og tørker raskt. Ideell for utendørs wudu eller uventet bading.",
+      "ur": "ہلکا، پانی کو جلدی جذب کرنے والا اور تیزی سے خشک ہونے والا تولیہ۔ وضو کرنے یا نہانے کے بعد استعمال کے لیے بہترین۔"
+    },
+    "store": {
+      "en": "XXL Sport / Clas Ohlson / Jula",
+      "no": "XXL Sport / Clas Ohlson / Jula",
+      "ur": "ایکس ایکس ایل اسپورٹس / کلاس اوہلسن / جولا"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "c11",
+    "category": "clothing",
+    "name": {
+      "en": "Rain Umbrella",
+      "no": "Paraply",
+      "ur": "بارش کی چھتری"
+    },
+    "desc": {
+      "en": "A compact wind-resistant travel umbrella. Very useful for brief city tours and walks to/from the minibus when raining.",
+      "no": "En kompakt og vindavvisende reiseparaply. Svært nyttig for korte byturer og raske turer til og fra bussen.",
+      "ur": "ہوا کے دباؤ کو برداشت کرنے والی چھوٹی سفری چھتری۔ بارش کے دوران بس سے نکلنے یا مختصر سیر کے لیے مددگار۔"
+    },
+    "store": {
+      "en": "Nille / Clas Ohlson / Normal",
+      "no": "Nille / Clas Ohlson / Normal",
+      "ur": "نلے / کلاس اوہلسن / نارمل"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1522441815192-d9f04eb0615c?auto=format&fit=crop&w=600&q=80"
+  },
+  {
     "id": "s4",
     "category": "spiritual",
     "name": {

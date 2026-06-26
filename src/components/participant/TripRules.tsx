@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -51,28 +51,26 @@ export const TripRules: React.FC = () => {
     // 1. One-time check and sync to avoid infinite write/snapshot feedback loops
     const checkAndSync = async () => {
       try {
-        const querySnapshot = await getDocs(query(collection(db, 'covenant')));
-        if (querySnapshot.empty) {
-          console.log("Seeding covenant rules in Firestore...");
-          for (const section of covenantData) {
-            await setDoc(doc(db, 'covenant', `section_${section.id}`), section);
-          }
-        } else {
-          let needsSync = false;
-          querySnapshot.forEach(docSnap => {
-            const data = docSnap.data() as CovenantSection;
-            const defaultSec = covenantData.find(s => s.id === data.id);
-            if (defaultSec && defaultSec.quranAyat && !data.quranAyat) {
-              needsSync = true;
-            }
-          });
+        const querySnapshot = await getDocs(collection(db, 'covenant'));
+        const existingDocs: Record<string, any> = {};
+        querySnapshot.forEach(docSnap => {
+          existingDocs[docSnap.id] = docSnap.data();
+        });
 
-          if (needsSync) {
-            console.log("Syncing covenant rules with new Quranic Ayats...");
-            for (const section of covenantData) {
-              await setDoc(doc(db, 'covenant', `section_${section.id}`), section, { merge: true });
-            }
+        let writePromises = [];
+        for (const section of covenantData) {
+          const docId = `section_${section.id}`;
+          const existing = existingDocs[docId];
+          // If completely missing, or if local default has a quranAyat but Firestore has empty/missing quranAyat
+          if (!existing || (section.quranAyat && (!existing.quranAyat || existing.quranAyat !== section.quranAyat))) {
+            console.log(`Syncing covenant section ${section.id} to Firestore...`);
+            writePromises.push(setDoc(doc(db, 'covenant', docId), section, { merge: true }));
           }
+        }
+
+        if (writePromises.length > 0) {
+          await Promise.all(writePromises);
+          console.log("Successfully synced covenant sections.");
         }
       } catch (err) {
         console.error("Error during rules check/sync:", err);
@@ -87,7 +85,9 @@ export const TripRules: React.FC = () => {
       if (!snap.empty) {
         const list: CovenantSection[] = [];
         snap.forEach(docSnap => {
-          list.push(docSnap.data() as CovenantSection);
+          const data = docSnap.data() as CovenantSection;
+          const docNumId = Number(docSnap.id.replace('section_', ''));
+          list.push({ ...data, id: data.id || docNumId } as CovenantSection);
         });
         setRules(list);
       }
@@ -97,40 +97,42 @@ export const TripRules: React.FC = () => {
   }, []);
 
   // Calculate checklists progress
-  const allItems = rules.flatMap(section => section.items || []);
+  const allItems = useMemo(() => rules.flatMap(section => section.items || []), [rules]);
   const totalItemsCount = allItems.length;
   const checkedCount = allItems.filter(item => checkedItems[item.id]).length;
   const allChecked = checkedCount === totalItemsCount && totalItemsCount > 0;
   const progressPercent = totalItemsCount > 0 ? Math.round((checkedCount / totalItemsCount) * 100) : 0;
 
+  // Auto-agree and check items if rules were signed
   useEffect(() => {
-    if (hasSignedRules && rules.length > 0) {
+    if (hasSignedRules && rules.length > 0 && !agreed) {
       setAgreed(true);
-      // Auto-check all items if they already signed
       const autoChecked: Record<string, boolean> = {};
       allItems.forEach(item => {
         autoChecked[item.id] = true;
       });
       setCheckedItems(autoChecked);
-
-      // Fetch signature data to display
-      if (user) {
-        const fetchSignature = async () => {
-          try {
-            const sigRef = collection(db, 'signatures');
-            const q = query(sigRef, where('participantId', '==', user.uid), limit(1));
-            const snap = await getDocs(q);
-            if (!snap.empty) {
-              setSignatureData(snap.docs[0].data());
-            }
-          } catch (err) {
-            console.error("Failed to fetch signature", err);
-          }
-        };
-        fetchSignature();
-      }
     }
-  }, [hasSignedRules, user, rules]);
+  }, [hasSignedRules, rules, allItems, agreed]);
+
+  // Fetch signature data for signed users
+  useEffect(() => {
+    if (hasSignedRules && user && !signatureData) {
+      const fetchSignature = async () => {
+        try {
+          const sigRef = collection(db, 'signatures');
+          const q = query(sigRef, where('participantId', '==', user.uid), limit(1));
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            setSignatureData(snap.docs[0].data());
+          }
+        } catch (err) {
+          console.error("Failed to fetch signature", err);
+        }
+      };
+      fetchSignature();
+    }
+  }, [hasSignedRules, user, signatureData]);
 
   const toggleItem = (itemId: string) => {
     if (hasSignedRules) return; // Disallow toggle after signing
@@ -183,6 +185,7 @@ export const TripRules: React.FC = () => {
 
       // Update participant's document as single source of truth
       await setDoc(doc(db, 'participants', user.uid), {
+        name: signatureName.trim(),
         hasSignedRules: true
       }, { merge: true });
 
