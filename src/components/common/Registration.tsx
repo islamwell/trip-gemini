@@ -233,6 +233,7 @@ export const Registration: React.FC = () => {
   const [email, setEmail] = useState('');
   const [passcode, setPasscode] = useState('');
   const [duty, setDuty] = useState('None - but I will make Dua');
+  const [favoriteFoods, setFavoriteFoods] = useState('');
   const [smsCode, setSmsCode] = useState('');
   
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -276,6 +277,7 @@ export const Registration: React.FC = () => {
         name: `${salutation} ${firstName} ${lastName}`.trim(),
         phone,
         duty,
+        favoriteFoods,
       });
     } catch (err: any) {
       setMessage(err.message || t('registration.failed', 'Registration failed'));
@@ -415,6 +417,11 @@ export const Registration: React.FC = () => {
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.email', 'Email (Opt)')}</label>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder="you@mail.com" />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.favoriteFoods', '3 Favorite Foods/Snacks')}</label>
+                <input type="text" value={favoriteFoods} onChange={(e) => setFavoriteFoods(e.target.value)} className={`${inputClass} px-3 py-2.5`} placeholder={t('registration.favoriteFoodsPlaceholder', 'e.g., Dates, Chips, Apples')} />
               </div>
 
               <div>

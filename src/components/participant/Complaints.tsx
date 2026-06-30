@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { db } from '../../services/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, onSnapshot } from 'firebase/firestore';
 import { MessageSquare, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
@@ -17,6 +17,22 @@ export const Complaints: React.FC = () => {
   const [error, setError] = useState('');
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch } = useForm<ComplaintForm>();
+  const [myComplaints, setMyComplaints] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, 'complaints'), where('participantId', '==', user.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let complaintsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      complaintsData.sort((a: any, b: any) => {
+        const timeA = a.timestamp?.toMillis ? a.timestamp.toMillis() : 0;
+        const timeB = b.timestamp?.toMillis ? b.timestamp.toMillis() : 0;
+        return timeB - timeA;
+      });
+      setMyComplaints(complaintsData);
+    });
+    return () => unsubscribe();
+  }, [user]);
 
   const textValue = watch('text', '');
 
@@ -130,6 +146,36 @@ export const Complaints: React.FC = () => {
                 </button>
               </div>
             </form>
+          )}
+
+          {/* User's Past Complaints */}
+          {myComplaints.length > 0 && (
+            <div className="mt-8 border-t border-card-border pt-6 space-y-4">
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-200">{t('complaints.myComplaints', 'My Past Complaints')}</h3>
+              <div className="space-y-4">
+                {myComplaints.map(c => {
+                  const isResolved = c.status === 'resolved';
+                  return (
+                    <div key={c.id} className={`p-4 rounded-xl border ${isResolved ? 'border-success/30 bg-success/5' : 'border-card-border bg-slate-50 dark:bg-slate-800/50'}`}>
+                      <div className="flex justify-between items-start gap-4 mb-2">
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${isResolved ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                          {isResolved ? t('complaints.statusResolved', 'Resolved') : t('complaints.statusPending', 'Pending Review')}
+                        </span>
+                        {c.timestamp && <span className="text-xs text-slate-400">{c.timestamp.toDate ? c.timestamp.toDate().toLocaleString() : new Date(c.timestamp).toLocaleString()}</span>}
+                      </div>
+                      <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{c.text}</p>
+                      
+                      {isResolved && c.adminReply && (
+                        <div className="mt-3 bg-white/60 dark:bg-slate-900/40 p-3 rounded-lg border border-card-border">
+                          <span className="text-xs font-bold text-primary-600 dark:text-primary-400 block mb-1">{t('complaints.adminReply', 'Reply from Admin:')}</span>
+                          <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{c.adminReply}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
 
         </div>

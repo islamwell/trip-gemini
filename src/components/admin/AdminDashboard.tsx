@@ -14,6 +14,8 @@ interface ParticipantProfile {
   role: string;
   hasSignedRules?: boolean;
   duty?: string;
+  createdAt?: any;
+  favoriteFoods?: string;
 }
 
 interface Signature {
@@ -32,6 +34,7 @@ interface Complaint {
   text: string;
   timestamp: any;
   status: 'unresolved' | 'resolved';
+  adminReply?: string;
 }
 
 interface Payment {
@@ -61,6 +64,7 @@ export const AdminDashboard: React.FC = () => {
   const [participants, setParticipants] = useState<ParticipantProfile[]>([]);
   const [signatures, setSignatures] = useState<Signature[]>([]);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [complaintReplies, setComplaintReplies] = useState<Record<string, string>>({});
   const [payments, setPayments] = useState<Payment[]>([]);
   const [itinerary, setItinerary] = useState<Record<string, any[]>>({});
 
@@ -592,9 +596,13 @@ export const AdminDashboard: React.FC = () => {
   // Resolve complaint
   const handleResolveComplaint = async (cId: string, currentStatus: string) => {
     try {
-      await setDoc(doc(db, 'complaints', cId), {
+      const payload: any = {
         status: currentStatus === 'resolved' ? 'unresolved' : 'resolved'
-      }, { merge: true });
+      };
+      if (currentStatus !== 'resolved' && complaintReplies[cId]) {
+        payload.adminReply = complaintReplies[cId];
+      }
+      await setDoc(doc(db, 'complaints', cId), payload, { merge: true });
     } catch (err) {
       console.error("Failed to update complaint status:", err);
     }
@@ -821,6 +829,21 @@ export const AdminDashboard: React.FC = () => {
       <div className="glass rounded-3xl p-6 border border-card-border">
         {activeTab === 'users' && (
           <div className="space-y-4">
+            {/* Summary of Favorite Foods */}
+            <div className="bg-primary-50 dark:bg-primary-950/20 border border-primary-100 dark:border-primary-900/50 p-4 rounded-2xl mb-6">
+              <h3 className="font-bold text-sm text-primary-800 dark:text-primary-300">Favorite Foods Summary</h3>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {participants.filter(p => p.favoriteFoods).map(p => (
+                  <span key={p.id} className="bg-white dark:bg-slate-800 border border-card-border px-2.5 py-1 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {p.name}: <span className="font-semibold text-primary-600 dark:text-primary-400">{p.favoriteFoods}</span>
+                  </span>
+                ))}
+                {participants.filter(p => p.favoriteFoods).length === 0 && (
+                  <span className="text-xs text-slate-500 italic">No favorite foods recorded yet.</span>
+                )}
+              </div>
+            </div>
+
             {/* Mobile View: Cards */}
             <div className="block md:hidden space-y-4">
               {participants.map((p) => {
@@ -838,6 +861,16 @@ export const AdminDashboard: React.FC = () => {
                       </button>
                     </div>
                     <div className="text-slate-500 font-mono break-all">{p.email}</div>
+                    {p.favoriteFoods && (
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-400">Favorite Foods</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300">{p.favoriteFoods}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-slate-400">Registered At</span>
+                      <span className="text-slate-600 dark:text-slate-400">{p.createdAt ? (p.createdAt.toDate ? p.createdAt.toDate().toLocaleString() : new Date(p.createdAt).toLocaleString()) : 'N/A'}</span>
+                    </div>
                     <div className="flex justify-between items-center pt-2 border-t border-card-border/50">
                       <span className="text-slate-400 font-semibold">Rules Status</span>
                       {sig ? (
@@ -871,8 +904,9 @@ export const AdminDashboard: React.FC = () => {
             <table className="hidden md:table w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-card-border text-slate-400 text-sm uppercase font-semibold">
-                  <th className="py-3 px-4">Name</th>
+                  <th className="py-3 px-4">Name & Fav Foods</th>
                   <th className="py-3 px-4">Email</th>
+                  <th className="py-3 px-4">Registered</th>
                   <th className="py-3 px-4">Rule Signing Status</th>
                   <th className="py-3 px-4">Signing IP Address</th>
                   <th className="py-3 px-4">Timestamp</th>
@@ -884,8 +918,14 @@ export const AdminDashboard: React.FC = () => {
                   const sig = signatures.find(s => s.participantId === p.id);
                   return (
                     <tr key={p.id} className="border-b border-card-border hover:bg-slate-50/50 dark:hover:bg-slate-900/20 text-slate-700 dark:text-slate-300">
-                      <td className="py-4 px-4 font-bold">{p.name}</td>
+                      <td className="py-4 px-4 font-bold">
+                        {p.name}
+                        {p.favoriteFoods && <div className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-1">Foods: {p.favoriteFoods}</div>}
+                      </td>
                       <td className="py-4 px-4 font-mono text-sm">{p.email}</td>
+                      <td className="py-4 px-4 text-xs text-slate-500">
+                        {p.createdAt ? (p.createdAt.toDate ? p.createdAt.toDate().toLocaleString() : new Date(p.createdAt).toLocaleString()) : 'N/A'}
+                      </td>
                       <td className="py-4 px-4">
                         {sig ? (
                           <span className="inline-flex items-center gap-1 bg-success/10 text-success text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -1229,9 +1269,28 @@ export const AdminDashboard: React.FC = () => {
                     isResolved ? 'border-success/20 bg-success/5 opacity-60' : 'border-card-border bg-slate-50/50 dark:bg-slate-900/10'
                   }`}>
                     <div className="flex justify-between items-start gap-4">
-                      <div>
+                      <div className="flex-1">
                         <span className="text-xs font-semibold text-slate-400 block">Submitted by: {c.participantName}</span>
                         <p className="mt-2 text-slate-700 dark:text-slate-300 font-medium whitespace-pre-wrap">{c.text}</p>
+                        
+                        {!isResolved ? (
+                          <div className="mt-4">
+                            <textarea
+                              placeholder="Write a reply to the user (optional)..."
+                              value={complaintReplies[c.id] || ''}
+                              onChange={(e) => setComplaintReplies(prev => ({ ...prev, [c.id]: e.target.value }))}
+                              className="w-full bg-white dark:bg-slate-800 border border-card-border px-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none"
+                              rows={2}
+                            />
+                          </div>
+                        ) : (
+                          c.adminReply && (
+                            <div className="mt-4 bg-white/50 dark:bg-slate-800/50 p-3 rounded-xl border border-card-border">
+                              <span className="text-xs font-bold text-primary-600 dark:text-primary-400 block mb-1">Admin Reply:</span>
+                              <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{c.adminReply}</p>
+                            </div>
+                          )
+                        )}
                       </div>
                       <button
                         onClick={() => handleResolveComplaint(c.id, c.status)}
