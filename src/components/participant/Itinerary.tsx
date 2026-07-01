@@ -103,56 +103,43 @@ function calculateTravelPrayers(locKey: string, dayOffset: number) {
 
 export const defaultItinerary: Record<string, any[]> = {
   thursday: [
-    { type: 'prayer', time: '{fajr}', label: '1. Fajr Prayer (Dawn)', desc: 'Fajr in Oslo (calculated at 1 hour before sunrise). Prayed individually before departure.', iconName: 'Sunrise' },
-    { type: 'location', time: '15:00', label: 'Departure from Nurulquran', desc: 'Meet up at Jerikoveien 26, 1067 Oslo. Board the 17-seater Sprinter minibus. Ensure all gear is loaded.', iconName: 'MapPin', image: '/images/nurulquran.jpg', stopKey: 'oslo' },
-    { type: 'break', time: '15:50', label: 'Rest Stop (9 mins)', desc: 'Short bathroom and stretch break after 50 minutes of driving.', iconName: 'Coffee' },
-    { type: 'location', time: '16:50', label: 'Scenic Stop: Flå (Hallingdal)', desc: 'Gateway to the Hallingdal valley. Sights: The Bear Park. Driving break and leg stretch.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Flaa_Kommune_Verwaltung.jpg/960px-Flaa_Kommune_Verwaltung.jpg', stopKey: 'fla' },
-    { type: 'location', time: '17:00', label: 'Stop: Hallingdal Islamic Center (Gol Mosque)', desc: 'Located at Furuvegen 5, 3550 Gol. We stop at the mosque for prayers and wudu.', iconName: 'MapPin', image: '/images/gol_mosque.jpg', stopKey: 'gol' },
-    { type: 'prayer', time: '17:15', label: '2 & 3. Combined Zuhr & Asr (Jam\' Qasr)', desc: 'Combined afternoon prayers prayed in Gol Mosque. Shortened to 2 Raka\'at each.', iconName: 'Sun' },
-    { type: 'break', time: '18:15', label: 'Rest Stop (9 mins)', desc: 'Short bathroom and stretch break.', iconName: 'Coffee' },
-    { type: 'location', time: '20:30', label: 'Arrival in Geilo (Mountain Cabins)', desc: 'Check into the cabins. Address: Gamlevegen 32, 3580 Geilo, Norway. Geilo is a prominent mountain resort town.', iconName: 'MapPin', image: '/images/geilo_cabins.jpg', stopKey: 'geilo' },
-    { type: 'prayer', time: '{sunset}', label: '4 & 5. Combined Maghrib & Isha (Jam\' Qasr)', desc: 'Combined night prayers prayed at the cabin. Calculated exactly at sunset.', iconName: 'Sunset' },
+    { type: 'prayer', time: '{fajr}', label: 'Fajr Prayer (Dawn)', desc: 'Fajr in Oslo (calculated at 1 hour before sunrise). Prayed individually before departure.', iconName: 'Sunrise' },
+    { type: 'location', time: '10:30', label: 'Meet up: NurulQuran', desc: 'Meet up at NurulQuran, Lindeberg, Oslo. Ensure all gear is loaded.', iconName: 'MapPin', image: '/images/nurulquran.jpg', stopKey: 'oslo' },
+    { type: 'location', time: '11:00', label: 'Drive out (Stop every 1 hour)', desc: 'Breakfast: Paratha + omelett (may change). Board the minibus and depart Oslo.', iconName: 'MapPin', stopKey: 'oslo' },
+    { type: 'break', time: '12:00', label: 'Baneveien 16 (Strawberry pluck)', desc: '1 hour stop for strawberry plucking.', iconName: 'Coffee' },
+    { type: 'location', time: '13:00', label: 'Towards Geilo', desc: 'Drive towards Geilo (approx 3h 14m).', iconName: 'MapPin' },
+    { type: 'prayer', time: '14:00', label: '1st stop = Prayer break + Lunch (2h)', desc: 'Combined Zuhr & Asr prayers. Lunch: Barbeque (may change).', iconName: 'Sun' },
+    { type: 'location', time: '16:00', label: 'Towards Uvdal', desc: 'Drive towards Uvdal (route may change).', iconName: 'MapPin', stopKey: 'oslo' },
+    { type: 'break', time: '17:00', label: 'Break (15 min)', desc: 'Short bathroom and stretch break.', iconName: 'Coffee' },
+    { type: 'location', time: '17:30', label: 'Drive out towards Geilo hytta', desc: 'Final leg of the drive (1h).', iconName: 'MapPin' },
+    { type: 'location', time: '18:30', label: 'Geilo Hytta - Check inn (KIWI)', desc: 'Arrive at Geilo cabins and check in. Dinner: Geilo - daal chawal (Taimoor + Hifza - may change).', iconName: 'MapPin', image: '/images/geilo_cabins.jpg', stopKey: 'geilo' },
+    { type: 'prayer', time: '{sunset}', label: 'Combined Maghrib & Isha', desc: 'Night prayers combined at the cabin. Calculated exactly at sunset.', iconName: 'Sunset' },
   ],
   friday: [
-    { type: 'prayer', time: '{fajr}', label: '1. Fajr Prayer (Dawn)', desc: 'Fajr in Geilo (1 hour before sunrise). Prayed in congregation.', iconName: 'Sunrise' },
-    { type: 'location', time: '09:00', label: 'Depart Geilo towards Stryn', desc: 'Driving north on Rv7/Rv52 through the dramatic Hemsedal mountain pass.', iconName: 'MapPin', image: '/images/geilo_cabins.jpg', stopKey: 'geilo' },
-    { type: 'break', time: '09:50', label: 'Rest Stop (9 mins)', desc: 'Short bathroom and stretch break after 50 mins driving.', iconName: 'Coffee' },
-    { type: 'location', time: '10:50', label: 'Scenic Stop: Borgund Stave Church (Lærdal)', desc: 'Built around 1180 AD. Sights: The most authentic and best-preserved of Norway\'s remaining stave churches.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Borgund_Stave_Church_in_L%C3%A6rdalen%2C_2013_June.jpg/960px-Borgund_Stave_Church_in_L%C3%A6rdalen%2C_2013_June.jpg', stopKey: 'laerdal' },
-    { type: 'location', time: '12:25', label: 'Drive: Lærdal Tunnel & Rest', desc: 'The world\'s longest road tunnel (24.5 km). Sights: Glowing blue/yellow caverns. We will stop for 9 minutes inside one of the caverns.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/L%C3%A6rdalstunnelen_Norway.JPG/960px-L%C3%A6rdalstunnelen_Norway.JPG', stopKey: 'laerdal' },
-    { type: 'break', time: '13:30', label: 'Ferry Crossing: Fodnes to Mannheller', desc: 'A scenic 15-minute crossing of the Sognefjord, Norway\'s deepest and longest fjord.', iconName: 'Coffee', image: 'https://upload.wikimedia.org/wikipedia/commons/4/47/Sognefjord%2C_Norway.jpg' },
-    { type: 'location', time: '14:40', label: 'Scenic Stop: Bøyabreen Glacier & Lunch', desc: 'Sights: Bøyabreen, a spectacular active branch of the Jostedalsbreen Ice Cap.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/B%C3%B8yabreen_1993.jpg/960px-B%C3%B8yabreen_1993.jpg', stopKey: 'boyabreen' },
-    { type: 'prayer', time: '15:00', label: '2 & 3. Combined Zuhr & Asr (Jam\' Qasr)', desc: 'Afternoon prayers combined at the Bøyabreen glacier viewing area.', iconName: 'Sun' },
-    { type: 'break', time: '16:30', label: 'Rest Stop (9 mins)', desc: 'Bathroom break before the final stretch.', iconName: 'Coffee' },
-    { type: 'location', time: '17:30', label: 'Arrival in Stryn & Check-in', desc: 'Arrive at the accommodation. Stryn is known for glaciers and majestic fjords.', iconName: 'MapPin', image: '/images/stryn_fjord.jpg', stopKey: 'stryn' },
-    { type: 'prayer', time: '{sunset}', label: '4 & 5. Combined Maghrib & Isha (Jam\' Qasr)', desc: 'Night prayers combined at the Stryn lodge at sunset.', iconName: 'Sunset' },
+    { type: 'prayer', time: '{fajr}', label: 'Fajr Prayer (Dawn)', desc: 'Fajr in Geilo (1 hour before sunrise). Prayed in congregation.', iconName: 'Sunrise' },
+    { type: 'location', time: '10:00', label: 'Check out Geilo', desc: 'Breakfast: Hotel breakfast (may change). Check out and prepare to depart.', iconName: 'MapPin', image: '/images/geilo_cabins.jpg', stopKey: 'geilo' },
+    { type: 'location', time: '13:00', label: '1st stop: Towards Geiranger', desc: 'Stop every 1 hour.', iconName: 'Coffee' },
+    { type: 'prayer', time: '14:00', label: 'Jummah stop (Stonndalen - Sogndal Moskee)', desc: 'Jummah prayers at Sogndal Mosque. Lunch: Pizza (asmat jee - may change). Fodnes Ferjekai ferry crossing (1h + 30 min wait/travel - may change).', iconName: 'Sun', stopKey: 'laerdal' },
+    { type: 'location', time: '20:00', label: 'Reach Stryn Hotel', desc: 'Arrive at the accommodation in Stryn. Dinner: Haleem + Roti (may change).', iconName: 'MapPin', image: '/images/stryn_fjord.jpg', stopKey: 'stryn' },
+    { type: 'prayer', time: '{sunset}', label: 'Combined Maghrib & Isha', desc: 'Night prayers combined at the Stryn lodge at sunset.', iconName: 'Sunset' },
   ],
   saturday: [
-    { type: 'prayer', time: '{fajr}', label: '1. Fajr Prayer (Dawn)', desc: 'Fajr in Stryn (1 hour before sunrise). Prayed in congregation before departure.', iconName: 'Sunrise' },
-    { type: 'location', time: '08:30', label: 'Depart Stryn towards Geiranger', desc: 'Driving north via Rv15 and Rv60 toward Stranda.', iconName: 'MapPin', image: '/images/stryn_fjord.jpg', stopKey: 'stryn' },
-    { type: 'break', time: '09:20', label: 'Rest Stop (9 mins)', desc: 'Short bathroom and stretch break.', iconName: 'Coffee' },
-    { type: 'location', time: '10:10', label: 'Ferry Crossing: Stranda to Liabygda', desc: 'Short car ferry across the Storfjorden.', iconName: 'Coffee', image: '/images/stryn_fjord.jpg' },
-    { type: 'location', time: '11:20', label: 'Scenic Stop: Gudbrandsjuvet (Valldal)', desc: 'Sights: A spectacular mountain ravine where the Valldøla river rages through.', iconName: 'MapPin', image: '/images/gudbrandsjuvet.jpg', stopKey: 'valldal' },
-    { type: 'break', time: '12:55', label: 'Rest Stop (9 mins)', desc: 'Quick rest stop.', iconName: 'Coffee' },
-    { type: 'location', time: '13:50', label: 'Scenic Stop: Trollstigen (Troll\'s Ladder) Pass', desc: 'Sights: Norway\'s most famous tourist road, 11 hairpin turns.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/DSC07845-Panorama.jpg/960px-DSC07845-Panorama.jpg', stopKey: 'trollstigen' },
-    { type: 'prayer', time: '14:20', label: '2 & 3. Combined Zuhr & Asr (Jam\' Qasr)', desc: 'Afternoon prayers combined on the Trollstigen plateau.', iconName: 'Sun' },
-    { type: 'location', time: '15:40', label: 'Scenic Stop: Ørnevegen (Eagle Road) Viewpoint', desc: 'Sights: Looking straight down at the UNESCO World Heritage Geirangerfjord.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Geirangerfjord_.jpg/960px-Geirangerfjord_.jpg', stopKey: 'geiranger' },
-    { type: 'location', time: '16:30', label: 'Arrival at Valldal Cabins', desc: 'Check in at cabins. Address: Murigjerdet 11, 6210 Sylte, Norway (Valldal).', iconName: 'MapPin', image: '/images/valldal_cabins.jpg', stopKey: 'valldal' },
-    { type: 'prayer', time: '{sunset}', label: '4 & 5. Combined Maghrib & Isha (Jam\' Qasr)', desc: 'Night prayers combined at the Geiranger cabins.', iconName: 'Sunset' },
+    { type: 'prayer', time: '{fajr}', label: 'Fajr Prayer (Dawn)', desc: 'Fajr in Stryn (1 hour before sunrise). Prayed in congregation before departure.', iconName: 'Sunrise' },
+    { type: 'location', time: '12:00', label: 'Dalsnibba Skywalk Viewpoint', desc: 'Breakfast: Hotel breakfast (may change). Sights: Europe\'s highest fjord view from a road (30 mins).', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Dalsnibba.jpg/960px-Dalsnibba.jpg', stopKey: 'dalsnibba' },
+    { type: 'prayer', time: '14:00', label: 'Combined Zuhr & Asr', desc: 'Afternoon prayers combined. Lunch: Bun - kebab (may change).', iconName: 'Sun' },
+    { type: 'location', time: '17:00', label: 'Leave Geiranger Center', desc: 'Departing Geiranger after sightseeing.', iconName: 'MapPin', stopKey: 'geiranger' },
+    { type: 'break', time: '18:00', label: '(Geiranger) Ferje (Hellesylt)', desc: 'Ferry trip (may change / subject to route updates).', iconName: 'Coffee' },
+    { type: 'location', time: '19:00', label: 'Eidsdal Ferje til Valdal Hytte', desc: 'Ferry from Eidsdal to Valldal (45 min). Arrive at Valldal Cabins. Dinner: Pulao + Raita (may change).', iconName: 'MapPin', image: '/images/valldal_cabins.jpg', stopKey: 'valldal' },
+    { type: 'prayer', time: '{sunset}', label: 'Combined Maghrib & Isha', desc: 'Night prayers combined at the Valldal cabins.', iconName: 'Sunset' },
   ],
   sunday: [
-    { type: 'prayer', time: '{fajr}', label: '1. Fajr Prayer (Dawn)', desc: 'Fajr in Geiranger (1 hour before sunrise). Prayed in congregation.', iconName: 'Sunrise' },
-    { type: 'location', time: '09:30', label: 'Depart Geiranger towards Oslo', desc: 'Driving up the Nibbevegen road toward Grotli.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Dalsnibba.jpg/960px-Dalsnibba.jpg', stopKey: 'geiranger' },
-    { type: 'location', time: '10:00', label: 'Scenic Stop: Dalsnibba Skywalk Viewpoint', desc: 'Sights: Europe\'s highest fjord view from a road.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Dalsnibba.jpg/960px-Dalsnibba.jpg', stopKey: 'dalsnibba' },
-    { type: 'break', time: '11:20', label: 'Rest Stop (9 mins)', desc: 'Bathroom break after coming down the mountains.', iconName: 'Coffee' },
-    { type: 'location', time: '12:20', label: 'Scenic Stop: Lom Stave Church & Lom Bakery', desc: 'Sights: Lom Stave Church and famous wood-fired bakery.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Stabkirche-Lom.jpg', stopKey: 'lom' },
-    { type: 'break', time: '14:10', label: 'Rest Stop (9 mins)', desc: 'Short bathroom and stretch break.', iconName: 'Coffee' },
-    { type: 'prayer', time: '14:30', label: '2 & 3. Combined Zuhr & Asr (Jam\' Qasr)', desc: 'Afternoon prayers combined at a quiet grassy spot near Otta.', iconName: 'Sun' },
-    { type: 'break', time: '15:30', label: 'Rest Stop (9 mins)', desc: 'Short break on the E6 highway.', iconName: 'Coffee' },
-    { type: 'location', time: '16:30', label: 'Scenic Stop: Lillehammer Olympic Park', desc: 'Sights: Home of the 1994 Winter Olympics. Lysgårdsbakkene ski jumping towers.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Lysg%C3%A5rd.JPG/960px-Lysg%C3%A5rd.JPG', stopKey: 'lillehammer' },
-    { type: 'location', time: '17:10', label: 'Stop: Lillehammer Moské', desc: 'Sights: The local mosque in Lillehammer (Bankgata 14). Rest and prayer.', iconName: 'MapPin', image: '/images/lillehammer_mosque.jpg', stopKey: 'lillehammer' },
-    { type: 'break', time: '18:15', label: 'Rest Stop (9 mins)', desc: 'Final short break before arriving in Oslo.', iconName: 'Coffee' },
-    { type: 'location', time: '19:00', label: 'Arrival back at Nurulquran', desc: 'Arrived back at Jerikoveien 26, 1067 Oslo. Unload Sprinter minibus, say goodbye.', iconName: 'MapPin', image: '/images/nurulquran.jpg', stopKey: 'oslo' },
-    { type: 'prayer', time: '{sunset}', label: '4 & 5. Combined Maghrib & Isha (Jam\' Qasr)', desc: 'Night prayers combined in Oslo at sunset (calculated dynamically).', iconName: 'Sunset' },
+    { type: 'prayer', time: '{fajr}', label: 'Fajr Prayer (Dawn)', desc: 'Fajr in Valldal (1 hour before sunrise). Prayed in congregation.', iconName: 'Sunrise' },
+    { type: 'location', time: '09:00', label: 'Leave Valdal', desc: 'Breakfast: Bread + Egg (may change). Depart Valldal cabins.', iconName: 'MapPin', image: '/images/valldal_cabins.jpg', stopKey: 'valldal' },
+    { type: 'location', time: '10:00', label: 'Reach Trollstigen', desc: 'Norway\'s most famous tourist road, 11 hairpin turns.', iconName: 'MapPin', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/DSC07845-Panorama.jpg/960px-DSC07845-Panorama.jpg', stopKey: 'trollstigen' },
+    { type: 'location', time: '11:00', label: 'Towards Dombaas', desc: 'Drive towards Dombås (2.5h).', iconName: 'MapPin' },
+    { type: 'prayer', time: '14:00', label: 'Combined Zuhr & Asr', desc: 'Afternoon prayers combined. Lunch: Barbeque + garlic bread (may change).', iconName: 'Sun' },
+    { type: 'location', time: '15:00', label: 'Otta / Beitostølen', desc: 'Passing through Otta (route via Beitostølen may change).', iconName: 'MapPin' },
+    { type: 'location', time: '21:00', label: 'Reached Oslo', desc: 'Arrive back in Oslo. Dinner: Everyone eat on the way (be prepared - may change).', iconName: 'MapPin', image: '/images/nurulquran.jpg', stopKey: 'oslo' },
   ]
 };
 
@@ -506,7 +493,35 @@ export const Itinerary: React.FC = () => {
   const currentElevation = locations[closestStop.key]?.elevation || 0;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 px-4">
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative z-10 pb-20 md:pb-8">
+      {/* Route Map Header Image */}
+      <div 
+        className="w-full glass rounded-3xl overflow-hidden shadow-sm relative group cursor-zoom-in"
+        onClick={() => setModalImage({ src: '/images/geiranger-route-map.jpg', alt: 'Geiranger Route Map' })}
+      >
+        <img 
+          src="/images/geiranger-route-map.jpg" 
+          alt="Geiranger Trip Route Map" 
+          className="w-full h-48 md:h-64 object-cover object-top transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/images/green_fjord_bg.jpg';
+            (e.target as HTMLImageElement).alt = 'Route map pending upload';
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+          <div className="text-white">
+            <h2 className="text-2xl font-bold mb-1 flex items-center gap-2">
+              <MapPin className="w-6 h-6" />
+              {t('itinerary.routeMap', 'Geiranger Trip Route')}
+            </h2>
+            <p className="text-white/80 text-sm flex items-center gap-2">
+              <ZoomIn className="w-4 h-4" />
+              {t('itinerary.clickToZoom', 'Click to enlarge and zoom map')}
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('itinerary.title', 'Itinerary & Schedule')}</h1>
