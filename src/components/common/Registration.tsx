@@ -342,8 +342,11 @@ export const Registration: React.FC = () => {
     "invalid:[&:not(:placeholder-shown)]:bg-pink-50 dark:invalid:[&:not(:placeholder-shown)]:bg-pink-900/30 invalid:[&:not(:placeholder-shown)]:border-pink-500 invalid:[&:not(:placeholder-shown)]:text-pink-600 invalid:[&:not(:placeholder-shown)]:focus:ring-pink-500/20";
 
   return (
-    <div className="flex flex-1 items-center justify-center p-4">
-      <div className="w-full max-w-md glass p-6 sm:p-8 rounded-2xl shadow-xl mt-8 mb-8">
+    <div 
+      className="flex flex-1 items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative before:absolute before:inset-0 before:bg-black/20 dark:before:bg-black/50"
+      style={{ backgroundImage: "url('/images/fjord_bg.jpg')" }}
+    >
+      <div className="w-full max-w-md glass p-6 sm:p-8 rounded-2xl shadow-xl mt-8 mb-8 relative z-10">
         
         {/* RECAPTCHA CONTAINER */}
         <div id="recaptcha-container"></div>
