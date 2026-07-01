@@ -1,8 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
-import { defaultPackingList } from './src/data/packingList';
-import { covenantData } from './src/data/covenant';
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { defaultPackingList } from './src/data/packingList.js';
+import { covenantData } from './src/data/covenant.js';
 import fs from 'fs';
 function loadEnv() {
     try {
@@ -53,11 +53,25 @@ async function main() {
         }
     }
     console.log("Authenticated successfully.");
+
+    console.log("Cleaning up database items as admin...");
+    await deleteDoc(doc(db, 'packing_list', 'd2'));
+    await deleteDoc(doc(db, 'packing_list', 'd3'));
+    await deleteDoc(doc(db, 'packing_list', 'd4'));
+    await deleteDoc(doc(db, 'packing_list', 'h1'));
+    console.log("Database items d2, d3, d4, h1 deleted.");
+
     console.log("\nChecking packing list sync...");
     const packingSnap = await getDocs(collection(db, "packing_list"));
     const existingPacking = {};
     packingSnap.forEach(docSnap => {
-        existingPacking[docSnap.id] = docSnap.data();
+        const data = docSnap.data();
+        const nameEn = data.name?.en?.toLowerCase() || '';
+        if (nameEn.includes('motion sickness bag') || docSnap.id === 'motion_sickness_bags') {
+            deleteDoc(doc(db, 'packing_list', docSnap.id)).then(() => console.log(`Deleted custom item ${docSnap.id}`));
+        } else {
+            existingPacking[docSnap.id] = data;
+        }
     });
     let packingCount = 0;
     for (const item of defaultPackingList) {
