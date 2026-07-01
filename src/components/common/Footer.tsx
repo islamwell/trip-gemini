@@ -32,10 +32,11 @@ export const Footer: React.FC = () => {
     <footer className="w-full mt-auto py-2 flex flex-col items-center justify-center gap-2">
       <button 
         onClick={handleHardRefresh}
-        className="text-xs text-slate-400 font-medium hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer focus:outline-none"
+        className="text-[10px] text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer focus:outline-none flex flex-col items-center gap-0.5"
         title="Hard Refresh & Clear Cache"
       >
-        Ver {pkg.version}
+        <span className="font-semibold">Version {pkg.version}</span>
+        <span className="text-[9px] opacity-75">Updated: {__BUILD_TIME__}</span>
       </button>
       
       <Link 

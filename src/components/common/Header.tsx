@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Palette, Bell, Sun, Moon, Coffee } from 'lucide-react';
+import { Palette, Bell, Sun, Moon, Coffee, Play, Pause, Loader2 } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
@@ -14,6 +14,73 @@ export const Header: React.FC = () => {
 
   const [latestNotif, setLatestNotif] = useState<any>(null);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioInstance, setAudioInstance] = useState<HTMLAudioElement | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState<'idle' | 'loading' | 'cached'>('idle');
+
+  useEffect(() => {
+    // Lazy check cache on mount (delayed slightly so it doesn't block page load)
+    const timer = setTimeout(async () => {
+      if ('caches' in window) {
+        try {
+          const cache = await caches.open('quran-audio-cache');
+          const matched = await cache.match('https://server6.mp3quran.net/abkr/057.mp3');
+          if (matched) {
+            setDownloadProgress('cached');
+            const blob = await matched.blob();
+            setAudioUrl(URL.createObjectURL(blob));
+          }
+        } catch (e) {
+          console.error("Cache check error:", e);
+        }
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handlePlayPause = async () => {
+    if (isPlaying) {
+      if (audioInstance) {
+        audioInstance.pause();
+      }
+      setIsPlaying(false);
+      return;
+    }
+
+    let url = audioUrl;
+    if (!url) {
+      setDownloadProgress('loading');
+      try {
+        const cache = await caches.open('quran-audio-cache');
+        const response = await fetch('https://server6.mp3quran.net/abkr/057.mp3');
+        if (!response.ok) throw new Error("Audio download failed");
+        
+        await cache.put('https://server6.mp3quran.net/abkr/057.mp3', response.clone());
+        const blob = await response.blob();
+        const localUrl = URL.createObjectURL(blob);
+        setAudioUrl(localUrl);
+        url = localUrl;
+        setDownloadProgress('cached');
+      } catch (err) {
+        console.error("Audio caching failed, fallback to online stream:", err);
+        url = 'https://server6.mp3quran.net/abkr/057.mp3';
+        setDownloadProgress('idle');
+      }
+    }
+
+    if (url) {
+      let audio = audioInstance;
+      if (!audio) {
+        audio = new Audio(url);
+        audio.addEventListener('ended', () => setIsPlaying(false));
+        setAudioInstance(audio);
+      }
+      audio.play().catch(err => console.error("Play failed:", err));
+      setIsPlaying(true);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -121,6 +188,23 @@ export const Header: React.FC = () => {
                 )}
               </div>
             )}
+
+            {/* Quranic Audio Player (Surah Al-Hadid) */}
+            <button 
+              onClick={handlePlayPause} 
+              className={`flex items-center justify-center w-10 h-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95 ${
+                isPlaying ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20' : 'text-slate-600 dark:text-slate-300'
+              }`}
+              title={isPlaying ? "Pause Surah Al-Hadid" : "Play Surah Al-Hadid (recited by Abdulbari Al-Thubaity)"}
+            >
+              {downloadProgress === 'loading' ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : isPlaying ? (
+                <Pause className="w-5 h-5" />
+              ) : (
+                <Play className="w-5 h-5" />
+              )}
+            </button>
 
             {/* Theme Cycler */}
             <button 
