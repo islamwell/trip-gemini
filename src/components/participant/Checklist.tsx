@@ -26,9 +26,12 @@ export const Checklist: React.FC = () => {
           existingDocs[docSnap.id] = docSnap.data();
         });
 
-        // Cleanup: travel insurance card (d2) and motion sickness bags
+        // Cleanup: travel insurance card (d2), driver's license (d3), cash & cards (d4), motion sickness pills (h1), and motion sickness bags
         try {
           await deleteDoc(doc(db, 'packing_list', 'd2'));
+          await deleteDoc(doc(db, 'packing_list', 'd3'));
+          await deleteDoc(doc(db, 'packing_list', 'd4'));
+          await deleteDoc(doc(db, 'packing_list', 'h1'));
           querySnapshot.forEach(async (docSnap) => {
             const data = docSnap.data();
             const nameEn = data.name?.en?.toLowerCase() || '';

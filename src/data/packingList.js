@@ -199,26 +199,7 @@ export const defaultPackingList = [
         },
         "imageUrl": "https://images.unsplash.com/photo-1520038410233-7141be7e6f97?auto=format&fit=crop&w=600&q=80"
     },
-    {
-        "id": "h1",
-        "category": "health",
-        "name": {
-            "en": "Motion Sickness Pills",
-            "no": "Reisesyketabletter",
-            "ur": "سفر کی الٹی کی گولیاں"
-        },
-        "desc": {
-            "en": "Crucial for the winding hairpin turns of Trollstigen and Eagle Road.",
-            "no": "Avgjørende for de svingete hårnålssvingene i Trollstigen og Ørnevegen.",
-            "ur": "ٹرولسٹائگن اور ایگل روڈ کے موڑ دار راستوں پر چکر اور الٹی سے بچنے کی دوا (لازمی)۔"
-        },
-        "store": {
-            "en": "Pharmacy (Apotek 1 / Vitusapotek)",
-            "no": "Apotek (Apotek 1 / Vitusapotek)",
-            "ur": "فارمیسی (اپوتیک 1)"
-        },
-        "imageUrl": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80"
-    },
+
     {
         "id": "h2",
         "category": "health",
@@ -560,46 +541,7 @@ export const defaultPackingList = [
         "imageUrl": "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=600&q=80"
     },
 
-    {
-        "id": "d3",
-        "category": "documents",
-        "name": {
-            "en": "Driver's License",
-            "no": "Førerkort",
-            "ur": "ڈرائیونگ لائسنس"
-        },
-        "desc": {
-            "en": "Required if you're one of the designated drivers. Must be valid in Norway.",
-            "no": "Kreves hvis du er en av de utpekte sjåførene. Må være gyldig i Norge.",
-            "ur": "اگر آپ نامزد ڈرائیوروں میں سے ایک ہیں۔ ناروے میں کارآمد ہونا ضروری ہے۔"
-        },
-        "store": {
-            "en": "Already owned",
-            "no": "Allerede eid",
-            "ur": "پہلے سے موجود ہے"
-        },
-        "imageUrl": "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&w=600&q=80"
-    },
-    {
-        "id": "d4",
-        "category": "documents",
-        "name": {
-            "en": "Cash & Cards",
-            "no": "Kontanter og kort",
-            "ur": "کیش اور کارڈز"
-        },
-        "desc": {
-            "en": "Have some Norwegian kroner (NOK) as backup. Not all mountain shops accept cards.",
-            "no": "Ha noen norske kroner (NOK) i bakhånd. Ikke alle fjellbutikker godtar kort.",
-            "ur": "مدد کے لیے کچھ نارویجن کرونر (NOK) نقد پاس رکھیں۔ تمام دکانیں کارڈ قبول نہیں کرتیں۔"
-        },
-        "store": {
-            "en": "Bank / ATM",
-            "no": "Bank / Minibank",
-            "ur": "بینک / اے ٹی ایم"
-        },
-        "imageUrl": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=600&q=80"
-    },
+
     {
         "id": "f1",
         "category": "comfort",
