@@ -419,8 +419,8 @@ export const Itinerary: React.FC = () => {
       const docRef = doc(db, 'itinerary', day);
       try {
         const snap = await getDoc(docRef);
-        if (!snap.exists()) {
-          await setDoc(docRef, { stops: defaultItinerary[day] });
+        if (!snap.exists() || snap.data().version !== 2) {
+          await setDoc(docRef, { stops: defaultItinerary[day], version: 2 });
         }
       } catch (err) {
         console.error(`Error checking/seeding day ${day}:`, err);
