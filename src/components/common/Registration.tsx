@@ -198,17 +198,17 @@ const CountdownTimer = () => {
       )}
       <div dir="ltr" className="flex justify-center mx-auto w-fit gap-4 sm:gap-6">
         {[
-          { key: 'days', label: t('countdown.days', 'Days'), value: timeLeft.days },
-          { key: 'hours', label: t('countdown.hours', 'Hours'), value: timeLeft.hours },
-          { key: 'mins', label: t('countdown.mins', 'Mins'), value: timeLeft.minutes },
-          { key: 'secs', label: t('countdown.secs', 'Secs'), value: timeLeft.seconds },
+          { key: 'days', label: 'Days', value: timeLeft.days },
+          { key: 'hours', label: 'Hours', value: timeLeft.hours },
+          { key: 'mins', label: 'Mins', value: timeLeft.minutes },
+          { key: 'secs', label: 'Secs', value: timeLeft.seconds },
         ].map(item => (
           <div key={item.key} className="flex flex-col items-center min-w-[60px] sm:min-w-[70px]">
             <div className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-b from-red-500 to-orange-500 drop-shadow-sm">
               {item.value.toString().padStart(2, '0')}
             </div>
             {item.label && (
-              <span className="block text-xs font-medium text-slate-400 mt-1 uppercase">
+              <span className="block text-xs font-bold tracking-widest text-slate-400 mt-1 uppercase">
                 {item.label}
               </span>
             )}
@@ -344,9 +344,9 @@ export const Registration: React.FC = () => {
   return (
     <div 
       className="flex flex-1 items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative before:absolute before:inset-0 before:bg-black/20 dark:before:bg-black/50"
-      style={{ backgroundImage: "url('/images/fjord_bg.jpg')" }}
+      style={{ backgroundImage: "url('/images/green_fjord_bg.jpg')" }}
     >
-      <div className="w-full max-w-md glass p-6 sm:p-8 rounded-2xl shadow-xl mt-8 mb-8 relative z-10">
+      <div className="w-full max-w-md glass p-6 sm:p-8 rounded-2xl shadow-2xl mt-8 mb-8 relative z-10 transition-all duration-300">
         
         {/* RECAPTCHA CONTAINER */}
         <div id="recaptcha-container"></div>
@@ -445,7 +445,9 @@ export const Registration: React.FC = () => {
                   {showOptional ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                 </button>
                 
-                {showOptional && (
+                <div 
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${showOptional ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+                >
                   <div className="p-4 space-y-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
                     <div>
                       <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.email', 'Email')}</label>
@@ -457,7 +459,7 @@ export const Registration: React.FC = () => {
                       <p className="text-xs text-slate-400 mt-1">{t('registration.passcodeHint', 'Used to log back in quickly on a new device.')}</p>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
 
               <button type="submit" disabled={loading} className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50 mt-4 shadow-md shadow-primary-500/20 active:scale-95">
