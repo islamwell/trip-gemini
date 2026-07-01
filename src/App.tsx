@@ -51,7 +51,7 @@ const AuthenticatedLayout = ({ children, hideNav = false }: { children: React.Re
       <Header />
       <div className="flex flex-1 max-w-7xl mx-auto w-full">
         {!hideNav && <Navigation />}
-        <main className={`flex-1 p-4 lg:p-8 pb-32 lg:pb-8 flex flex-col ${hideNav ? 'w-full' : ''}`}>
+        <main className={`flex-1 p-4 lg:p-8 pb-32 md:pb-8 flex flex-col ${hideNav ? 'w-full' : ''}`}>
           {children}
           <Footer />
         </main>
