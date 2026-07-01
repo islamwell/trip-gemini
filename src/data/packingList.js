@@ -559,26 +559,7 @@ export const defaultPackingList = [
         },
         "imageUrl": "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=600&q=80"
     },
-    {
-        "id": "d2",
-        "category": "documents",
-        "name": {
-            "en": "Travel Insurance Card",
-            "no": "Reiseforsikringskort",
-            "ur": "ٹریول انشورنس کارڈ"
-        },
-        "desc": {
-            "en": "European Health Insurance Card (EHIC) or travel insurance document. Essential for medical coverage.",
-            "no": "Europeisk helsetrygdkort (helsetrygdkort) eller reiseforsikringsbevis. Viktig for medisinsk dekning.",
-            "ur": "یورپی ہیلتھ انشورنس کارڈ (EHIC) یا ٹریول انشورنس دستاویز۔ طبی کوریج کے لیے ضروری۔"
-        },
-        "store": {
-            "en": "Insurance provider / Bank",
-            "no": "Forsikringsselskap / Bank",
-            "ur": "انشورنس کمپنی / بینک"
-        },
-        "imageUrl": "https://images.unsplash.com/photo-1589758438368-0ad531db3366?auto=format&fit=crop&w=600&q=80"
-    },
+
     {
         "id": "d3",
         "category": "documents",

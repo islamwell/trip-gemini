@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { CheckSquare, Square, ShoppingBag, Info } from 'lucide-react';
 import { db } from '../../services/firebase';
-import { collection, doc, setDoc, query, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, doc, setDoc, query, onSnapshot, getDocs, deleteDoc } from 'firebase/firestore';
 import { defaultPackingList } from '../../data/packingList';
 import type { PackingItem } from '../../data/packingList';
 
@@ -25,6 +25,20 @@ export const Checklist: React.FC = () => {
         querySnapshot.forEach(docSnap => {
           existingDocs[docSnap.id] = docSnap.data();
         });
+
+        // Cleanup: travel insurance card (d2) and motion sickness bags
+        try {
+          await deleteDoc(doc(db, 'packing_list', 'd2'));
+          querySnapshot.forEach(async (docSnap) => {
+            const data = docSnap.data();
+            const nameEn = data.name?.en?.toLowerCase() || '';
+            if (nameEn.includes('motion sickness bag') || docSnap.id === 'motion_sickness_bags') {
+              await deleteDoc(doc(db, 'packing_list', docSnap.id));
+            }
+          });
+        } catch (cleanupErr) {
+          console.error("Cleanup error in Firestore:", cleanupErr);
+        }
 
         let writePromises = [];
         for (const item of defaultPackingList) {
