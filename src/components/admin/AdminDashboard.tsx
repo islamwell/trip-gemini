@@ -10,7 +10,8 @@ import { Finances } from '../participant/Finances';
 interface ParticipantProfile {
   id: string;
   name: string;
-  email: string;
+  email?: string;
+  phone: string;
   role: string;
   hasSignedRules?: boolean;
   duty?: string;

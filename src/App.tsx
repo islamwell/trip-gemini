@@ -79,7 +79,6 @@ const Itinerary = React.lazy(() => import('./components/participant/Itinerary').
 const Complaints = React.lazy(() => import('./components/participant/Complaints').then(m => ({ default: m.Complaints })));
 const Welcome = React.lazy(() => import('./components/participant/Welcome').then(m => ({ default: m.Welcome })));
 const Checklist = React.lazy(() => import('./components/participant/Checklist').then(m => ({ default: m.Checklist })));
-const Finances = React.lazy(() => import('./components/participant/Finances').then(m => ({ default: m.Finances })));
 const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 const AdminLogin = React.lazy(() => import('./components/admin/AdminLogin').then(m => ({ default: m.AdminLogin })));
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -149,14 +148,6 @@ function AppContent() {
           <ProtectedRoute>
             <AuthenticatedLayout>
               <Checklist />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        } />
-
-        <Route path="/finances" element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Finances />
             </AuthenticatedLayout>
           </ProtectedRoute>
         } />

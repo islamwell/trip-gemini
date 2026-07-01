@@ -17,6 +17,7 @@ interface ParticipantProfile {
   role: string;
   hasSignedRules?: boolean;
   duty?: string;
+  favoriteFoods?: string;
 }
 
 interface NotificationMsg {
@@ -45,6 +46,7 @@ export const Dashboard: React.FC = () => {
   const [editSalutation, setEditSalutation] = useState('Brother');
   const [editFirstName, setEditFirstName] = useState('');
   const [editLastName, setEditLastName] = useState('');
+  const [editFavoriteFoods, setEditFavoriteFoods] = useState('');
   const [savingName, setSavingName] = useState(false);
 
   const parseName = (fullName: string | undefined) => {
@@ -76,6 +78,7 @@ export const Dashboard: React.FC = () => {
     setEditSalutation(parsed.salutation);
     setEditFirstName(parsed.firstName);
     setEditLastName(parsed.lastName);
+    setEditFavoriteFoods(profile?.favoriteFoods || '');
     setIsEditingName(true);
   };
 
@@ -90,7 +93,8 @@ export const Dashboard: React.FC = () => {
     try {
       const newFullName = `${editSalutation ? editSalutation + ' ' : ''}${editFirstName.trim()} ${editLastName.trim()}`.trim();
       await setDoc(doc(db, 'participants', user.uid), {
-        name: newFullName
+        name: newFullName,
+        favoriteFoods: editFavoriteFoods.trim()
       }, { merge: true });
       showSuccess(t('dashboard.name_updated', 'Name updated successfully!'));
       setIsEditingName(false);
@@ -744,6 +748,20 @@ export const Dashboard: React.FC = () => {
                   onChange={(e) => setEditLastName(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
                   placeholder="e.g. Imran"
+                />
+              </div>
+
+              {/* Favorite Foods Input */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t('dashboard.favorite_foods', 'Favorite Foods & Snacks')}
+                </label>
+                <input
+                  type="text"
+                  value={editFavoriteFoods}
+                  onChange={(e) => setEditFavoriteFoods(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  placeholder="e.g. Pizza, Chips, Chocolate"
                 />
               </div>
 

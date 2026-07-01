@@ -4,7 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { RecaptchaVerifier } from 'firebase/auth';
 import type { ConfirmationResult } from 'firebase/auth';
 import { auth } from '../../services/firebase';
-import { HelpCircle, X } from 'lucide-react';
+import { HelpCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface DutyOption {
   dbValue: string;
@@ -164,7 +164,7 @@ const EXTENDED_DUTY_OPTIONS: DutyGroup[] = [
 
 const CountdownTimer = () => {
   const { t } = useLanguage();
-  const targetDate = new Date('2026-07-02T14:00:00+02:00').getTime(); // July 2, 2pm
+  const targetDate = new Date('2026-07-02T11:00:00+02:00').getTime(); // July 2, 11am
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
@@ -233,7 +233,10 @@ export const Registration: React.FC = () => {
   const [email, setEmail] = useState('');
   const [passcode, setPasscode] = useState('');
   const [duty, setDuty] = useState('None - but I will make Dua');
-  const [favoriteFoods, setFavoriteFoods] = useState('');
+  const [food1, setFood1] = useState('');
+  const [food2, setFood2] = useState('');
+  const [food3, setFood3] = useState('');
+  const [showOptional, setShowOptional] = useState(false);
   const [smsCode, setSmsCode] = useState('');
   
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -277,7 +280,7 @@ export const Registration: React.FC = () => {
         name: `${salutation} ${firstName} ${lastName}`.trim(),
         phone,
         duty,
-        favoriteFoods,
+        favoriteFoods: [food1.trim(), food2.trim(), food3.trim()].filter(Boolean).join(', '),
       });
     } catch (err: any) {
       setMessage(err.message || t('registration.failed', 'Registration failed'));
@@ -407,27 +410,51 @@ export const Registration: React.FC = () => {
                 </div>
               </div>
 
-              {/* Phone & Email Row */}
+              {/* Phone Row */}
               <div className="flex flex-col sm:flex-row gap-3">
-                <div className="w-full sm:w-1/2">
+                <div className="w-full">
                   <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.phone', 'Phone')}</label>
                   <input required type="tel" pattern="^\+.*" title="Must start with country code (e.g., +47)" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder="+47 123 45 678" />
                 </div>
-                <div className="w-full sm:w-1/2">
-                  <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.email', 'Email (Opt)')}</label>
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`${inputClass} px-3 py-2 text-sm`} placeholder="you@mail.com" />
+              </div>
+              {/* Food Row */}
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  {t('registration.favoriteFoods', '3 Favorite Foods/Snacks (Required)')}
+                </label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input required type="text" value={food1} onChange={(e) => setFood1(e.target.value)} className={`${inputClass} px-3 py-2 text-sm w-full sm:w-1/3`} placeholder="e.g., Dates" />
+                  <input required type="text" value={food2} onChange={(e) => setFood2(e.target.value)} className={`${inputClass} px-3 py-2 text-sm w-full sm:w-1/3`} placeholder="e.g., Chips" />
+                  <input required type="text" value={food3} onChange={(e) => setFood3(e.target.value)} className={`${inputClass} px-3 py-2 text-sm w-full sm:w-1/3`} placeholder="e.g., Apples" />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.favoriteFoods', '3 Favorite Foods/Snacks')}</label>
-                <input type="text" value={favoriteFoods} onChange={(e) => setFavoriteFoods(e.target.value)} className={`${inputClass} px-3 py-2.5`} placeholder={t('registration.favoriteFoodsPlaceholder', 'e.g., Dates, Chips, Apples')} />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.passcode', 'Passcode (Opt 4-12 digits)')}</label>
-                <input type="password" minLength={4} maxLength={12} value={passcode} onChange={(e) => setPasscode(e.target.value)} className={`${inputClass} px-3 py-2.5`} placeholder="1234" />
-                <p className="text-xs text-slate-400 mt-1">{t('registration.passcodeHint', 'Used to log back in quickly on a new device.')}</p>
+              {/* Optional Accordion */}
+              <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setShowOptional(!showOptional)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                    {t('registration.optionalSection', 'Optional Information')}
+                  </span>
+                  {showOptional ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </button>
+                
+                {showOptional && (
+                  <div className="p-4 space-y-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.email', 'Email')}</label>
+                      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`${inputClass} px-3 py-2 text-sm w-full`} placeholder="you@mail.com" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">{t('registration.passcode', 'Passcode (4-12 digits)')}</label>
+                      <input type="password" minLength={4} maxLength={12} value={passcode} onChange={(e) => setPasscode(e.target.value)} className={`${inputClass} px-3 py-2.5 w-full`} placeholder="1234" />
+                      <p className="text-xs text-slate-400 mt-1">{t('registration.passcodeHint', 'Used to log back in quickly on a new device.')}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button type="submit" disabled={loading} className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50 mt-4 shadow-md shadow-primary-500/20 active:scale-95">

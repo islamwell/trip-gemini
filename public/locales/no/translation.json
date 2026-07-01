@@ -336,7 +336,7 @@
     "errorMaxLength": "Kan ikke overstige 500 tegn"
   },
   "countdown": {
-    "title": "Registreringsfrist",
+    "title": "",
     "days": "Dager",
     "hours": "Timer",
     "mins": "Min",

@@ -336,7 +336,7 @@
     "errorMaxLength": "Cannot exceed 500 characters"
   },
   "countdown": {
-    "title": "Registration Deadline",
+    "title": "",
     "days": "Days",
     "hours": "Hours",
     "mins": "Mins",
